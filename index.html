@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1917;
+  --paper:#faf9f6;
+  --warm:#f5f0e8;
+  --warm2:#ede8dc;
+  --accent:#b85c28;
+  --accent2:#1d5fa8;
+  --accent3:#1e7a4e;
+  --muted:#7a7570;
+  --border:#ddd8ce;
+  --hero-bg:#16120e;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  line-height:1.7;
+  font-size:17px;
+}
+a{color:inherit}
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:var(--hero-bg);
+  color:#f8f4ee;
+  min-height:48vh;
+  display:grid;
+  align-items:center;
+}
+.hero-bg{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 50%,#1e2a3a 0%,transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 30%,#2a1a0e 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 80%,#1a1a2e 0%,transparent 50%);
+}
+.hero-grid{
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 40%,transparent 100%);
+}
+.container{
+  position:relative;
+  z-index:2;
+  width:min(1080px,100%);
+  margin:0 auto;
+  padding:72px 44px;
+}
+.eyebrow{
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:#e8945a;
+  margin-bottom:18px;
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(42px,7vw,84px);
+  font-weight:300;
+  line-height:1.05;
+  letter-spacing:-.02em;
+  max-width:760px;
+}
+h1 em{
+  color:#e8945a;
+  font-style:italic;
+}
+.intro{
+  max-width:560px;
+  margin-top:22px;
+  color:rgba(248,244,238,.58);
+  font-size:16px;
+}
+.page-list{
+  background:var(--paper);
+  border-top:1px solid var(--border);
+}
+.section-head{
+  display:grid;
+  grid-template-columns:80px 1fr;
+  gap:28px;
+  align-items:start;
+  padding-bottom:38px;
+  border-bottom:1px solid var(--border);
+}
+.section-number{
+  color:var(--accent);
+  font-family:'Cormorant Garamond',serif;
+  font-size:72px;
+  font-weight:300;
+  line-height:1;
+  letter-spacing:-.04em;
+  opacity:.15;
+}
+.section-label{
+  color:var(--accent);
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(30px,4vw,50px);
+  font-weight:300;
+  line-height:1.1;
+  letter-spacing:-.02em;
+}
+.cards{
+  display:grid;
+  gap:0;
+}
+.page-card{
+  display:grid;
+  grid-template-columns:56px 1fr auto;
+  gap:20px;
+  align-items:center;
+  padding:26px 0;
+  color:var(--ink);
+  text-decoration:none;
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.page-card:hover{
+  background:rgba(0,0,0,.025);
+  margin:0 -44px;
+  padding-left:44px;
+  padding-right:44px;
+}
+.page-id{
+  color:var(--accent);
+  font-family:'Cormorant Garamond',serif;
+  font-size:34px;
+  font-weight:300;
+  line-height:1;
+}
+.page-name{
+  display:block;
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;
+  font-weight:400;
+  line-height:1.2;
+}
+.page-sub{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.page-arrow{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:18px;
+  transition:background .2s,border-color .2s,color .2s,transform .2s;
+}
+.page-card:hover .page-arrow{
+  transform:translateX(3px);
+  background:var(--ink);
+  border-color:var(--ink);
+  color:var(--paper);
+}
+.footer{
+  border-top:1px solid var(--border);
+  color:var(--muted);
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:28px 44px;
+  text-align:center;
+}
+@media (max-width:680px){
+  .container{padding:56px 24px}
+  .section-head{grid-template-columns:1fr;gap:8px}
+  .section-number{font-size:56px}
+  .page-card{grid-template-columns:42px 1fr 28px;gap:14px}
+  .page-card:hover{margin:0 -24px;padding-left:24px;padding-right:24px}
+  .page-name{font-size:21px}
+  .footer{padding:24px}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="eyebrow">Interactive explainers</div>
+    <h1>Learning pages<br><em>in one place</em></h1>
+    <p class="intro">A simple index for the explainers in this folder, styled to sit naturally beside the current page.</p>
+  </div>
+</header>
+
+<main class="page-list">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-number">01</div>
+      <div>
+        <div class="section-label">Pages</div>
+        <h2 class="section-title">Available explainers</h2>
+      </div>
+    </div>
+
+    <nav class="cards" aria-label="Available pages">
+      <a class="page-card" href="how_llms_work.html">
+        <span class="page-id">A</span>
+        <span>
+          <span class="page-name">How an LLM Answers Your Question</span>
+          <span class="page-sub">Pipeline · Tokens · Attention · Alignment</span>
+        </span>
+        <span class="page-arrow" aria-hidden="true">›</span>
+      </a>
+    </nav>
+  </div>
+</main>
+
+<footer class="footer">Add new HTML pages here as the collection grows</footer>
+</body>
+</html>
