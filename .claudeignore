@@ -1,0 +1,39 @@
+# Version control
+.git/
+
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+out/
+.next/
+.vite/
+coverage/
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Logs, caches, and temporary files
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
