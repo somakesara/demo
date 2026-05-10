@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harness Engineering — Principles and Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191714;
+  --paper:#fbfaf7;
+  --warm:#f4efe6;
+  --warm2:#ebe4d8;
+  --line:#ded6c8;
+  --muted:#766f64;
+  --muted2:#9a9184;
+  --clay:#b65f34;
+  --blue:#245c8c;
+  --green:#26724c;
+  --plum:#6a3f83;
+  --gold:#a77a25;
+  --red:#9e3830;
+  --dark:#15120f;
+  --code:#f0ebe2;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"DM Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;font-weight:300;line-height:1.72;overflow-x:hidden}
+a{color:inherit}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--warm2);border:1px solid var(--line);border-radius:5px;padding:.08rem .32rem}
+pre{margin:0;white-space:pre;overflow-x:auto}
+
+/* ── HERO ── */
+.hero{min-height:92vh;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto;color:#fbf5eb;background:radial-gradient(ellipse 60% 55% at 18% 50%,rgba(38,114,76,.28),transparent 60%),radial-gradient(ellipse 50% 65% at 82% 20%,rgba(167,122,37,.32),transparent 58%),linear-gradient(135deg,#0f130f 0%,#0f1218 54%,#141410 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,black 35%,transparent 100%)}
+.hero-inner{position:relative;z-index:2;width:min(1160px,100%);margin:0 auto;padding:92px 44px 48px;display:grid;align-content:center}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#82d9a8;margin-bottom:18px}
+h1,h2,h3{font-family:var(--serif);font-weight:300;line-height:1.06;letter-spacing:0;margin:0}
+h1{max-width:850px;font-size:clamp(44px,8vw,96px)}
+h1 em{color:#82d9a8;font-style:italic}
+.hero-sub{max-width:660px;margin-top:24px;color:rgba(251,245,235,.66);font-size:clamp(16px,2vw,20px)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border:1px solid rgba(251,245,235,.22);border-radius:8px;color:#fbf5eb;background:rgba(251,245,235,.07);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.btn.primary{background:#82d9a8;color:#0f130f;border-color:#82d9a8}
+.scroll-hint{position:relative;z-index:2;padding:0 44px 34px;text-align:center;color:rgba(251,245,235,.34);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── TYPING ANIMATION ── */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.cursor{display:inline-block;width:2px;height:1em;background:#82d9a8;vertical-align:text-bottom;animation:blink 1s step-end infinite;margin-left:2px}
+
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;background:rgba(251,250,247,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{flex:0 0 auto;padding:15px 18px;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.topnav a:hover,.topnav a.active{color:var(--green);border-color:var(--green)}
+
+/* ── SECTION ── */
+.section{border-bottom:1px solid var(--line)}
+.section.collapsed .container>:not(.section-head){display:none}
+.section-head{cursor:pointer;position:relative;padding-right:54px;display:grid;grid-template-columns:84px 1fr;gap:28px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.section-head:focus-within{outline:2px solid rgba(38,114,76,.55);outline-offset:6px}
+.section-head:hover .section-title{color:var(--green)}
+.section-toggle{cursor:pointer;padding:0;position:absolute;right:0;top:8px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--paper);font-family:var(--mono);font-size:18px;transition:background .2s,color .2s,transform .2s,border-color .2s}
+.section:not(.collapsed) .section-toggle{transform:rotate(45deg);background:var(--dark);color:var(--paper);border-color:var(--dark)}
+.section.collapsed .section-head{padding-bottom:0;border-bottom:0}
+.section.collapsed .container{padding-top:34px;padding-bottom:34px}
+.section-status{margin-top:12px;color:var(--muted2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ── LAYOUT ── */
+.container{width:min(1120px,100%);margin:0 auto;padding:72px 44px}
+.section-no{color:var(--green);opacity:.16;font-family:var(--serif);font-size:78px;line-height:1}
+.section-label{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:8px 0}
+.section-title{font-size:clamp(34px,4.4vw,56px);max-width:880px}
+.lead{max-width:760px;color:#4c453d;font-size:18px;margin:18px 0 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:34px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+
+/* ── PANELS ── */
+.panel{border:1px solid var(--line);background:var(--warm);border-radius:8px;padding:22px}
+.panel.white{background:#fffdfa}
+.panel.dark{background:#1b1713;color:#fbf5eb;border-color:#302720}
+.panel.blue{background:#eaf0f7;border-color:rgba(36,92,140,.2)}
+.panel h3{font-size:27px;margin-bottom:10px}
+.panel p{margin:0;color:#50483f}
+.panel.dark p{color:rgba(251,245,235,.66)}
+.panel.blue p{color:#1e3a52}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;margin-bottom:12px;color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.tag.blue{color:var(--blue)}
+.tag.clay{color:var(--clay)}
+.tag.gold{color:var(--gold)}
+.tag.red{color:var(--red)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:26px;border-left:3px solid var(--green);background:#edf4ee;padding:16px 18px;border-radius:8px;color:#253d2d}
+.warn{border-left-color:var(--red);background:#f7ece9;color:#4a2b28}
+.info{border-left-color:var(--blue);background:#eaf0f7;color:#1e3a52}
+
+/* ── CODEBLOCK ── */
+pre.codeblock,div.codeblock{margin:0;border:0;border-radius:0;padding:18px 22px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;color:#2a2520;background:var(--code);white-space:pre;word-break:normal;overflow-wrap:normal}
+.codeblock .dim{color:#918779}
+.codeblock .key{color:#8f3d16;font-weight:400}
+.codeblock .ok{color:#1f7045}
+.codeblock .blue{color:#1f5d8d}
+.codeblock .accent{color:#a07020}
+.codeblock .red{color:#9e3830}
+.codeblock .str{color:#2d6b2d}
+.codeblock .cmt{color:#9a9184;font-style:italic}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;margin-top:28px}
+table{width:100%;border-collapse:collapse;min-width:600px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:14px 12px;text-align:left;vertical-align:top}
+th{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+td{color:#423c35}
+
+/* ── FRAMEWORK CARD ── */
+.framework-cards{display:grid;gap:18px;margin-top:28px}
+.framework-card{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fffdfa}
+.fc-head{padding:18px 20px;background:var(--warm);border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.fc-title{font-family:var(--serif);font-size:24px;line-height:1.1}
+.fc-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);padding:4px 10px;border-radius:12px;border:1px solid rgba(38,114,76,.4);background:#edf4ee;white-space:nowrap}
+.fc-body{padding:18px 20px;display:grid;gap:14px}
+.fc-body h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin:0 0 6px}
+.fc-body p{font-size:13.5px;color:#433d36;line-height:1.65;margin:0}
+
+/* ── SCENE ── */
+.scene{margin-top:0;border-left:3px solid var(--green);padding:18px 22px;background:linear-gradient(to right,#f0f7f2,#fffdfa);border-radius:0 8px 8px 0;font-size:16px;color:#3a3028;line-height:1.8}
+.scene+.scene{margin-top:14px}
+.scene-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+
+/* ── PRINCIPLE LIST ── */
+.principle-list{margin-top:28px;display:grid;gap:16px}
+.principle{border:1px solid var(--line);border-radius:8px;padding:20px;background:#fffdfa}
+.principle h4{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink)}
+.principle p{margin:0;color:#514a42;font-size:14px;line-height:1.7}
+
+/* ── FOOTER ── */
+.footer{padding:28px 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+@media(max-width:880px){
+  .hero-inner{padding:76px 28px 28px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .fc-head{grid-template-columns:1fr}
+  .topnav a{padding:13px 14px}
+}
+@media(max-width:680px){
+  body{font-size:16px}
+  .container{padding:54px 24px}
+  .section-head{grid-template-columns:1fr;gap:8px}
+  .section-no{font-size:58px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Engineering Discipline</div>
+    <h1>Harness <em>every AI system</em> with the same frameworks<br>you use for software.</h1>
+    <p class="hero-sub">AI systems are not special. They require the same architecture, security, governance, and operational discipline as any production system. This guide covers harness engineering—applying proven systems discipline to AI-enabled applications without inventing new frameworks.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#what">What is harness engineering</a>
+      <a class="btn" href="#dimensions">Five dimensions</a>
+      <a class="btn" href="#frameworks">Frameworks</a>
+      <a class="btn" href="#maturity">Maturity model</a>
+      <a class="btn" href="#reference">Reference</a>
+    </div>
+  </div>
+  <div class="scroll-hint">Each section is self-contained — expand any one to start</div>
+</header>
+
+<nav class="topnav" aria-label="Page sections">
+  <a href="#what">01 What is harness engineering</a>
+  <a href="#thesis">02 Core thesis</a>
+  <a href="#dimensions">03 Five dimensions</a>
+  <a href="#frameworks">04 Operational frameworks</a>
+  <a href="#maturity">05 Maturity model</a>
+  <a href="#organization">06 Organization</a>
+  <a href="#reference">07 Reference</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════ 01 WHAT ═══ -->
+<section class="section" id="what">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">01</div>
+  <div>
+    <div class="section-label">What is harness engineering</div>
+    <h2 class="section-title">Harness engineering is the discipline of converting working AI prototypes into production systems using established software engineering practices.</h2>
+    <p class="lead">Harness engineering is not AI engineering. It is not machine learning operations. It is the application of systems architecture, security design, operational discipline, and financial discipline to AI-enabled applications. The difference is the scope: harness engineering treats the entire AI system—the model, the data pipeline, the inference layer, the business logic, the monitoring—as a single production service that must be reliable, secure, governed, and cost-controlled.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">The problem harness engineering solves</div>
+  A team at a financial services company built a credit-risk model. In testing, accuracy was 89%. In production after two weeks, accuracy degraded to 82%. The model was fine—the data distribution changed. No one was monitoring it. No one had a process for detecting drift or triggering retraining. The production system had no circuit breaker for confidence scores below a threshold. Fallback was missing. That's not a model problem. That's a systems design problem. It's the difference between "we have a model" and "we have a production AI system."
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag green">Harness engineering approach</span>
+    <h3>Treat AI as production systems</h3>
+    <p>Define failure modes upfront. Design fallback paths. Monitor continuously for degradation. Plan for retraining before you deploy. Govern decisions the same way you govern database access. Cost is treated as a first-class constraint from day one, not an afterthought. The model is one component in a larger engineered system.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag red">Common alternative</span>
+    <h3>Treat AI as experimental</h3>
+    <p>Deploy the model. Monitor if you remember. Retrain when things break. No circuit breakers. No fallback paths. No cost controls. Governance is a legal checkbox. The system assumes the model will work correctly—because it works correctly in testing. That assumption breaks within weeks or months.</p>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Why the term "harness"?</strong> A harness is what connects a working component into a larger system. A horse's harness doesn't train the horse. It distributes load, prevents injury, and ensures the horse's strength is applied to useful work. A model is the horse. The harness is everything else: the data pipeline that feeds it, the inference layer that executes it, the fallback logic that handles failures, the monitoring that detects degradation, the governance that controls who can retrain it. Harness engineering is the discipline of designing and operating that harness at production scale.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 02 THESIS ═══ -->
+<section class="section" id="thesis">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">02</div>
+  <div>
+    <div class="section-label">The core thesis</div>
+    <h2 class="section-title">AI systems require no revolutionary new frameworks. Apply existing production discipline to AI.</h2>
+    <p class="lead">Organizations that treat AI as "special" and invent new methodologies will be outexecuted by those that treat it as another production problem. The frameworks you use for microservices, databases, and infrastructure are sufficient. The degree of scrutiny is higher in some dimensions (monitoring, governance, quality assurance) but the kind of discipline is the same.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Principle 1: Uncertainty is not special</h4>
+    <p>AI introduces probabilistic outcomes. But uncertainty exists in all systems: network failures, data corruption, edge cases. You've managed uncertainty in production for decades. Model accuracy degradation is data degradation. Treat it like any other quality regression.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Principle 2: Quality is a spectrum</h4>
+    <p>Binary quality (correct/incorrect) doesn't apply to probabilistic systems. A model that's 85% accurate is production-ready if the remaining 15% are routed to humans, auditable, and the cost of human review is acceptable. This is a business decision, not a technical limitation. It's engineered. It's governed. It's not an excuse for poor model quality.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Principle 3: Architecture is not negotiable</h4>
+    <p>Every production AI system requires: a data validation layer (input quality), an inference layer (execution), a business logic layer (thresholds, guardrails), an integration layer (connection to downstream systems), an observability layer (logging, monitoring, auditing), a feedback layer (ground truth collection). You don't invent these. You design them into the system upfront.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Principle 4: Cost is as critical as quality</h4>
+    <p>Traditional software: cost is infrastructure + development. AI adds inference cost per prediction. If your model costs $0.10 per inference and you process 1M predictions per day, that's $100K per month in inference cost alone. This is not managed separately. It's part of unit economics from day one.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Principle 5: Governance is upstream, not downstream</h4>
+    <p>Decision governance—who approves which model, who can trigger retraining, who audits bias—is part of the architecture design, not an afterthought. This is no different from access control to a database. It's not added in month six. It's designed in month zero.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 03 DIMENSIONS ═══ -->
+<section class="section" id="dimensions">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">03</div>
+  <div>
+    <div class="section-label">Five dimensions of harness engineering</div>
+    <h2 class="section-title">Every production AI system has five dimensions that must be engineered independently, then aligned.</h2>
+    <p class="lead">These dimensions are not novel. They exist in every complex system. The difference is the specific concerns unique to AI: data dependency, probabilistic degradation, model versioning, inference cost scaling. Each dimension has a framework. Each framework has success criteria.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="framework-cards">
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Dimension 1: Architecture</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">The system design that connects all components.</p>
+      </div>
+      <span class="fc-label">Structural</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Standard requirements (any system)</h4>
+        <p>Data validation and preprocessing. Execution engine. Integration to downstream systems. Logging and audit trail. Failure handling.</p>
+      </div>
+      <div>
+        <h4>AI-specific requirements</h4>
+        <p>Where does the model live (on-premise, cloud, edge)? How are inference failures handled (fallback, queue, circuit breaker)? Latency vs cost tradeoff (batch vs real-time). Model versioning and rollback strategy. Data flow is tracked from input to decision.</p>
+      </div>
+      <div>
+        <h4>Success criteria</h4>
+        <p>System handles inference failures gracefully. Data flow is validated at each boundary. Model versions are immutable and tracked. Fallback paths are tested and documented.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Dimension 2: Security</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Data protection and access control.</p>
+      </div>
+      <span class="fc-label">Control</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Standard requirements (any system)</h4>
+        <p>Encryption in transit and at rest. Access control and authentication. Input validation. Audit logging. Rate limiting.</p>
+      </div>
+      <div>
+        <h4>AI-specific requirements</h4>
+        <p>Training data provenance and lineage. PII detection in data pipelines. Model weight protection (prevent theft). Model integrity verification (detect tampering). Inference cost controls (prevent API abuse).</p>
+      </div>
+      <div>
+        <h4>Success criteria</h4>
+        <p>Training data is traceable to source. PII is masked before model access. Model files are signed and versioned. Every inference decision is logged and auditable.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Dimension 3: Governance</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Decision control and audit mechanisms.</p>
+      </div>
+      <span class="fc-label">Policy</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Standard requirements (any system)</h4>
+        <p>Who makes decisions? Who approves decisions? Can decisions be overridden? Are decisions auditable?</p>
+      </div>
+      <div>
+        <h4>AI-specific requirements</h4>
+        <p>Model approval gates before production. Data governance (training data quality, provenance). Decision logging with model version, confidence, and rationale. Retraining gates (when is it triggered). Bias auditing (does the model treat all groups fairly).</p>
+      </div>
+      <div>
+        <h4>Success criteria</h4>
+        <p>No model reaches production without a gate. Every decision is logged with metadata. Retraining is triggered by policy, not manual request. Bias audits are run quarterly and documented.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Dimension 4: Quality</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Probabilistic correctness and reliability.</p>
+      </div>
+      <span class="fc-label">Assurance</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Standard requirements (any system)</h4>
+        <p>Does it do what it's supposed to do (functional correctness)? Does it do it fast enough (performance)? Does it do it reliably (uptime)?</p>
+      </div>
+      <div>
+        <h4>AI-specific requirements</h4>
+        <p>Accuracy is measured across all categories and groups. Model drift is detected automatically. Failures are explainable or routed to humans. Fallback paths exist for all failure modes. Quality degrades gracefully (not catastrophically).</p>
+      </div>
+      <div>
+        <h4>Success criteria</h4>
+        <p>Accuracy baselines are set and monitored. Drift is detected within hours, not days. All model predictions above a confidence threshold are served; below threshold, requests are routed to humans.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Dimension 5: Economics</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Cost structure and financial discipline.</p>
+      </div>
+      <span class="fc-label">Financial</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Standard requirements (any system)</h4>
+        <p>Development cost + infrastructure cost. Scaling cost grows with load. Budget allocation and tracking.</p>
+      </div>
+      <div>
+        <h4>AI-specific requirements</h4>
+        <p>Inference cost per prediction (variable, usage-based). Retraining cost (full cost per cycle, not just GPU time). Cost of human review (if quality is probabilistic, you may need humans in the loop). Total cost of ownership includes model development, inference, monitoring, and human oversight.</p>
+      </div>
+      <div>
+        <h4>Success criteria</h4>
+        <p>Cost per inference is tracked and known. Inference cost is included in unit economics from the start. Cheaper alternative (human labor, older automation) cost is included in the business case.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="callout warn" style="margin-top:28px">
+  <strong>Misalignment is fatal:</strong> A good model + poor architecture = system failure. A good architecture + poor governance = compliance failure. A good model + no cost controls = financial failure. Success requires alignment across all five dimensions. "Good enough" in one dimension doesn't compensate for weakness in another.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 04 FRAMEWORKS ═══ -->
+<section class="section" id="frameworks">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">04</div>
+  <div>
+    <div class="section-label">Operational frameworks by dimension</div>
+    <h2 class="section-title">Concrete patterns and decision frameworks for each dimension.</h2>
+    <p class="lead">Each dimension requires explicit design decisions. These frameworks provide checklists, decision gates, and success criteria. They are not AI-specific. They are applied to AI systems at higher scrutiny than traditional systems.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Design decision</th>
+        <th>AI-specific considerations</th>
+        <th>Success criteria</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="3"><strong>Architecture</strong></td>
+        <td>Model placement</td>
+        <td>On-premise (latency), cloud API (cost/convenience), edge (privacy/latency)</td>
+        <td>Trade-off chosen and documented. Cost model matches choice.</td>
+      </tr>
+      <tr>
+        <td>Inference mode</td>
+        <td>Real-time (latency constraint), batch (cost optimization), streaming (continuous update)</td>
+        <td>Chosen based on SLA. Fallback mechanism exists if mode fails.</td>
+      </tr>
+      <tr>
+        <td>Confidence thresholds</td>
+        <td>Below threshold: route to humans. Above threshold: automated decision. Threshold tuned for acceptable error rate.</td>
+        <td>Threshold documented. Human SLA defined. Cost of human review calculated.</td>
+      </tr>
+      <tr>
+        <td rowspan="3"><strong>Security</strong></td>
+        <td>Data classification</td>
+        <td>PII, sensitive, public. Training data classified upfront. Masking rules defined.</td>
+        <td>No unmasked PII enters model. Data lineage tracked.</td>
+      </tr>
+      <tr>
+        <td>Model access control</td>
+        <td>Who can invoke inference? Who can access model weights? Who can retrain?</td>
+        <td>Access is audited. Service account used for model, not user account.</td>
+      </tr>
+      <tr>
+        <td>Inference cost controls</td>
+        <td>Rate limiting per client. Cost per inference tracked. Alerts on unexpected spike.</td>
+        <td>Monthly bill is predictable. Abuse is detected and blocked within minutes.</td>
+      </tr>
+      <tr>
+        <td rowspan="3"><strong>Governance</strong></td>
+        <td>Model approval gate</td>
+        <td>Who approves a model for production? What are the sign-off criteria (accuracy, bias audit, compliance review)?</td>
+        <td>No model in production without approval. Approval is tracked in Git.</td>
+      </tr>
+      <tr>
+        <td>Retraining policy</td>
+        <td>Trigger: drift detected, new data available, periodic schedule, manual request. Who can trigger?</td>
+        <td>Trigger is automatic or gated. Retraining happens without manual intervention.</td>
+      </tr>
+      <tr>
+        <td>Bias auditing</td>
+        <td>Quarterly audit across all demographic groups. Disparate impact measured. Findings documented.</td>
+        <td>Audit is automated. Results are published. Remediation is tracked.</td>
+      </tr>
+      <tr>
+        <td rowspan="3"><strong>Quality</strong></td>
+        <td>Accuracy metrics</td>
+        <td>Baseline set in testing. Monitored continuously in production. Alert on drift >X%.</td>
+        <td>Accuracy is measured per cohort, not aggregate. Drift is detected within hours.</td>
+      </tr>
+      <tr>
+        <td>Fallback strategy</td>
+        <td>What happens if model fails? Does the system degrade gracefully? Is there a human reviewer? Is there an older model as fallback?</td>
+        <td>Fallback is tested and documented. SLA is maintained even if model fails.</td>
+      </tr>
+      <tr>
+        <td>Explainability</td>
+        <td>For high-consequence decisions, why did the model choose this output? Feature importance, top K factors, decision boundary.</td>
+        <td>Explanation is produced with every decision. Explanation is auditable.</td>
+      </tr>
+      <tr>
+        <td rowspan="3"><strong>Economics</strong></td>
+        <td>Cost per inference</td>
+        <td>Model cost (GPU/CPU per inference), API cost (per call), data cost (storage, retrieval), human review cost (per decision routed to human).</td>
+        <td>Cost is known to the cent. Cost is included in product pricing or ROI calculation.</td>
+      </tr>
+      <tr>
+        <td>Retraining cost</td>
+        <td>Compute cost per cycle, storage cost for training data, human cost for labeling, validation. Frequency?</td>
+        <td>Annual retraining budget is known. Frequency is determined by degradation triggers, not hunches.</td>
+      </tr>
+      <tr>
+        <td>Total cost of ownership</td>
+        <td>Sum of: development, inference, monitoring, governance, human review, retraining. Compared to alternatives.</td>
+        <td>Business case is defensible. ROI is positive against the best non-AI alternative.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 05 MATURITY ═══ -->
+<section class="section" id="maturity">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">05</div>
+  <div>
+    <div class="section-label">Maturity model</div>
+    <h2 class="section-title">Five stages of harness engineering maturity. Most AI systems are at Level 1. Few reach Level 4.</h2>
+    <p class="lead">Maturity progresses from ad-hoc reactions to proactive system management. Each level unlocks new capabilities and reduces operational burden. The progression is not automatic—each level requires intentional design.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Level 1: Ad-hoc</h4>
+    <p><strong>Characteristic:</strong> Model exists in production. No monitoring, no governance, no cost control, no fallback. Failures are discovered by customers, not systems. Retraining is manual and triggered by crisis.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Level 2: Reactive</h4>
+    <p><strong>Characteristic:</strong> Basic monitoring exists (accuracy, uptime). Manual governance (approval exists but is ad-hoc). Cost is tracked but not controlled. Failures are detected by monitoring, routed to humans for manual response.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Level 3: Defined</h4>
+    <p><strong>Characteristic:</strong> Architecture is standardized and documented. Comprehensive monitoring across accuracy, drift, bias, cost. Automated governance gates. Cost is optimized (model selection, inference optimization). Fallback paths are designed and tested. Failures trigger automated alerts and runbooks.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Level 4: Managed</h4>
+    <p><strong>Characteristic:</strong> Automated retraining pipeline (triggered by drift, not manual request). Predictive monitoring (alerts before failures). Continuous cost optimization. Proactive governance (audit results drive policy changes). System adjusts inference strategy based on cost/latency tradeoff.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Level 5: Optimized</h4>
+    <p><strong>Characteristic:</strong> Self-managing (retraining automatic, no human intervention). Self-healing (failures trigger recovery without human action). Cost minimized (model/infra choice optimized automatically). Continuous improvement (system measures itself and improves). Handles distribution shift proactively.</p>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Progression is not universal:</strong> Some systems stay at Level 2 forever. This is acceptable if the business value is low and failure cost is tolerable. A recommendation engine can be Level 2. A fraud detection system must be Level 3+. A compliance-critical system must be Level 4+. Level choice is a business decision, not a technical one.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 06 ORGANIZATION ═══ -->
+<section class="section" id="organization">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">06</div>
+  <div>
+    <div class="section-label">Organizational structure for harness engineering</div>
+    <h2 class="section-title">Three accountable owners. One decision rights matrix.</h2>
+    <p class="lead">The question is not centralized vs distributed. The question is: who owns what when the system fails? This is sharper than the org chart. Most failed AI deployments fail this question, not the structure question.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel">
+    <h3 style="color:var(--green);margin-bottom:14px">Owner 1: Business Unit (Outcome)</h3>
+    <p><strong>Owns:</strong> The decision threshold (e.g., "we accept 12% false positives"). The business case (ROI vs alternatives). Whether the system stays in production or is sunset.</p>
+    <p style="margin-top:12px"><strong>Accountable for:</strong> Defining acceptable error rate and cost. Validating that the model solves the business problem. Communicating business impact.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="color:var(--green);margin-bottom:14px">Owner 2: Platform / AI Team (System)</h3>
+    <p><strong>Owns:</strong> Model training, deployment, monitoring. Data pipeline quality. Infrastructure and cost. Retraining and versioning.</p>
+    <p style="margin-top:12px"><strong>Accountable for:</strong> Meeting the accuracy baselines set by business. Detecting and responding to drift. Keeping inference cost within budget. Operating the system at the promised SLA.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="color:var(--green);margin-bottom:14px">Owner 3: Risk / Compliance (Gate)</h3>
+    <p><strong>Owns:</strong> Approval gates before production. Periodic audits (bias, security, compliance). Data governance policy. Retraining sign-off.</p>
+    <p style="margin-top:12px"><strong>Accountable for:</strong> No model in production without a gate. Bias audits happen quarterly. Compliance requirements are met. Decisions are auditable.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="color:var(--green);margin-bottom:14px">Decision matrix example</h3>
+    <p><strong>Model goes to production:</strong> Platform team proposes. Risk team approves. Business team signs off on SLA.</p>
+    <p style="margin-top:12px"><strong>Accuracy drops below threshold:</strong> Platform team detects. Business team decides: accept temporary SLA miss or roll back? Risk team signs off on remediation plan.</p>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>Why this works:</strong> Clear accountability. Each team has veto power in its domain. No team can hide behind another team's decision. If the system fails, you know exactly who to talk to.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 07 REFERENCE ═══ -->
+<section class="section" id="reference">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">07</div>
+  <div>
+    <div class="section-label">Reference and checklist</div>
+    <h2 class="section-title">Quick reference for the five dimensions. Use this before deploying an AI system to production.</h2>
+    <p class="lead">This is a starting checklist, not comprehensive. Tailor it to your domain and risk level. A credit risk model requires stricter governance than a recommendation engine. A compliance-critical system requires more layers of review than an internal tool.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Pre-production checklist</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Architecture</strong></td>
+        <td>
+          □ Model placement decided (on-prem, cloud, edge) and cost modeled<br>
+          □ Inference latency / cost tradeoff defined and SLA set<br>
+          □ Confidence threshold defined; below-threshold behavior documented<br>
+          □ Fallback path designed (human review, older model, timeout behavior)<br>
+          □ Circuit breaker logic defined (when to stop calling the model)<br>
+          □ Data flow diagram created; validation at each boundary documented<br>
+          □ Model versioning strategy defined (immutable, tracked in Git)
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Security</strong></td>
+        <td>
+          □ Training data classified (PII, sensitive, public)<br>
+          □ PII masking rules defined and validated<br>
+          □ Data lineage traceable from source to model<br>
+          □ Model weights are signed and versioned<br>
+          □ Inference is audited (caller, timestamp, input, output logged)<br>
+          □ Access control: who can invoke model, access weights, retrain<br>
+          □ Inference cost per client tracked and rate-limited<br>
+          □ Encryption in transit (TLS) and at rest (KMS) verified
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Governance</strong></td>
+        <td>
+          □ Model approval gate defined (criteria, approval body, decision log)<br>
+          □ This model approved and signed off before production deploy<br>
+          □ Retraining trigger defined (drift threshold, schedule, manual request)<br>
+          □ Retraining approver identified<br>
+          □ Bias audit scheduled (frequency, auditor, remediation process)<br>
+          □ Decision logging: every inference logged with model version, confidence<br>
+          □ Explainability requirement defined (required for all decisions? high-consequence only?)<br>
+          □ Compliance review complete (GDPR, SOC2, industry-specific, etc.)
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Quality</strong></td>
+        <td>
+          □ Accuracy baseline set in test set; disaggregated by demographic groups<br>
+          □ Baseline accuracy acceptable to business unit; threshold for rollback defined<br>
+          □ Drift monitoring configured (accuracy, data distribution, prediction distribution)<br>
+          □ Drift alert triggers automatic escalation (to operations team)<br>
+          □ Quality metrics dashboard created and shared with business unit<br>
+          □ Fallback quality measured (e.g., human review accuracy at >90%)<br>
+          □ Edge cases identified and tested (what does model do at distribution boundaries)<br>
+          □ Graceful degradation tested (system works with model disabled)
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Economics</strong></td>
+        <td>
+          □ Cost per inference calculated (model, infrastructure, data, logging)<br>
+          □ Monthly inference cost estimated and budgeted<br>
+          □ Inference cost included in product pricing (if applicable)<br>
+          □ Cost of human review calculated (if below-threshold decisions routed to humans)<br>
+          □ Retraining cost calculated (compute, storage, validation, labeling)<br>
+          □ Retraining frequency set and cost projected annually<br>
+          □ Total cost of ownership compared to non-AI alternatives<br>
+          □ ROI case is defensible (payback period, breakeven point, growth model)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout warn" style="margin-top:28px">
+  <strong>Checklist is not deployment approval:</strong> This is a framework. Every organization has different risk tolerance. A financial services company will require stricter governance than a media company. A compliance-critical system requires more checkboxes than an internal tool. Use this as a starting point. Tailor it to your domain and regulatory environment.
+</div>
+
+</div>
+</section>
+
+</main>
+
+<footer class="footer">
+  Harness Engineering Microsite | May 2026 | Based on <em>AI Productization: Strategic Concept Paper</em> by Soma Kesara
+</footer>
+
+<script>
+function toggleSection(header) {
+  const section = header.closest('.section');
+  section.classList.toggle('collapsed');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const nav = document.querySelector('.topnav');
+  const links = nav.querySelectorAll('a');
+
+  window.addEventListener('scroll', function() {
+    let current = '';
+    document.querySelectorAll('section').forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (pageYOffset >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').slice(1) === current) {
+        link.classList.add('active');
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
