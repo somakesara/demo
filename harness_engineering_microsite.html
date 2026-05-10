@@ -142,6 +142,14 @@ td{color:#423c35}
 .principle h4{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink)}
 .principle p{margin:0;color:#514a42;font-size:14px;line-height:1.7}
 
+/* ── DISCLAIMER ── */
+.disclaimer{background:#f7ece9;border-top:1px solid #ded6c8;padding:28px 44px;margin-top:0}
+.disclaimer-inner{width:min(1120px,100%);margin:0 auto;font-size:14px;color:#4a2b28;line-height:1.7}
+.disclaimer-inner h3{font-family:var(--serif);margin:0 0 14px;font-size:22px;font-weight:400}
+.disclaimer-inner p{margin:0;padding-bottom:12px}
+.disclaimer-inner p:last-child{margin-bottom:0}
+.disclaimer-inner strong{color:#3a2b28}
+
 /* ── FOOTER ── */
 .footer{padding:28px 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 
@@ -208,7 +216,7 @@ td{color:#423c35}
 
 <div class="scene" style="margin-top:28px">
   <div class="scene-label">The problem harness engineering solves</div>
-  A team at a financial services company built a credit-risk model. In testing, accuracy was 89%. In production after two weeks, accuracy degraded to 82%. The model was fine—the data distribution changed. No one was monitoring it. No one had a process for detecting drift or triggering retraining. The production system had no circuit breaker for confidence scores below a threshold. Fallback was missing. That's not a model problem. That's a systems design problem. It's the difference between "we have a model" and "we have a production AI system."
+  <strong>Example scenario:</strong> A team at a financial services company built a credit-risk model. In testing, accuracy was 89%. In production after two weeks, accuracy degraded to 82%. The model was fine—the data distribution changed. No one was monitoring it. No one had a process for detecting drift or triggering retraining. The production system had no circuit breaker for confidence scores below a threshold. Fallback was missing. That's not a model problem. That's a systems design problem. It's the difference between "we have a model" and "we have a production AI system."
 </div>
 
 <div class="grid-2" style="margin-top:28px">
@@ -238,8 +246,8 @@ td{color:#423c35}
   <div class="section-no">02</div>
   <div>
     <div class="section-label">The core thesis</div>
-    <h2 class="section-title">AI systems require no revolutionary new frameworks. Apply existing production discipline to AI.</h2>
-    <p class="lead">Organizations that treat AI as "special" and invent new methodologies will be outexecuted by those that treat it as another production problem. The frameworks you use for microservices, databases, and infrastructure are sufficient. The degree of scrutiny is higher in some dimensions (monitoring, governance, quality assurance) but the kind of discipline is the same.</p>
+    <h2 class="section-title">AI systems require no revolutionary new frameworks. Apply existing production discipline to AI—at the appropriate level for your use case.</h2>
+    <p class="lead">Organizations that treat AI as "special" and invent entirely new methodologies often overengineer. Those that treat it as another production problem, calibrated to their specific use case and risk profile, execute more effectively. The frameworks you use for microservices, databases, and infrastructure are the right starting point. The degree of scrutiny is higher in some dimensions (monitoring, governance, quality assurance) but the kind of discipline is the same. Maturity requirements vary: a recommendation system needs less harness engineering than a medical AI system.</p>
     <div class="section-status">Collapse ↑ / Expand ↓</div>
   </div>
   <button class="section-toggle" aria-label="toggle section">+</button>
@@ -382,7 +390,7 @@ td{color:#423c35}
       </div>
       <div>
         <h4>Success criteria</h4>
-        <p>Accuracy baselines are set and monitored. Drift is detected within hours, not days. All model predictions above a confidence threshold are served; below threshold, requests are routed to humans.</p>
+        <p>Accuracy baselines are set and monitored. Drift is detected as quickly as infrastructure allows (hours for high-traffic systems, days for lower-volume systems). All model predictions above a confidence threshold are served; below threshold, requests are routed to humans or fallback systems.</p>
       </div>
     </div>
   </div>
@@ -490,8 +498,8 @@ td{color:#423c35}
       </tr>
       <tr>
         <td>Bias auditing</td>
-        <td>Quarterly audit across all demographic groups. Disparate impact measured. Findings documented.</td>
-        <td>Audit is automated. Results are published. Remediation is tracked.</td>
+        <td>Regular audit across all demographic groups (quarterly recommended for high-stakes systems). Disparate impact measured. Findings documented.</td>
+        <td>Audit is automated where possible. Results are documented. Remediation is tracked. Frequency matches regulatory and business requirements.</td>
       </tr>
       <tr>
         <td rowspan="3"><strong>Quality</strong></td>
@@ -574,7 +582,7 @@ td{color:#423c35}
 </div>
 
 <div class="callout info" style="margin-top:28px">
-  <strong>Progression is not universal:</strong> Some systems stay at Level 2 forever. This is acceptable if the business value is low and failure cost is tolerable. A recommendation engine can be Level 2. A fraud detection system must be Level 3+. A compliance-critical system must be Level 4+. Level choice is a business decision, not a technical one.
+  <strong>Progression is not universal, and not all systems need the same level:</strong> Harness engineering maturity should match your use case and risk profile. Some systems appropriately stay at Level 2 forever. A personalized recommendation engine (low cost of error) can be Level 2. A fraud detection system (medium cost of error) should be Level 3+. A medical diagnosis system or loan approval system (high cost of error) must be Level 4+. Level choice is a business decision, not a technical one. As of May 2026, regulatory frameworks are still evolving; align your maturity level with your industry's current guidance.
 </div>
 
 </div>
@@ -993,10 +1001,10 @@ td{color:#423c35}
           □ This model approved and signed off before production deploy<br>
           □ Retraining trigger defined (drift threshold, schedule, manual request)<br>
           □ Retraining approver identified<br>
-          □ Bias audit scheduled (frequency, auditor, remediation process)<br>
-          □ Decision logging: every inference logged with model version, confidence<br>
-          □ Explainability requirement defined (required for all decisions? high-consequence only?)<br>
-          □ Compliance review complete (GDPR, SOC2, industry-specific, etc.)
+          □ Bias audit schedule defined (frequency based on use case and regulations, auditor, remediation process)<br>
+          □ Decision logging: mechanism defined for logging inferences (may be sampled for high-volume systems)<br>
+          □ Explainability requirement defined (required for all decisions? high-consequence only? driven by use case)<br>
+          □ Compliance review complete (regulatory requirements specific to your jurisdiction and industry)
         </td>
       </tr>
       <tr>
@@ -1030,13 +1038,20 @@ td{color:#423c35}
 </div>
 
 <div class="callout warn" style="margin-top:28px">
-  <strong>Checklist is not deployment approval:</strong> This is a framework. Every organization has different risk tolerance. A financial services company will require stricter governance than a media company. A compliance-critical system requires more checkboxes than an internal tool. Use this as a starting point. Tailor it to your domain and regulatory environment.
+  <strong>Checklist is not deployment approval:</strong> This is a framework. Every organization has different risk tolerance. A financial services company will require stricter governance than a media company. A compliance-critical system requires more checkboxes than an internal tool. A medical AI system requires more than a recommender system. Use this as a starting point. Tailor it to your domain and regulatory environment.
 </div>
 
 </div>
 </section>
 
 </main>
+
+<section class="disclaimer">
+<div class="disclaimer-inner">
+  <h3 style="font-family:var(--serif);margin-top:0">Disclaimer: Framework vs Prescription</h3>
+  <p>This microsite presents frameworks and principles based on proven systems engineering practices applied to AI. The content reflects the state of AI productization practice as of May 2026. However: <strong>(1) Regulatory requirements for AI systems are evolving.</strong> EU AI Act compliance, RBI guidelines, and industry-specific regulations continue to mature. Treat this content as guidance, not legal compliance documentation. <strong>(2) No single maturity level is right for all systems.</strong> A recommendation engine and a medical AI system have different risk profiles and require different harness engineering investment. <strong>(3) The frameworks are descriptive, not prescriptive.</strong> Use them as starting points. Adapt them to your specific context, constraints, and regulatory obligations. <strong>(4) Examples and scenarios are illustrative.</strong> They are constructed to show principles, not documented case studies.</p>
+</div>
+</section>
 
 <footer class="footer">
   Harness Engineering Microsite | May 2026 | Based on <em>AI Productization: Strategic Concept Paper</em> by Soma Kesara
