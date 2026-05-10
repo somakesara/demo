@@ -185,7 +185,9 @@ td{color:#423c35}
   <a href="#frameworks">04 Operational frameworks</a>
   <a href="#maturity">05 Maturity model</a>
   <a href="#organization">06 Organization</a>
-  <a href="#reference">07 Reference</a>
+  <a href="#engineering-layers">07 Engineering layers</a>
+  <a href="#agentic">08 Agentic AI</a>
+  <a href="#reference">09 Reference</a>
 </nav>
 
 <main>
@@ -625,7 +627,318 @@ td{color:#423c35}
 </div>
 </section>
 
-<!-- ═══════════════════════ 07 REFERENCE ═══ -->
+<!-- ═══════════════════════ 07 ENGINEERING LAYERS ═══ -->
+<section class="section" id="engineering-layers">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">07</div>
+  <div>
+    <div class="section-label">Engineering layers: Prompt, Context, Harness</div>
+    <h2 class="section-title">Three distinct engineering disciplines, each solving a different problem. Most projects confuse them.</h2>
+    <p class="lead">Prompt engineering, context engineering, and harness engineering operate at different layers of abstraction. They solve different problems. They require different skill sets. A strong harness engineering practice does not eliminate the need for good context engineering. But they are not the same thing.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Scope</th>
+        <th>Problem solved</th>
+        <th>Expertise required</th>
+        <th>Scope of change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Prompt Engineering</strong></td>
+        <td>Single interaction</td>
+        <td>How do I ask the model to solve this task right now?</td>
+        <td>Domain knowledge, psychology, iterative experimentation</td>
+        <td>Text. Invocation. No code.</td>
+      </tr>
+      <tr>
+        <td><strong>Context Engineering</strong></td>
+        <td>Single session or application</td>
+        <td>What context should the model always have? How is context loaded, updated, passed reliably?</td>
+        <td>Architecture, data design, API design, information scoping</td>
+        <td>Config files, CLAUDE.md, documentation, data structures</td>
+      </tr>
+      <tr>
+        <td><strong>Harness Engineering</strong></td>
+        <td>Production system</td>
+        <td>How do we operate this AI system at scale? How do we make it reliable, governed, auditable, cost-controlled?</td>
+        <td>Systems architecture, security, operations, financial discipline, governance</td>
+        <td>Infrastructure, monitoring, policies, access control, data pipeline</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="framework-cards" style="margin-top:28px">
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 1: Prompt Engineering</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Instructing a single API call</p>
+      </div>
+      <span class="fc-label">Tactical</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Crafting the text you send to an LLM in a single interaction. "Summarize this document in three bullets." "Write a function that validates email addresses." The prompt is the instruction. The response is the result. One shot.</p>
+      </div>
+      <div>
+        <h4>Examples of prompt engineering work</h4>
+        <p>Testing different phrasings to improve code quality. Adding examples to show the model the pattern you want. Asking for output in a specific format (JSON, XML, markdown). Using chain-of-thought prompting to improve reasoning.</p>
+      </div>
+      <div>
+        <h4>Success is</h4>
+        <p>The model produces the right output for this request, in this format, meeting these requirements. Repeatability is not the goal—you're optimizing this invocation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 2: Context Engineering</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Designing reliable context flow</p>
+      </div>
+      <span class="fc-label">Structural</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Deciding what information the model should always have (codebase documentation, domain rules, team conventions). How context is loaded (from files, databases, APIs). How it's kept current. How it's scoped (which engineer sees which context). Context engineering is about <strong>reliable information architecture</strong> for the model.</p>
+      </div>
+      <div>
+        <h4>Examples of context engineering work</h4>
+        <p>Writing CLAUDE.md with codebase documentation. Designing a retrieval system to load relevant context from a database. Creating domain guides that the model reads on every invocation. Building a system to keep documentation in sync with code. Scoping which secrets the model can access.</p>
+      </div>
+      <div>
+        <h4>Success is</h4>
+        <p>The model always has the right context for its task. Context is kept current. Context is scoped appropriately. The model doesn't need to ask "where's the X file?" because the architecture guarantees it's available.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 3: Harness Engineering</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Operating at production scale</p>
+      </div>
+      <span class="fc-label">Strategic</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Building the system around the model: architecture that handles failures, security controls, governance gates, monitoring and observability, cost controls, human fallback paths. The harness is everything that makes the model usable and safe at scale. <strong>Harness engineering doesn't care what the model outputs—it cares that the system is reliable, secure, governed, and cost-controlled.</strong></p>
+      </div>
+      <div>
+        <h4>Examples of harness engineering work</h4>
+        <p>Designing fallback paths when model confidence is low. Building monitoring to detect model drift. Setting up governance gates before a model goes to production. Creating cost controls and inference rate limits. Designing audit trails so every decision is logged. Building retraining pipelines. Defining who can approve model updates.</p>
+      </div>
+      <div>
+        <h4>Success is</h4>
+        <p>The system operates reliably 24/7. Failures are handled gracefully. Drift is detected automatically. Every decision is auditable. Costs are predictable. Governance is enforced. The model output quality is less important than the system's reliability and safety.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag blue">Layers work together</span>
+    <h3>Strong teams do all three</h3>
+    <p>Good prompt engineering makes the model output better. Good context engineering ensures the model has what it needs. Good harness engineering ensures the system is safe, reliable, and operated correctly. Weakness in any layer breaks the whole chain. A brilliant prompt can't fix a poorly-harnessed system. A beautifully-harnessed system can't run on a badly-written prompt.</p>
+  </div>
+
+  <div class="panel white">
+    <span class="tag red">Common mistake</span>
+    <h3>Conflating the layers</h3>
+    <p>Teams say "we need better prompt engineering" when the actual problem is context architecture. Or they say "we need harness engineering" when the real issue is nobody documented what the codebase does. Or they spend months on beautiful harness design when they haven't figured out what prompt actually works. Each layer has different ROI depending on your problem.</p>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Which layer first?</strong> If you don't know what prompt works, prompt engineer first. Once you have a prompt that works, add context engineering to make it reliable at scale. Once it's reliable, add harness engineering to make it production-ready. Don't build harness infrastructure for a prompt that doesn't work yet. You're solving the wrong problem.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 08 AGENTIC AI ═══ -->
+<section class="section" id="agentic">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">08</div>
+  <div>
+    <div class="section-label">Agentic AI vs Harness Engineering</div>
+    <h2 class="section-title">Two related but distinct concerns. They often appear together but solve different problems.</h2>
+    <p class="lead">Agentic AI is about autonomy: giving models the ability to make decisions, take actions, and operate without human intervention in the loop. Harness engineering is about safety and reliability: ensuring that whatever the system does (agentic or not), it's secure, governed, observable, and cost-controlled. These are orthogonal concerns.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Agentic AI</th>
+        <th>Harness Engineering</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Core question</strong></td>
+        <td>Can the model act independently? Can it decide what to do without asking a human first?</td>
+        <td>Is the system safe, reliable, and governed when it acts?</td>
+      </tr>
+      <tr>
+        <td><strong>Focus</strong></td>
+        <td>Model capability and autonomy. Tool use, planning, decision-making, multi-step reasoning</td>
+        <td>System safety and reliability. Monitoring, fallback, cost control, audit trails</td>
+      </tr>
+      <tr>
+        <td><strong>Problem it solves</strong></td>
+        <td>How do I reduce human oversight? How do I let the model reason through complex tasks?</td>
+        <td>How do I ensure this system is safe, secure, and compliant when it runs?</td>
+      </tr>
+      <tr>
+        <td><strong>Moves the responsibility from</strong></td>
+        <td>Human decision-making → model decision-making</td>
+        <td>Operational risk → engineered controls</td>
+      </tr>
+      <tr>
+        <td><strong>Success metric</strong></td>
+        <td>The model accomplished the task without human intervention</td>
+        <td>The model accomplished the task safely, auditably, cost-effectively</td>
+      </tr>
+      <tr>
+        <td><strong>Failure looks like</strong></td>
+        <td>The model gets stuck, asks for help, or makes a bad decision autonomously</td>
+        <td>The model did the right thing but nobody knows who approved it, what it cost, or why</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Misconception 1: More autonomous = more engineered</h4>
+    <p><strong>Reality:</strong> Agentic AI increases risk. More autonomy means fewer humans in the loop, which means harness engineering becomes more critical, not less. An autonomous fraud detection system that makes decisions without human review REQUIRES perfect monitoring, perfect governance, and perfect audit trails. A non-autonomous system (human-in-the-loop) can tolerate some monitoring gaps because a human is always there to catch issues. Autonomy demands better harness engineering, not worse.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Misconception 2: Agentic AI is all or nothing</h4>
+    <p><strong>Reality:</strong> Autonomy is a spectrum. A model that can invoke tools but only if a human approves each action is semi-agentic. A model that can make decisions below a cost threshold but escalates larger decisions to humans is partially autonomous. A model that can retry failed actions but escalates permanent failures is conditionally autonomous. Most production systems use graduated autonomy: let the system act for high-confidence, low-cost decisions; route uncertain or high-cost decisions to humans.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Misconception 3: Agentic AI and harness engineering are separate</h4>
+    <p><strong>Reality:</strong> They are tightly coupled. The more autonomous a system is, the more harness engineering it requires. An interactive system (human types a prompt, model responds) can be Level 2-3 maturity (basic monitoring, manual governance). An autonomous system (model makes decisions continuously, no human in loop) must be Level 4+ (automated monitoring, automated governance, cost controls). You can't decouple them.</p>
+  </div>
+
+  <div class="principle">
+    <h4>Misconception 4: Harness engineering slows down autonomous systems</h4>
+    <p><strong>Reality:</strong> It enables them. Without harness engineering, autonomous systems become liabilities. You can't ship a model that makes decisions autonomously if you can't answer: "Who approved this? What's the cost? Did it violate any policies? Is it treating all users fairly?" Harness engineering answers these questions. It's not overhead—it's the price of admission for autonomous systems.</p>
+  </div>
+</div>
+
+<div class="framework-cards" style="margin-top:28px">
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Example 1: Interactive system (non-agentic)</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Human asks, model responds, human acts</p>
+      </div>
+      <span class="fc-label">Typical</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Agentic AI component</h4>
+        <p>None. The model responds to user queries. The user decides whether to act on the response.</p>
+      </div>
+      <div>
+        <h4>Harness engineering requirements</h4>
+        <p>Moderate. Context engineering is critical (user needs the right information to make good decisions). Monitoring is important (accuracy, latency). Governance is light (the human is the gate). Cost controls are simple (per-query).</p>
+      </div>
+      <div>
+        <h4>Example</h4>
+        <p>A Claude Code session where you ask Claude to review code and then decide whether to apply the changes. Claude is not autonomous. You are.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Example 2: Semi-autonomous system</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Model acts within guardrails, human approves</p>
+      </div>
+      <span class="fc-label">Common</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Agentic AI component</h4>
+        <p>The model can invoke tools (read files, run commands, call APIs) and decide what to do based on the results. But only if the cost is below a threshold or the confidence is above a threshold. High-stakes decisions escalate to humans.</p>
+      </div>
+      <div>
+        <h4>Harness engineering requirements</h4>
+        <p>High. Perfect audit trails (every tool invocation logged). Governance is automated but has human gates (model can approve <$100 decisions, escalates >$100). Monitoring detects unexpected behavior (model tried to access a resource it shouldn't). Cost controls are strict (per-action limits).</p>
+      </div>
+      <div>
+        <h4>Example</h4>
+        <p>An automated customer support agent that can refund orders under $50 but escalates larger refunds to humans. Or a DevOps agent that can restart services but must get approval before deploying to production.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Example 3: Fully autonomous system</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Model acts independently, humans observe</p>
+      </div>
+      <span class="fc-label">Rare</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Agentic AI component</h4>
+        <p>The model runs continuously, makes decisions, invokes tools, takes actions. No human approval required before each action. Humans only intervene if something goes wrong.</p>
+      </div>
+      <div>
+        <h4>Harness engineering requirements</h4>
+        <p>Extreme. This is Level 4+ only. Perfect monitoring (detect anomalies in seconds). Automated governance (policy enforcement in code, not manual review). Instant cost controls (circuit breakers, kill switches). Complete audit trails (every decision logged with full context). Fallback paths for all failure modes.</p>
+      </div>
+      <div>
+        <h4>Example</h4>
+        <p>A fraud detection system that freezes suspicious transactions autonomously. A dynamic pricing system that adjusts prices in real-time. An automated infrastructure manager that scales services up/down based on demand.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="callout warn" style="margin-top:28px">
+  <strong>Harness engineering is non-negotiable for autonomous systems:</strong> If your system is autonomous, every dimension of harness engineering becomes critical. You cannot skimp on monitoring because there's no human to catch issues. You cannot skip audit trails because regulators will demand to know what happened. You cannot skip cost controls because the model can run forever. Autonomy creates operational risk. Harness engineering mitigates that risk.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════ 09 REFERENCE ═══ -->
 <section class="section" id="reference">
 <div class="container">
 <div class="section-head" onclick="toggleSection(this)" tabindex="0">
