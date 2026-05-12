@@ -296,7 +296,8 @@ td{color:#423c35}
   <a href="#security">05 Security</a>
   <a href="#java">06 Java walkthrough</a>
   <a href="#limits">07 Limitations</a>
-  <a href="#reference">08 Reference</a>
+  <a href="#personas">09 Personas</a>
+  <a href="#reference">10 Reference</a>
 </nav>
 
 <main>
@@ -1115,11 +1116,1835 @@ td{color:#423c35}
 </div>
 </section>
 
-<!-- ═══════════════ 08 REFERENCE ═══ -->
+<!-- ═══════════════ 09 PERSONAS ═══ -->
+<section class="section" id="personas">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">09</div>
+  <div>
+    <div class="section-label">Role-specific workflows</div>
+    <h2 class="section-title">Claude Code adapts to your role. These workflows show how different engineers use the same tool to solve different problems.</h2>
+    <p class="lead">Whether you build user interfaces, manage infrastructure, or ensure system reliability, Claude Code's core capabilities apply — but the way you use them differs. These sections show concrete examples for six common roles.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Frontend developers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Component refactor to hooks</div>
+      <span class="fc-label blue">React/TypeScript</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Convert class component to functional + hooks, maintain identical behavior.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads class component, traces <code>state</code>, lifecycle methods, traces refs. Refactors to <code>useState</code>, <code>useEffect</code>, <code>useRef</code>. Preserves lifecycle semantics (componentDidMount → effect with empty deps, etc.).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Visual regression testing, run test suite, verify no behavior change.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Accessibility audit (a11y)</div>
+      <span class="fc-label blue">WCAG 2.1</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Find all accessibility violations in form component (ARIA, keyboard nav, screen readers).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Scans JSX for missing <code>role</code>, <code>aria-label</code>, <code>tabIndex</code>, improper heading hierarchy. Identifies keyboard traps. Generates fixes with WCAG mappings.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test with screen reader (NVDA/JAWS), keyboard navigation, run axe audit.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.10–0.25 | <strong>Time saved:</strong> 30–60 minutes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: CSS breakpoint debugging</div>
+      <span class="fc-label blue">Responsive Design</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Mobile view breaks on tablets. Find and fix the conflicting breakpoints.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Greps all media queries across CSS/styled-components, identifies overlaps, explains cascade, suggests modern flexbox/grid alternatives instead of floats.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test on actual devices/DevTools, verify no regression on desktop.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.08–0.20 | <strong>Time saved:</strong> 45–90 minutes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Performance optimization</div>
+      <span class="fc-label blue">React Performance</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>List component renders slowly with 1000 items. Identify and fix.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Identifies missing <code>React.memo</code>, unnecessary re-renders, finds expensive computations. Suggests <code>useMemo</code>, <code>useCallback</code>, virtualization (react-window). Adds performance instrumentation.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Profile with DevTools, measure FPS before/after, verify no visual regressions.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.45 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Form validation framework</div>
+      <span class="fc-label blue">React Hook Form</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate form with validation, error messages, async field validators.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates hook-based form using react-hook-form, generates Zod/Yup schema, adds async validators (email uniqueness, username availability), generates accessible error UI.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test validation rules, async behavior, error states, accessibility.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">DevOps engineers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Infrastructure review & optimization</div>
+      <span class="fc-label blue">Terraform/CloudFormation</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Review Terraform modules for cost, security, compliance violations.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Scans <code>.tf</code> files for unused resources, hardcoded secrets, over-provisioned instances, missing encryption, improper IAM policies. Suggests reserved instances, rightsizing, cost tagging.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review recommendations, test in staging, validate tagging compliance.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.80 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Pipeline debugging</div>
+      <span class="fc-label blue">CI/CD (GitHub Actions, GitLab)</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Docker build fails silently in pipeline. Find root cause and fix.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads Dockerfile, pipeline YAML, build logs. Identifies layer caching issues, missing args, base image problems, slow builds. Suggests multi-stage builds, caching strategy improvements.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test fix in staging pipeline, verify build time improvement.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Observability setup</div>
+      <span class="fc-label blue">CloudWatch/Prometheus</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create dashboards + alarms for microservice (metrics, logs, traces).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads service code, generates CloudFormation/Terraform for dashboards (latency, error rate, throughput), defines intelligent alarm thresholds, creates runbook links, suggests log group structure.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test alarms with synthetic traffic, verify alert routing.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Secrets management</div>
+      <span class="fc-label blue">AWS Secrets Manager/HashiCorp Vault</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Audit codebase for hardcoded credentials, migrate to Secrets Manager.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Greps for API keys, passwords, connection strings in code. Generates Terraform for Secrets Manager, creates secret rotation policies, updates application code to fetch secrets at runtime.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test secret rotation, verify no hardcoded remnants, audit access logs.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Disaster recovery plan</div>
+      <span class="fc-label blue">IaC & Runbooks</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate DR infrastructure, failover runbooks, RTO/RPO validation.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates standby infrastructure in secondary region, generates Terraform for cross-region replication, writes runbooks for manual failover, calculates RTO/RPO, creates backup validation scripts.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Execute DR drills, measure actual failover time, verify data consistency.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–0.90 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">SRE engineers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Incident post-mortem</div>
+      <span class="fc-label blue">Root Cause Analysis</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Analyze 2-hour outage logs + metrics, generate RCA and systemic fixes.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Parses logs, builds timeline, correlates failures with metric spikes, identifies cascading failures, suggests preventive measures (timeouts, circuit breakers, alerting improvements, chaos tests).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Verify timeline accuracy, implement preventive measures, add tests.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–1.20 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Capacity & scaling</div>
+      <span class="fc-label blue">Auto-scaling Policies</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design auto-scaling for variable load (20–500 rps), optimize cost.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes historical load patterns, calculates required headroom, generates scaling thresholds, suggests instance types, balances cost vs. redundancy, generates scaling policy code.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test with synthetic load, verify cost projections, monitor real-world performance.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Chaos engineering</div>
+      <span class="fc-label blue">Gremlin/Chaoskube</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design chaos tests for DB failover, region loss, dependency timeouts.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads architecture, generates chaos experiments (kill pods, inject latency, block traffic), predicts failure modes, suggests mitigation strategies, generates test runbooks.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Execute experiments, measure recovery time, document learnings.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.75 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: SLO monitoring</div>
+      <span class="fc-label blue">Error budgets & alerts</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Define SLOs (99.9% availability), calculate error budgets, set alerts.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads service requirements, defines SLI metrics (latency p99, error rate), calculates error budget, generates alerting thresholds that notify before budget exhaustion, creates dashboard.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test alert sensitivity, refine SLO targets based on business needs.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Runbook generation</div>
+      <span class="fc-label blue">Operational procedures</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create runbooks for common incidents (database failover, deployment rollback, cache clear).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes architecture, generates step-by-step runbooks with validation checks, shell commands, rollback procedures, escalation paths, estimated time for each step.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Execute runbooks in staging, time them, refine for clarity.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Kubernetes specialists (YAML authors)</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Manifest generation</div>
+      <span class="fc-label blue">Deployment/StatefulSet/DaemonSet</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate K8s manifests (Deployment, Service, ConfigMap) with health checks, limits, security.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads application code, generates Deployment/StatefulSet with correct probes (liveness/readiness), adds resource requests/limits, generates ServiceAccount, NetworkPolicy, Pod Security Policy. Validates with kubeval.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review security contexts, test health probes, validate resource usage.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Helm chart creation</div>
+      <span class="fc-label blue">Helm 3 templating</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Convert static manifests to parameterized Helm chart.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Identifies parameterizable values (replicas, image, resources), generates values.yaml with defaults, creates templates with {{ .Values.* }}, generates Chart.yaml, adds helpers and NOTES.txt.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test <code>helm install</code>, verify template rendering, test upgrades.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Kustomize overlays</div>
+      <span class="fc-label blue">Multi-env configs</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate dev/staging/prod overlays with different replicas, limits, domains.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates base manifest, generates kustomization.yaml for each environment with patches for replicas, resources, image tags, ConfigMap overrides.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test <code>kustomize build</code> for each environment, verify correctness.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Network policies</div>
+      <span class="fc-label blue">K8s security</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate NetworkPolicies to restrict traffic between services (zero-trust).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads service architecture, generates NetworkPolicies for ingress/egress rules, creates egress policies for DNS, external APIs, blocks unexpected traffic by default.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test connectivity between services, verify external calls still work.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Operator & CRD</div>
+      <span class="fc-label blue">Custom Resources</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create CustomResourceDefinition + Operator for application lifecycle.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates CRD YAML, creates Operator skeleton (using Operator SDK), generates controller logic for reconciliation, adds status/conditions, generates example CR manifests.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Implement reconciliation logic, test CR creation/updates, verify operator restarts.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–0.90 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Web security professionals</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Vulnerability audit</div>
+      <span class="fc-label red">OWASP Top 10</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Scan codebase for SQL injection, XSS, CSRF, insecure deserialize, secrets.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads code, identifies risky patterns (string concat in SQL, unsanitized templates, hardcoded secrets), generates proof-of-concept payloads, rates severity, suggests framework-specific fixes.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Prioritize findings, verify exploitability, implement fixes, retest.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.50–1.50 | <strong>Time saved:</strong> 4–8 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Security headers</div>
+      <span class="fc-label red">CSP, CORS, Headers</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Define CSP, CORS, HSTS policies for multi-tenant SaaS app.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes app architecture (CDN, third-party scripts, APIs), generates restrictive-by-default policies, explains bypass vectors, provides implementation for framework (Express, Django, Rails).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test policies, monitor violations, refine as needed.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Auth flow audit</div>
+      <span class="fc-label red">JWT/OAuth2/Session</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Verify JWT implementation, token expiry, refresh tokens, permissions.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Traces token generation → validation → refresh, identifies timing attacks, incomplete checks, insecure storage, suggests fixes (rotation, rate limiting, secure cookies).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Implement fixes, penetration test, monitor token usage.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.75 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Input validation</div>
+      <span class="fc-label red">Data validation & sanitization</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Audit input validation across all endpoints (path traversal, XXE, zip bombs).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Identifies missing validation, unsafe deserialization, file upload vulnerabilities, generates validation schema, suggests library usage (Joi, Yup, Cerberus).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test with malicious inputs, fuzz test, verify rejection behavior.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Dependency scanning</div>
+      <span class="fc-label red">Vulnerability management</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Scan dependencies for known CVEs, prioritize updates, generate upgrade plan.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes package.json/requirements.txt, checks for known CVEs, assesses upgrade impact, generates upgrade plan (breaking changes, deprecations), creates test plan for each upgrade.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test dependency upgrades, verify functionality, monitor for regressions.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Project managers and technical leads</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Technical debt inventory</div>
+      <span class="fc-label plum">Risk prioritization</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Scan for technical debt: outdated dependencies, deprecated APIs, coverage gaps.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes codebase, generates inventory with effort estimates, risk scores, and refactor ordering that minimizes disruption. Suggests quick wins vs. long-term initiatives.</p>
+      </div>
+      <div>
+        <h4>You use this to</h4>
+        <p>Negotiate timeline, prioritize sprints, communicate risk to stakeholders.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–1.00 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Estimation support</div>
+      <span class="fc-label plum">Effort & timeline</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Estimate effort: monolith-to-microservices migration, architecture redesign.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Maps service boundaries, identifies hidden dependencies, estimates phases, flags risks (data consistency, testing), generates phased timeline with go/no-go gates.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review with team, adjust for team velocity, communicate to stakeholders.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.50–1.50 | <strong>Time saved:</strong> 4–8 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Onboarding docs</div>
+      <span class="fc-label plum">Knowledge transfer</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate onboarding docs for new team member on 50K-line codebase.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Maps architecture, generates ASCII diagrams, explains entry points, traces request path end-to-end, identifies critical reading order, creates learning checklist.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review for accuracy, customize for team, measure ramp-up time.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.70 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Risk assessment</div>
+      <span class="fc-label plum">Change impact analysis</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Assess risk of upgrading core framework (Rails 5 → 7, React 16 → 18).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes dependency tree, identifies breaking changes, scans codebase for deprecated patterns, estimates refactor scope, suggests phased upgrade strategy.</p>
+      </div>
+      <div>
+        <h4>You present to</h4>
+        <p>Stakeholders with clear risk/benefit tradeoffs, timeline, contingency plan.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.35–0.80 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Process automation</div>
+      <span class="fc-label plum">Operations efficiency</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Identify manual processes that can be automated (deploys, releases, reporting).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes current workflows, identifies automation opportunities, estimates effort vs. time savings, prioritizes by ROI.</p>
+      </div>
+      <div>
+        <h4>You use to</h4>
+        <p>Plan team roadmap, reduce toil, improve operational efficiency.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Database administrators and data engineers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Schema migration</div>
+      <span class="fc-label blue">Zero-downtime changes</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Add column to 10M-row table without downtime, no app changes needed.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads schema, identifies dependencies, generates shadow column strategy with data population, creates atomic cutover script, generates rollback procedure, estimates execution time and locks.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test on staging, measure execution time, schedule during maintenance window.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Query optimization</div>
+      <span class="fc-label blue">Index & execution plans</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Report query runs in 45 seconds. Find and fix bottleneck.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads query and schema, identifies missing indexes, suggests rewrites, generates execution plans, recommends covering indexes, estimates improvement (target: 2–5 seconds).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test on staging, measure latency reduction, monitor production performance.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Pipeline validation</div>
+      <span class="fc-label blue">ETL/data quality</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>ETL fails silently — records missing in warehouse, no error logs.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Traces data flow (source → transform → load), identifies schema mismatches, type conversion errors, null handling gaps, generates reconciliation queries, finds root cause.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Fix pipeline, add validation checks, rerun with reconciliation.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Backup & recovery</div>
+      <span class="fc-label blue">Disaster recovery</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design backup strategy with RTO/RPO targets, test recovery.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates backup scripts (full + incremental), calculates RPO from transaction volume, generates recovery procedures, creates point-in-time recovery playbook, validates backup integrity checks.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test recovery procedures, measure recovery time, document RTO/RPO.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.70 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Capacity planning</div>
+      <span class="fc-label blue">Growth projections</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Estimate database growth, plan scaling (sharding, read replicas).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes growth trends, projects space/QPS growth, suggests scaling strategy (vertical, horizontal, sharding), estimates cost per strategy, generates implementation plan.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review growth assumptions, select strategy, implement gradually.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Quality assurance and test engineers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Test coverage generation</div>
+      <span class="fc-label blue">Coverage gaps → tests</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Improve coverage from 62% → 80% by generating tests for untested paths.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Scans code, identifies coverage gaps, generates parameterized test cases for edge cases (null, boundaries, errors), follows team naming conventions, suggests test data.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review test correctness, ensure assertions are valid, run full suite.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.75 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Flaky test debugging</div>
+      <span class="fc-label blue">Race conditions & timing</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Test passes 80%, fails 20% — identify timing issue.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads test + implementation, identifies timing-dependent logic, race conditions, global state pollution, suggests fixes (synchronization, cleanup, deterministic mocks).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Implement fixes, run test 100+ times, verify stability.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Integration harness</div>
+      <span class="fc-label blue">Docker Compose + Testcontainers</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate integration tests for API endpoints with real dependencies.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates docker-compose.yml, creates harness with setup/teardown, writes parameterized endpoint tests (happy path, errors, edge cases), generates test data factories.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Run tests, verify dependency setup, add domain-specific assertions.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Performance testing</div>
+      <span class="fc-label blue">Load & stress testing</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate load tests, identify bottlenecks under stress.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates Gatling/JMeter/k6 test scripts for realistic load patterns, defines success criteria (p99 latency, error rate), generates performance baseline scripts, suggests ramp-up profiles.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Run tests, identify bottlenecks, measure before/after improvements.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Test data management</div>
+      <span class="fc-label blue">Fixtures & factories</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create reusable test data fixtures and factories for complex objects.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes domain model, generates factories/builders for all entities, creates fixtures for common scenarios (valid user, expired token, etc.), generates realistic test data.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review factories, add edge case combinations, maintain as domain evolves.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Cloud architects and solutions engineers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Multi-cloud strategy</div>
+      <span class="fc-label blue">AWS + GCP + Azure</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design IaC for AWS + GCP with cost optimization and failover.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes app requirements, generates Terraform modules for both clouds with identical interfaces, compares costs, suggests hybrid strategy (hot-warm-cold failover), generates drift detection.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review cost projections, test failover, stage in low-traffic environment.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–1.00 | <strong>Time saved:</strong> 3–6 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Serverless migration</div>
+      <span class="fc-label blue">Lambda + DynamoDB</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Convert monolith to serverless (Lambda, DynamoDB, API Gateway).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Maps functions to Lambda handlers, generates DynamoDB schema, creates API Gateway routes, generates IaC (CDK/Terraform), estimates cost savings vs. monolith.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test cold starts, verify latency, calculate savings, stage gradually.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.50–1.20 | <strong>Time saved:</strong> 4–8 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Compliance automation</div>
+      <span class="fc-label blue">SOC 2 / ISO 27001</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Implement compliance controls (encryption, logging, backup, access).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Maps compliance requirements to infrastructure controls, generates AWS Config rules, CloudTrail audit trails, creates evidence collection scripts, generates audit checklists.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review with compliance team, test audit collection, prepare for auditor review.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.35–0.85 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Cost optimization</div>
+      <span class="fc-label blue">FinOps & savings</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Analyze cloud spend, identify savings opportunities (20–40% typical).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes Cost Explorer data, identifies unused resources, suggests reserved instances, rightsizing opportunities, generated optimization code (terminate idle, schedule scaling).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review recommendations, test optimizations, measure savings.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Disaster recovery</div>
+      <span class="fc-label blue">RTO/RPO planning</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design and implement DR across regions with RTO/RPO targets.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates multi-region infrastructure, generates replication config, creates failover runbooks, calculates RTO/RPO, generates health check endpoints, suggests monitoring strategy.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Execute DR drills, measure actual RTO, verify data consistency.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–0.95 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Mobile developers (iOS/Android engineers)</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: API SDK generation</div>
+      <span class="fc-label blue">Swift/Kotlin codegen</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Backend changed API format. Generate updated Swift/Kotlin models.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads OpenAPI/Swagger spec, generates Codable models (Swift) or data classes (Kotlin), handles enum serialization, generates version compatibility, creates unit tests.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test JSON serialization, verify backward compatibility, integrate into app.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.10–0.25 | <strong>Time saved:</strong> 30–60 minutes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: State management refactor</div>
+      <span class="fc-label blue">Redux → Zustand/MobX</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Migrate from Redux Toolkit to lighter state management.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads Redux store, actions, reducers, generates equivalent using Zustand/MobX, traces state mutations, preserves async logic, generates migration tests.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test state changes, verify async behavior, run on device.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.70 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Memory profiling</div>
+      <span class="fc-label blue">Leaks & optimization</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>App crashes on older devices. Find memory leaks.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads crash logs and code, identifies circular references, large allocations, retained listeners, suggests fixes (weak refs, cleanup, lazy loading), generates profiling instrumentation.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Profile with Xcode/Android Profiler, verify fixes, test on target devices.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Navigation architecture</div>
+      <span class="fc-label blue">Navigation graphs & flows</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate navigation architecture (React Navigation/Jetpack Compose).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates navigation graph, generates screen components, defines navigation actions, handles deep links, generates type-safe navigation helpers.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test navigation flows, verify deep link handling, test on device.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Platform-specific optimization</div>
+      <span class="fc-label blue">iOS/Android specifics</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Optimize for iOS (battery, background) and Android (permissions, lifecycle).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates platform-specific code (location updates, notification handling, permission requests), suggests OS-appropriate patterns, generates background task handling.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test on real devices, verify permissions, check battery impact.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Machine learning engineers and data scientists</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: ML pipeline orchestration</div>
+      <span class="fc-label blue">Airflow/Prefect + MLflow</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create end-to-end pipeline: load → preprocess → train → infer with monitoring.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates Airflow/Prefect pipeline, implements data validation (Great Expectations), adds MLflow versioning, creates inference wrapper, generates stage tests, adds alerting.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test each stage, monitor metrics, deploy to production.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–1.00 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Feature engineering</div>
+      <span class="fc-label blue">Feature discovery & importance</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Accuracy plateaued. Identify missing features, engineer new ones.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes features and raw data, suggests interactions/aggregations, generates feature code, calculates importance via SHAP, suggests domain-specific features.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test feature combinations, retrain, measure improvement.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Model evaluation framework</div>
+      <span class="fc-label blue">Baseline vs LSTM vs Transformer</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Compare 3 architectures with proper statistical tests.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates training scripts for each, creates evaluation metrics (accuracy, precision, F1, AUC), generates comparison plots, runs statistical significance tests, suggests hyperparameter ranges.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Run experiments, interpret results, select best model.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.75 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Hyperparameter optimization</div>
+      <span class="fc-label blue">Bayesian optimization</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Optimize hyperparameters for best validation accuracy.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates Optuna/Ray Tune search space, defines objective function, creates tuning script, generates result analysis (importance, correlations), suggests final hyperparameters.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Run search (can be slow), review top-5 params, retrain final model.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Model explainability</div>
+      <span class="fc-label blue">SHAP/LIME/attention</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Explain predictions for debugging and model trust.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates SHAP summary plots, creates LIME explanations for individual predictions, suggests attention visualization for NLP, generates decision rules (ANCHOR), documents insights.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review explanations, identify bias, document findings for stakeholders.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Documentation and technical writers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: API documentation</div>
+      <span class="fc-label blue">OpenAPI + Markdown</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Auto-generate API reference from code.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads controllers/handlers, extracts endpoints, generates OpenAPI spec, creates markdown docs with examples, generates request/response samples with curl commands.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review examples, check accuracy, publish to docs site.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Architecture decision records</div>
+      <span class="fc-label blue">ADR format</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Document architectural decision (Service A vs Service B).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads relevant code and config, generates ADR with context, decision, alternatives, consequences, accepted/rejected status.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review for accuracy, add team notes, archive in ADR repository.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.10–0.25 | <strong>Time saved:</strong> 30–60 minutes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Onboarding guide</div>
+      <span class="fc-label blue">New contributor flow</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate step-by-step guide for new team members.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates setup instructions, creates architecture overview with ASCII diagrams, writes troubleshooting guide, suggests reading order, creates learning checklist.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Follow guide yourself, customize for your OS, test with new hire.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Runbook generation</div>
+      <span class="fc-label blue">Incident procedures</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create runbooks for common incidents (database failover, deployment rollback).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates step-by-step procedures with validation checks, shell commands, estimated time per step, escalation paths, success criteria.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Execute in staging, time each step, refine for clarity.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Troubleshooting guides</div>
+      <span class="fc-label blue">Common problems & solutions</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Create FAQ + troubleshooting guide from support tickets.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes common errors, generates FAQ with step-by-step fixes, creates decision tree for diagnosis, suggests preventive measures, links to relevant docs.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Review for accuracy, test solutions, publish to docs site.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Financial/fintech engineers and compliance officers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: PCI-DSS audit</div>
+      <span class="fc-label red">Compliance scanning</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Audit payment code for PCI-DSS violations (credentials, encryption, access).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Scans for hardcoded credentials, unencrypted transmission, weak access controls, generates compliance mapping, suggests remediation with code examples, generates audit evidence.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Implement fixes, retest, document compliance.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.40–1.00 | <strong>Time saved:</strong> 3–5 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Reconciliation validation</div>
+      <span class="fc-label red">Accounting accuracy</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Verify reconciliation matches double-entry bookkeeping standards.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Reads reconciliation logic, validates against accounting rules, checks rounding, traces settlement flows, generates edge case tests (partial refunds, reversals, disputes).</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test edge cases, audit with accounting team, sign off.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Audit trail design</div>
+      <span class="fc-label red">Immutable logs</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate immutable audit trail for all financial transactions.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Designs append-only schema, generates versioning for data changes, creates auditor query interface, generates retention policies, implements tamper detection.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test immutability, verify auditor access, document retention rules.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Settlement workflow</div>
+      <span class="fc-label red">Multi-step settlement</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design robust settlement: authorization → clearing → settlement with rollback.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates state machine for settlement states, implements idempotent operations, generates rollback procedures, creates reconciliation checks, adds timeout handling.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test settlement flows, verify idempotency, audit with compliance team.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.30–0.75 | <strong>Time saved:</strong> 2–3 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Regulatory reporting</div>
+      <span class="fc-label red">Automated compliance</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate automated regulatory reports (daily settlement, monthly reconciliation).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates report generators for each requirement, implements data extraction from ledger, generates validation checks, creates audit trail for each report, schedules automated runs.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test report accuracy, verify completeness, submit to regulators.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.35–0.85 | <strong>Time saved:</strong> 2–4 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Release engineers and build system owners</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 1: Semantic versioning</div>
+      <span class="fc-label blue">Auto-versioning</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Auto-bump version (major/minor/patch) based on commits.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes commit messages and diffs, applies semver rules, generates changelog from commits, tags release, creates build artifacts, generates release notes.</p>
+      </div>
+      <div>
+        <h4>You gate</h4>
+        <p>Review version bump, approve release, monitor deployment.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.10–0.25 | <strong>Time saved:</strong> 30–60 minutes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 2: Multi-platform builds</div>
+      <span class="fc-label blue">Linux/macOS/Windows</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate unified build config for all platforms.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Generates Makefile/CMake/Gradle, identifies platform-specific deps, handles path differences, creates cross-platform test runners, generates CI matrix.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test builds on each platform, verify artifacts.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.20–0.50 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 3: Artifact management</div>
+      <span class="fc-label blue">Retention & cleanup</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Design artifact retention + cleanup policy, manage dependencies.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes dependency tree, identifies unused artifacts, generates retention policies (keep last N, delete pre-release), creates vulnerability scanning integration.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Implement policies, monitor repository size, audit dependencies.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 4: Build caching strategy</div>
+      <span class="fc-label blue">CI/CD optimization</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Optimize CI build time with smart caching.</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Analyzes dependencies, designs cache keys, generates cache warming strategies, measures cache hit rates, suggests cache invalidation triggers.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Measure build time improvement, monitor cache efficiency.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.15–0.40 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Example 5: Binary distribution</div>
+      <span class="fc-label blue">Package & deploy</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Task</h4>
+        <p>Generate distribution channels (npm, PyPI, Homebrew, Docker, GitHub Releases).</p>
+      </div>
+      <div>
+        <h4>What Claude does</h4>
+        <p>Creates package.json/setup.py/Dockerfile, generates publish scripts, handles release signing, creates update checkers, generates installation docs.</p>
+      </div>
+      <div>
+        <h4>You validate</h4>
+        <p>Test installation on target platforms, verify authenticity checks.</p>
+      </div>
+      <div>
+        <h4>Time & cost</h4>
+        <p><strong>Cost:</strong> $0.25–0.60 | <strong>Time saved:</strong> 1–2 hours</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout gold-callout" style="margin-top:28px">
+  <strong>The common thread across roles:</strong> Claude Code excels at tasks that require reading and understanding large amounts of code, identifying patterns across files, and generating implementation details. Every role uses the same three capabilities differently: exploration (what does the code do?), planning (how should we change it?), and execution (make the change safely). The difference is domain-specific knowledge — DevOps knows infrastructure constraints, security teams know threat models, frontend knows accessibility standards, finance knows compliance requirements, ML engineers know model validation. Bring that knowledge. Claude brings code comprehension at scale.
+</div>
+
+<!-- ═══════════════ 10 REFERENCE ═══ -->
 <section class="section" id="reference">
 <div class="container">
 <div class="section-head" onclick="toggleSection(this)" tabindex="0">
-  <div class="section-no">08</div>
+  <div class="section-no">10</div>
   <div>
     <div class="section-label">Reference</div>
     <h2 class="section-title">Quick reference for daily use. The questions that come up in week one, answered directly.</h2>
@@ -1207,7 +3032,7 @@ td{color:#423c35}
 </section>
 
 <footer class="footer">
-  Claude Code Engineer Training | May 2026 | Current as of Claude Code CLI, Claude Haiku 4.5 / Sonnet 4.6 / Opus 4.7
+  Claude Code Engineer Training | May 2026 | 12 role-specific personas with 3+ examples each
 </footer>
 
 <script>
