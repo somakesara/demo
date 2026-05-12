@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Economics — Doing More with Less</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191714;
+  --paper:#fbfaf7;
+  --warm:#f4efe6;
+  --warm2:#ebe4d8;
+  --line:#ded6c8;
+  --muted:#766f64;
+  --muted2:#9a9184;
+  --clay:#b65f34;
+  --blue:#245c8c;
+  --green:#26724c;
+  --plum:#6a3f83;
+  --gold:#a77a25;
+  --red:#9e3830;
+  --dark:#15120f;
+  --code:#f0ebe2;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"DM Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;font-weight:300;line-height:1.72;overflow-x:hidden}
+a{color:inherit}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--warm2);border:1px solid var(--line);border-radius:5px;padding:.08rem .32rem}
+pre{margin:0;white-space:pre;overflow-x:auto}
+
+/* ── HERO ── */
+.hero{min-height:92vh;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto;color:#fbf5eb;background:radial-gradient(ellipse 68% 58% at 12% 50%,rgba(38,114,76,.34),transparent 60%),radial-gradient(ellipse 50% 62% at 84% 20%,rgba(167,122,37,.26),transparent 58%),linear-gradient(135deg,#0c130f 0%,#0f120a 54%,#141008 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,black 35%,transparent 100%)}
+
+/* hero cost panel */
+.hero-panel{position:absolute;inset:auto 5vw 7vh auto;width:min(440px,38vw);min-width:280px;opacity:.9;display:grid;gap:12px}
+.cost-card{border:1px solid rgba(251,245,235,.14);background:rgba(14,20,14,.82);backdrop-filter:blur(10px);border-radius:10px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.36)}
+.cost-card-head{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.cost-card-head.bad{color:#f08080;background:rgba(158,56,48,.18)}
+.cost-card-head.good{color:#82d9a8;background:rgba(38,114,76,.18)}
+.cost-card-body{padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;color:rgba(251,245,235,.72)}
+.cost-card-body .dim{color:rgba(251,245,235,.34)}
+.cost-card-body .red{color:#f08080}
+.cost-card-body .ok{color:#82d9a8}
+.cost-card-body .gold{color:#f0c46d}
+.cost-badge{font-family:var(--mono);font-size:12px;font-weight:400;padding:2px 8px;border-radius:8px}
+.cost-badge.bad{background:rgba(158,56,48,.3);color:#f08080}
+.cost-badge.good{background:rgba(38,114,76,.3);color:#82d9a8}
+.savings-bar{margin-top:10px;background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden}
+.savings-fill{height:100%;background:linear-gradient(to right,#26724c,#82d9a8);border-radius:4px;animation:growBar 1.4s 2s ease forwards;width:0}
+@keyframes growBar{to{width:87%}}
+.savings-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#82d9a8;margin-top:6px}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cost-card{animation:fadeUp .5s ease forwards;opacity:0}
+.cost-card:nth-child(1){animation-delay:.2s}
+.cost-card:nth-child(2){animation-delay:.8s}
+.cost-card:nth-child(3){animation-delay:1.4s}
+.cursor{display:inline-block;width:7px;height:1em;background:#82d9a8;vertical-align:text-bottom;animation:blink 1s step-end infinite}
+
+.hero-inner{position:relative;z-index:2;width:min(1160px,100%);margin:0 auto;padding:92px 44px 48px;display:grid;align-content:center}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#82d9a8;margin-bottom:18px}
+h1,h2,h3{font-family:var(--serif);font-weight:300;line-height:1.06;letter-spacing:0;margin:0}
+h1{max-width:780px;font-size:clamp(44px,8vw,96px)}
+h1 em{color:#82d9a8;font-style:italic}
+.hero-sub{max-width:620px;margin-top:24px;color:rgba(251,245,235,.66);font-size:clamp(16px,2vw,20px);line-height:1.62}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border:1px solid rgba(251,245,235,.22);border-radius:8px;color:#fbf5eb;background:rgba(251,245,235,.07);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.btn.primary{background:#82d9a8;color:#0c130f;border-color:#82d9a8}
+.scroll-hint{position:relative;z-index:2;padding:0 44px 34px;text-align:center;color:rgba(251,245,235,.34);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;background:rgba(251,250,247,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{flex:0 0 auto;padding:15px 18px;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.topnav a:hover,.topnav a.active{color:var(--green);border-color:var(--green)}
+
+/* ── SECTION COLLAPSE ── */
+.section{border-bottom:1px solid var(--line)}
+.section.collapsed .container>:not(.section-head){display:none}
+.section-head{cursor:pointer;position:relative;padding-right:54px;display:grid;grid-template-columns:84px 1fr;gap:28px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.section-head:focus-within{outline:2px solid rgba(38,114,76,.55);outline-offset:6px}
+.section-head:hover .section-title{color:var(--green)}
+.section-toggle{cursor:pointer;padding:0;position:absolute;right:0;top:8px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--paper);font-family:var(--mono);font-size:18px;transition:background .2s,color .2s,transform .2s,border-color .2s}
+.section:not(.collapsed) .section-toggle{transform:rotate(45deg);background:var(--dark);color:var(--paper);border-color:var(--dark)}
+.section.collapsed .section-head{padding-bottom:0;border-bottom:0}
+.section.collapsed .container{padding-top:34px;padding-bottom:34px}
+.section-status{margin-top:12px;color:var(--muted2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ── LAYOUT ── */
+.container{width:min(1120px,100%);margin:0 auto;padding:72px 44px}
+.section-no{color:var(--green);opacity:.16;font-family:var(--serif);font-size:78px;line-height:1}
+.section-label{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:8px 0}
+.section-title{font-size:clamp(34px,4.4vw,56px);max-width:880px}
+.lead{max-width:760px;color:#4c453d;font-size:18px;margin:18px 0 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:34px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+
+/* ── PANELS ── */
+.panel{border:1px solid var(--line);background:var(--warm);border-radius:8px;padding:22px}
+.panel.white{background:#fffdfa}
+.panel.dark{background:#1b1713;color:#fbf5eb;border-color:#302720}
+.panel.green{background:#edf4ee;border-color:rgba(38,114,76,.2)}
+.panel h3{font-size:27px;margin-bottom:10px}
+.panel p{margin:0;color:#50483f}
+.panel.dark p{color:rgba(251,245,235,.66)}
+.panel.green p{color:#253d2d}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;margin-bottom:12px;color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.tag.red{color:var(--red)}
+.tag.gold{color:var(--gold)}
+.tag.blue{color:var(--blue)}
+.tag.clay{color:var(--clay)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:26px;border-left:3px solid var(--green);background:#edf4ee;padding:16px 18px;border-radius:8px;color:#253d2d;line-height:1.7}
+.warn{border-left-color:var(--red);background:#f7ece9;color:#4a2b28}
+.info{border-left-color:var(--blue);background:#eaf0f7;color:#1e3a52}
+.gold-callout{border-left-color:var(--gold);background:#faf5e8;color:#3d2e08}
+
+/* ── CODE BLOCKS ── */
+pre.codeblock,div.codeblock{margin:0;border:0;border-radius:0;padding:18px 22px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;color:#2a2520;background:var(--code);white-space:pre;word-break:normal;overflow-wrap:normal}
+.codeblock .dim{color:#918779}
+.codeblock .key{color:#8f3d16;font-weight:400}
+.codeblock .ok{color:#1f7045}
+.codeblock .blue{color:#1f5d8d}
+.codeblock .red{color:#9e3830}
+.codeblock .str{color:#2d6b2d}
+.codeblock .cmt{color:#9a9184;font-style:italic}
+.codeblock .gold{color:#a07020}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;margin-top:28px}
+table{width:100%;border-collapse:collapse;min-width:600px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:14px 12px;text-align:left;vertical-align:top}
+th{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+td{color:#423c35}
+td.good{color:var(--green);font-weight:400}
+td.bad{color:var(--red)}
+
+/* ── FRAMEWORK CARDS ── */
+.framework-cards{display:grid;gap:18px;margin-top:28px}
+.framework-card{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fffdfa}
+.fc-head{padding:18px 20px;background:var(--warm);border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.fc-title{font-family:var(--serif);font-size:24px;line-height:1.1}
+.fc-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:12px;white-space:nowrap}
+.fc-label{color:var(--green);border:1px solid rgba(38,114,76,.4);background:#edf4ee}
+.fc-label.red{color:var(--red);border-color:rgba(158,56,48,.4);background:#f7ece9}
+.fc-label.gold{color:var(--gold);border-color:rgba(167,122,37,.4);background:#faf5e8}
+.fc-label.blue{color:var(--blue);border-color:rgba(36,92,140,.4);background:#eaf0f7}
+.fc-body{padding:18px 20px;display:grid;gap:14px}
+.fc-body h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin:0 0 6px}
+.fc-body p{font-size:13.5px;color:#433d36;line-height:1.65;margin:0}
+
+/* ── SCENE ── */
+.scene{margin-top:0;border-left:3px solid var(--green);padding:18px 22px;background:linear-gradient(to right,#edf4ee,#fffdfa);border-radius:0 8px 8px 0;font-size:16px;color:#3a3028;line-height:1.8}
+.scene+.scene{margin-top:14px}
+.scene-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+
+/* ── PRINCIPLE LIST ── */
+.principle-list{margin-top:28px;display:grid;gap:16px}
+.principle{border:1px solid var(--line);border-radius:8px;padding:20px;background:#fffdfa}
+.principle h4{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink)}
+.principle p{margin:0;color:#514a42;font-size:14px;line-height:1.7}
+
+/* ── COMPARE ROW ── */
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:24px}
+.compare-cell{background:var(--paper);padding:20px 22px;font-size:14px;color:#3a3028;line-height:1.65}
+.compare-cell.head{background:var(--warm);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:13px 22px}
+.compare-cell.head.waste{color:var(--red)}
+.compare-cell.head.save{color:var(--green)}
+
+/* ── TRACE ── */
+.trace{margin-top:28px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.trace-head{padding:14px 18px;background:var(--dark);color:#fbf5eb;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:flex;gap:10px;align-items:center}
+.trace-dot{width:8px;height:8px;border-radius:50%;background:#82d9a8;flex-shrink:0}
+.trace-dot.pulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.trace-row{display:grid;grid-template-columns:130px 1fr;border-bottom:1px solid var(--line)}
+.trace-row:last-child{border-bottom:0}
+.trace-who{padding:14px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--line);display:flex;align-items:flex-start;padding-top:16px;flex-shrink:0}
+.trace-who.bad{color:var(--red);background:#fdf1ef}
+.trace-who.good{color:var(--green);background:#f0f7f2}
+.trace-who.tip{color:var(--gold);background:#faf5e8}
+.trace-who.result{color:var(--blue);background:#f2f6fb}
+.trace-what{padding:14px 18px;font-size:14px;color:#3a3028;line-height:1.65;background:#fffdfa}
+.trace-what code{font-size:.83em}
+.outcome{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:2px 8px;border-radius:10px}
+.outcome.save{background:#edf4ee;color:var(--green);border:1px solid rgba(38,114,76,.3)}
+.outcome.waste{background:#fdf1ef;color:var(--red);border:1px solid rgba(158,56,48,.3)}
+.outcome.note{background:#eaf0f7;color:var(--blue);border:1px solid rgba(36,92,140,.3)}
+
+/* ── CHAPTER BRIDGE ── */
+.chapter-bridge{margin:40px 0 0;padding:22px 24px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,#f0f7f2,#f9f5ef);font-size:16px;color:#3a3028;line-height:1.82}
+.chapter-bridge strong{color:var(--green)}
+.chapter-num{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+
+/* ── SAVING METER — unique to this microsite ── */
+.meter-grid{display:grid;gap:14px;margin-top:28px}
+.meter-row{border:1px solid var(--line);border-radius:8px;background:#fffdfa;padding:16px 20px}
+.meter-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.meter-name{font-family:var(--serif);font-size:20px}
+.meter-nums{font-family:var(--mono);font-size:12px;color:var(--muted2)}
+.meter-nums span{color:var(--green);font-weight:400}
+.meter-track{background:var(--warm2);border-radius:4px;height:8px;overflow:hidden;display:grid;grid-template-columns:1fr}
+.meter-before,.meter-after{height:8px;border-radius:4px;transition:width 1s ease}
+.meter-wrap{display:grid;gap:4px}
+.meter-before{background:var(--red);opacity:.55}
+.meter-after{background:var(--green)}
+.meter-desc{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* ── DISCLAIMER / FOOTER ── */
+.disclaimer{background:#f7ece9;border-top:1px solid var(--line);padding:28px 44px}
+.disclaimer-inner{width:min(1120px,100%);margin:0 auto;font-size:14px;color:#4a2b28;line-height:1.7}
+.disclaimer-inner h3{font-family:var(--serif);margin:0 0 14px;font-size:22px;font-weight:400}
+.disclaimer-inner p{margin:0 0 12px}
+.disclaimer-inner p:last-child{margin-bottom:0}
+.footer{padding:28px 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+@media(max-width:880px){
+  .hero-panel{position:relative;inset:auto;width:auto;margin:0 24px 34px}
+  .hero-inner{padding:76px 28px 28px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .compare-row{grid-template-columns:1fr}
+  .trace-row{grid-template-columns:1fr}
+  .trace-who{border-right:0;border-bottom:1px solid var(--line);padding-top:12px}
+  .fc-head{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  body{font-size:16px}
+  .container{padding:54px 24px}
+  .section-head{grid-template-columns:1fr;gap:8px}
+  .section-no{font-size:58px}
+  .topnav a{padding:13px 14px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Claude Code — May 2026</div>
+    <h1>More work.<br><em>Far fewer tokens.</em></h1>
+    <p class="hero-sub">The same task can cost $0.08 or $4.20 depending on how you structure it. Token spend is almost never about the task — it is about the habits around the task. This guide gives you the mental models, concrete patterns, and before/after comparisons that let you ship more with dramatically less.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#mental-model">The mental model</a>
+      <a class="btn" href="#prompt-craft">Prompt craft</a>
+      <a class="btn" href="#caching">Caching</a>
+      <a class="btn" href="#agents">Agent discipline</a>
+      <a class="btn" href="#claude-md">CLAUDE.md</a>
+      <a class="btn" href="#patterns">Pattern library</a>
+      <a class="btn" href="#budget">Team budget</a>
+    </div>
+  </div>
+  <div class="hero-panel" aria-hidden="true">
+    <div class="cost-card">
+      <div class="cost-card-head bad">
+        <span>Naive approach</span>
+        <span class="cost-badge bad">$4.20 / task</span>
+      </div>
+      <div class="cost-card-body">
+        <div class="red">"Refactor our entire payment system</div>
+        <div class="red"> to use async patterns"</div>
+        <div class="dim">→ Claude explores 31K lines</div>
+        <div class="dim">→ Context fills, summarises, refills</div>
+        <div class="dim">→ Broad edits, many rework cycles</div>
+      </div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-card-head good">
+        <span>Scoped approach</span>
+        <span class="cost-badge good">$0.31 / task</span>
+      </div>
+      <div class="cost-card-body">
+        <div class="ok">"Refactor PaymentService.processOrder()</div>
+        <div class="ok"> to use CompletableFuture.allOf().</div>
+        <div class="ok"> Files: PaymentService.java, its test."</div>
+        <div class="dim">→ Claude reads 2 files, plans, executes</div>
+        <div class="dim">→ Tests pass first attempt</div>
+      </div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-card-head good">
+        <span>Savings</span>
+        <span class="cost-badge good">93% less<span class="cursor"></span></span>
+      </div>
+      <div class="cost-card-body">
+        <div class="savings-bar"><div class="savings-fill"></div></div>
+        <div class="savings-label">Same outcome · 93% lower cost</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Each section is self-contained — expand any one to start</div>
+</header>
+
+<nav class="topnav" aria-label="Page sections">
+  <a href="#mental-model">01 Mental model</a>
+  <a href="#prompt-craft">02 Prompt craft</a>
+  <a href="#caching">03 Caching</a>
+  <a href="#agents">04 Agent discipline</a>
+  <a href="#claude-md">05 CLAUDE.md</a>
+  <a href="#patterns">06 Pattern library</a>
+  <a href="#budget">07 Team budget</a>
+  <a href="#reference">08 Reference</a>
+</nav>
+
+<main>
+
+<!-- ═══ 01 MENTAL MODEL ═══ -->
+<section class="section" id="mental-model">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">01</div>
+  <div>
+    <div class="section-label">The mental model</div>
+    <h2 class="section-title">Every token you send is context Claude must process. Every token Claude returns is reasoning you paid for. Waste lives in both directions.</h2>
+    <p class="lead">Token cost is not a function of task complexity. It is a function of context size × iterations. A simple task with a bloated context costs more than a complex task with a precise one. Learning to control context size is the single highest-leverage skill in token economics.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">Why this is counterintuitive</div>
+  Most engineers assume that bigger tasks cost more tokens. In practice, task size is a weak predictor of cost. A junior engineer who types "fix our whole auth system" pays 10× more than a senior who types "fix the token expiry check in <code>JwtValidator.verify()</code> — it's not refreshing tokens within 5 minutes of expiry." The senior knows where the problem is, so Claude never has to look. The junior pays for the search. <strong>Token discipline is knowledge discipline.</strong>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">The three cost drivers</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Driver 1: Context width</div>
+      <span class="fc-label red">Biggest lever</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Every token in your prompt and every file Claude reads counts as input. A 500-line file Claude reads but does not need costs roughly 400 input tokens — about $0.0012. Multiply by 20 unnecessary files and you have added $0.024 to a session before Claude has done any work. At scale, this compounds significantly.</p>
+      </div>
+      <div>
+        <h4>How to control it</h4>
+        <p>Point Claude at specific files. Use file paths, function names, and line numbers when you know them. Never ask Claude to "look at the project" when you mean "look at <code>OrderService.java</code> lines 40–120." The difference is 30,000 tokens vs 640 tokens for the same task.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Driver 2: Iteration count</div>
+      <span class="fc-label red">Second lever</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Each back-and-forth adds the full conversation history to the context for the next turn. A 10-turn session on a 2,000-token conversation costs roughly 2K + 4K + 6K + … = 110K tokens just in accumulated context, before any new work happens. Rework cycles are exponentially expensive.</p>
+      </div>
+      <div>
+        <h4>How to control it</h4>
+        <p>Invest in the first prompt. A precise, constraint-rich first prompt that gets the task right on the first pass eliminates the most expensive iterations. Every "no, not like that" costs 1–3× the original task in cumulative context. Plan before you type.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Driver 3: Output verbosity</div>
+      <span class="fc-label gold">Controllable</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What it is</h4>
+        <p>Output tokens cost 5× input tokens ($15/M vs $3/M). Claude's default output style is thorough — explanations, alternatives, caveats. If you only need the code, you are paying for prose you discard. Claude's explanations are valuable; they are also expensive when you do not need them.</p>
+      </div>
+      <div>
+        <h4>How to control it</h4>
+        <p>Request only what you need. "Give me just the diff, no explanation" cuts output by 60–80% on code tasks. "List only the failing tests, not the passing ones" cuts test output by 90% on green suites. Output format instructions pay for themselves immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="chapter-bridge">
+  <div class="chapter-num">The fundamental equation</div>
+  <strong>Cost = (context_size × turns) + (output_size × 5)</strong>. Every technique in this guide reduces one or more of these three variables. You do not need to use all of them. Pick the highest-leverage ones for your workflow and apply them consistently. A 70% reduction in token spend is achievable in one week of habit change — without reducing the quality of work Claude produces.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 02 PROMPT CRAFT ═══ -->
+<section class="section" id="prompt-craft">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">02</div>
+  <div>
+    <div class="section-label">Prompt craft</div>
+    <h2 class="section-title">The highest-leverage token saving is the prompt itself. A better prompt costs you 30 seconds and saves thousands of tokens.</h2>
+    <p class="lead">Prompt quality and token efficiency are the same thing. A vague prompt forces Claude to explore, clarify, and iterate. A precise prompt lets Claude execute directly. The examples below show real before/after pairs with measured token differences.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Rule 1: Name the file, function, and line</h3>
+
+<div class="compare-row">
+  <div class="compare-cell head waste">Expensive prompt (~18K tokens)</div>
+  <div class="compare-cell head save">Efficient prompt (~1.2K tokens)</div>
+  <div class="compare-cell"><em>"Our user registration is broken. Can you look at the code and figure out what's wrong?"</em><br><br>Claude reads: UserController, UserService, UserRepository, EmailService, ValidationUtils, ApplicationConfig, 3 test files. Explores. Asks clarifying questions.</div>
+  <div class="compare-cell"><em>"The email uniqueness check in <code>UserService.register()</code> line 84 is not throwing on duplicate — it returns null instead. Fix the null check to throw <code>DuplicateEmailException</code>."</em><br><br>Claude reads: 1 function. Fixes it. Done.</div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Rule 2: State constraints upfront, not after</h3>
+
+<div class="scene" style="margin-top:0">
+  <div class="scene-label">The correction tax</div>
+  Every constraint you add <em>after</em> Claude has produced output costs you the full response to discard plus a new full response to regenerate. If Claude writes 800 tokens of code and you then say "oh, also don't use streams" — you have paid for 800 tokens of waste plus another 800 to redo the work. That is a 100% surcharge for a constraint you could have stated upfront in 5 words. <strong>State all constraints in the first message.</strong>
+</div>
+
+<div class="compare-row" style="margin-top:18px">
+  <div class="compare-cell head waste">Adds constraints after (2× cost)</div>
+  <div class="compare-cell head save">States constraints upfront (1× cost)</div>
+  <div class="compare-cell">Turn 1: "Write a method to parse CSV files."<br>Turn 2: "Actually don't use external libraries."<br>Turn 3: "Also handle quoted commas."<br>Turn 4: "And return Optional, not null."<br><br><em>3 regeneration cycles. ~6K tokens.</em></div>
+  <div class="compare-cell">Turn 1: "Write a method to parse CSV files. Constraints: no external libraries, handle quoted commas, return <code>Optional&lt;List&lt;String[]&gt;&gt;</code>, not null."<br><br><em>1 generation. ~1.8K tokens.</em></div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Rule 3: Specify output format to eliminate unwanted prose</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Without format instruction</th>
+        <th>With format instruction</th>
+        <th>Saving</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Run tests, report result</td>
+        <td>Full test output + explanation of each failure + suggestion for each + summary paragraph</td>
+        <td><code>"List only failing tests: name, line, assertion that failed. No passing tests."</code></td>
+        <td class="good">~75% fewer output tokens</td>
+      </tr>
+      <tr>
+        <td>Code review</td>
+        <td>Summary, inline comments, explanation of each pattern, alternatives considered, overall assessment</td>
+        <td><code>"List issues only: severity, file:line, one-line description. No praise, no alternatives."</code></td>
+        <td class="good">~60% fewer output tokens</td>
+      </tr>
+      <tr>
+        <td>Find all usages of a function</td>
+        <td>Narrative walkthrough of each usage with context and explanation</td>
+        <td><code>"List as: file:line — one-line description. No prose."</code></td>
+        <td class="good">~80% fewer output tokens</td>
+      </tr>
+      <tr>
+        <td>Generate a diff</td>
+        <td>Diff + explanation of every change + rationale for each decision</td>
+        <td><code>"Provide the diff only. No explanation unless I ask."</code></td>
+        <td class="good">~70% fewer output tokens</td>
+      </tr>
+      <tr>
+        <td>Explain an error</td>
+        <td>Background on the error type, historical context, multiple possible causes, links to documentation</td>
+        <td><code>"Root cause in 2 sentences. Fix in 3 lines. Nothing else."</code></td>
+        <td class="good">~85% fewer output tokens</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">Rule 4: Use the right model for the task</h3>
+
+<div class="grid-3">
+  <div class="panel white">
+    <span class="tag">Haiku 4.5</span>
+    <h3>Cheap and fast</h3>
+    <p>$0.80/M input, $4/M output. Use for: file search, simple edits, formatting, linting, boilerplate generation, test scaffolding. Anything well-defined with a clear correct answer. Switching from Sonnet to Haiku on these tasks cuts cost by ~75%.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag blue">Sonnet 4.6</span>
+    <h3>Default for most work</h3>
+    <p>$3/M input, $15/M output. The right choice for: debugging, refactoring, code review, planning, explaining complex code. The accuracy gain over Haiku is worth the cost on tasks requiring genuine reasoning.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag gold">Opus 4.7</span>
+    <h3>Reserve for hard problems</h3>
+    <p>$15/M input, $75/M output. Use only when Sonnet demonstrably fails: complex architectural decisions, multi-constraint optimization, adversarial security analysis. At 5× Sonnet's cost, the upgrade must earn its price every time.</p>
+  </div>
+</div>
+
+<div class="callout gold-callout" style="margin-top:28px">
+  <strong>The switching habit:</strong> Most engineers default to Sonnet for everything and Opus for "important" things. The real optimization is routing well-defined tasks to Haiku. A lint check on Haiku costs $0.002. The same check on Sonnet costs $0.012. Run that 500 times a month and you've saved $5 for no change in outcome. At team scale, systematic model routing is worth auditing explicitly.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 03 CACHING ═══ -->
+<section class="section" id="caching">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">03</div>
+  <div>
+    <div class="section-label">Prompt caching</div>
+    <h2 class="section-title">Anthropic's prompt cache turns repeated context from a recurring cost into a one-time investment.</h2>
+    <p class="lead">Prompt caching reduces input token cost to roughly 10% for content that was cached in the previous 5 minutes. For scheduled agents, repeated audits, and any workflow that sends the same system context on every call, this is the single biggest cost reduction available — often 70–90% of input cost, with no change in output quality.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel green">
+    <span class="tag">What gets cached</span>
+    <h3>Stable prefix content</h3>
+    <p>The cache stores the longest common prefix of your prompt across calls. Your system prompt, CLAUDE.md contents, architectural documentation, shared codebase context — all of it is cached if it appears first and stays unchanged. The variable part (the specific task) goes at the end and is not cached. This is the right structure anyway for clarity.</p>
+  </div>
+  <div class="panel green">
+    <span class="tag">TTL and mechanics</span>
+    <h3>5-minute TTL</h3>
+    <p>The cache entry lives for 5 minutes from last use. A session that stays active resets the clock on each call. Scheduled agents that run every 5 minutes stay in cache continuously. Agents that run hourly pay full price on each run unless you explicitly structure for caching with the SDK's <code>cache_control</code> parameter.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Cache-friendly prompt structure</h3>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot pulse"></div>
+    Prompt structure — cache-optimized vs cache-busting
+  </div>
+  <div class="trace-row">
+    <div class="trace-who bad">Cache miss</div>
+    <div class="trace-what">
+      Variable content first: <code>"Today is May 12. Analyze this PR: [diff]. Using our standards: [5KB of standards]."</code><br>
+      The date changes daily → prefix never matches → full price every call.<br>
+      <span class="outcome waste">~$0.015 / call × 30 calls/day = $4.50/month</span>
+    </div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who good">Cache hit</div>
+    <div class="trace-what">
+      Stable content first: <code>"[5KB of standards] Analyze this PR: [diff]. Today is May 12."</code><br>
+      Standards are stable → cached after first call → 90% cheaper on every subsequent call within 5 min.<br>
+      <span class="outcome save">~$0.0015 / call × 30 calls/day = $0.45/month</span>
+    </div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who result">Result</div>
+    <div class="trace-what">Same analysis quality. Same output. <strong>$4.05/month saved</strong> by reordering the prompt. At team scale (10 engineers × 30 calls/day), that is $40.50/month from a 30-second prompt restructure. <span class="outcome save">90% saved</span></div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">SDK usage — enabling cache_control</h3>
+
+<div class="framework-card" style="margin-top:0">
+  <div class="fc-head">
+    <div class="fc-title">Anthropic SDK — cache_control parameter</div>
+    <span class="fc-label blue">Python + TypeScript</span>
+  </div>
+  <div style="border-top:1px solid var(--line)">
+<pre class="codeblock"><span class="cmt"># Python — mark stable context as cacheable</span>
+<span class="key">import</span> anthropic
+
+client = anthropic.Anthropic()
+
+<span class="cmt"># Load once — this is your stable prefix</span>
+system_doc = <span class="str">open("CLAUDE.md").read()</span>
+arch_doc   = <span class="str">open("ARCHITECTURE.md").read()</span>
+
+response = client.messages.create(
+  model=<span class="str">"claude-sonnet-4-6"</span>,
+  max_tokens=<span class="gold">1024</span>,
+  system=[
+    {
+      <span class="str">"type"</span>: <span class="str">"text"</span>,
+      <span class="str">"text"</span>: system_doc + arch_doc,
+      <span class="str">"cache_control"</span>: {<span class="str">"type"</span>: <span class="str">"ephemeral"</span>}  <span class="cmt"># ← mark for caching</span>
+    }
+  ],
+  messages=[
+    {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: variable_task}  <span class="cmt"># ← goes last, not cached</span>
+  ]
+)
+
+<span class="cmt"># Check cache performance</span>
+<span class="key">print</span>(response.usage.cache_read_input_tokens)   <span class="cmt"># tokens served from cache (10% cost)</span>
+<span class="key">print</span>(response.usage.cache_creation_input_tokens)  <span class="cmt"># tokens written to cache (full cost, once)</span></pre>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>The cache creation cost:</strong> The first call that creates a cache entry costs 25% more than a normal call (cache write overhead). Every subsequent hit costs 10% of normal. Break-even is at 2 hits. Three or more hits and you are saving money. For any task that runs more than twice in 5 minutes, caching pays for itself.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Real savings: nightly security scan</h3>
+
+<div class="meter-grid">
+  <div class="meter-row">
+    <div class="meter-label">
+      <div class="meter-name">Without prompt caching</div>
+      <div class="meter-nums">30 scans/day × $0.18 = <span>$5.40/day · $162/month</span></div>
+    </div>
+    <div class="meter-wrap">
+      <div class="meter-track"><div class="meter-before" style="width:100%"></div></div>
+    </div>
+    <div class="meter-desc">Each scan sends full system prompt + security rules + codebase context. Full price every time.</div>
+  </div>
+  <div class="meter-row">
+    <div class="meter-label">
+      <div class="meter-name">With prompt caching</div>
+      <div class="meter-nums">First scan $0.22 (cache write) + 29 hits × $0.018 = <span>$0.74/day · $22/month</span></div>
+    </div>
+    <div class="meter-wrap">
+      <div class="meter-track"><div class="meter-after" style="width:14%"></div></div>
+    </div>
+    <div class="meter-desc">Stable system prompt cached after scan 1. Each subsequent scan pays 10% of input cost. Same analysis quality.</div>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 04 AGENT DISCIPLINE ═══ -->
+<section class="section" id="agents">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">04</div>
+  <div>
+    <div class="section-label">Agent discipline</div>
+    <h2 class="section-title">Agents are the most powerful tool and the most expensive mistake. Use them precisely or not at all.</h2>
+    <p class="lead">A multi-agent loop costs 3–10× more than a single focused session for the same task. That multiplier is earned when agents run genuinely parallel work that cannot be sequenced. It is wasted when agents are used because the task felt complex, not because it actually required parallelism.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">When agents earn their cost</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>The task has genuinely parallel independent branches</h4>
+    <p>Security review + performance analysis + compliance check on the same PR. Each requires different expertise, different file access, different reasoning. Running them sequentially in one session serializes parallel work. Three agents running simultaneously finish in 1/3 the wall-clock time. The 3× token cost is justified by 3× throughput and independent context isolation.</p>
+  </div>
+  <div class="principle">
+    <h4>The task overflows a single context window</h4>
+    <p>A 500K-line codebase migration cannot fit in one 200K token context. An orchestrating agent routes subproblems to workers with isolated context. Each worker reads only its assigned module. Total tokens: lower than stuffing everything into one context and watching it summarize itself repeatedly.</p>
+  </div>
+  <div class="principle">
+    <h4>You need context isolation to avoid cross-contamination</h4>
+    <p>An Explore agent that searches broadly for a pattern should not pollute the main session's context with thousands of intermediate grep results. The subagent absorbs the noise, returns a clean summary. Your main session stays lean.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:16px;font-size:27px">When agents waste money</h3>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot"></div>
+    Agent misuse patterns — with cost impact
+  </div>
+  <div class="trace-row">
+    <div class="trace-who bad">Mistake</div>
+    <div class="trace-what">
+      Using an Explore agent to find a file you could locate in 10 seconds with Glob.<br>
+      <code>"Use an agent to find where we handle user authentication."</code><br>
+      Agent spawns, reads dozens of files, returns after 2 minutes.<br>
+      <span class="outcome waste">~$0.80 · could have been $0.003 with Glob</span>
+    </div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who bad">Mistake</div>
+    <div class="trace-what">
+      Sequential tasks wrapped in parallel agents that block on each other's output.<br>
+      Agent A finishes writing code → Agent B reviews it → Agent C writes tests based on B's review.<br>
+      Sequential dependency makes parallelism impossible. You paid 3× for 1× work.<br>
+      <span class="outcome waste">3× cost · 0× speed gain</span>
+    </div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who bad">Mistake</div>
+    <div class="trace-what">
+      Running an agent loop without a scope constraint, letting it explore indefinitely.<br>
+      <code>"Audit the entire codebase for security issues."</code> with no file boundary.<br>
+      Agent reads every file. Finds 200 minor style issues alongside 3 real vulnerabilities. Takes 18 minutes.<br>
+      <span class="outcome waste">~$14 · scoped version: $1.20</span>
+    </div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tip">Fix</div>
+    <div class="trace-what">
+      Before spawning an agent, ask: <em>Can I sequence this in a single session?</em> If yes — do not use an agent. <em>Does the agent have a bounded scope?</em> Define file paths or module names before it starts. <em>Are the branches truly independent?</em> If A's output feeds B, use one session with two sequential tasks.<br>
+      <span class="outcome save">discipline saves 60–90% on agent tasks</span>
+    </div>
+  </div>
+</div>
+
+<div class="compare-row" style="margin-top:28px">
+  <div class="compare-cell head waste">Agent for a sequential task ($8.40)</div>
+  <div class="compare-cell head save">Single session for sequential task ($0.90)</div>
+  <div class="compare-cell">Spawn 3 agents: one to find the bug, one to fix it, one to write tests. Agent 1 finishes → passes result to Agent 2 → Agent 2 finishes → passes to Agent 3. Each agent recreates context from scratch. Total: 3 cold-starts, 3 full context loads.</div>
+  <div class="compare-cell">One session: find the bug (Grep, 1 tool call), fix it (Edit, 1 tool call), write tests (2 Read + 1 Write). Shared context, no cold-starts, no re-reads. Total wall clock: 4 minutes. Same outcome.</div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 05 CLAUDE.MD ═══ -->
+<section class="section" id="claude-md">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">05</div>
+  <div>
+    <div class="section-label">CLAUDE.md — your highest-ROI investment</div>
+    <h2 class="section-title">A well-written CLAUDE.md eliminates entire categories of corrections. Each correction you prevent saves 2–5× its own token cost in rework.</h2>
+    <p class="lead">CLAUDE.md is loaded at session start. Every rule you document there is a correction you will never pay to make mid-session. The economics are simple: writing a constraint once in CLAUDE.md costs ~50 tokens to store. Not writing it costs 200–2,000 tokens every time Claude violates it and you correct it.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">The compounding return</div>
+  A fintech team added 12 rules to their CLAUDE.md over two weeks: monetary values use <code>BigDecimal</code> never <code>double</code>, all public methods need Javadoc, test classes follow a specific naming pattern, database calls must include a timeout, no <code>System.out.println</code> (use the logger). Before the CLAUDE.md, they were correcting these in review 8–12 times per week — each correction costing 400–800 tokens in the session. After: zero corrections on any of those patterns. That is 4,000–10,000 tokens of rework eliminated weekly. The CLAUDE.md itself cost 600 tokens to write.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">What belongs in CLAUDE.md</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Non-obvious code conventions</div>
+      <span class="fc-label">High value</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Document it if Claude gets it wrong even once</h4>
+        <p>Every time you say "actually, we use X not Y" mid-session, that correction belongs in CLAUDE.md. The first violation is the signal. After the first correction, that rule is free to enforce forever via the document.</p>
+      </div>
+      <div>
+        <h4>Examples</h4>
+        <p>Monetary amounts: always <code>BigDecimal</code>, never <code>double</code> or <code>float</code>. Date handling: always <code>Instant</code> or <code>ZonedDateTime</code>, never <code>Date</code> or <code>Calendar</code>. Exceptions: always log before rethrowing. Result types: use <code>Optional</code>, never return null from public methods.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Architecture and module boundaries</div>
+      <span class="fc-label">High value</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Why this saves tokens</h4>
+        <p>Without architecture documentation, Claude reads files to infer structure. With it, Claude knows where things live without reading. A one-paragraph architecture summary can eliminate 5,000–20,000 tokens of exploration on every session that touches unfamiliar parts of the codebase.</p>
+      </div>
+      <div>
+        <h4>What to include</h4>
+        <p>Module names and their purpose. Entry points. Data flow for the 2–3 most common request paths. Which packages are off-limits for modification. Which services own which data. External dependencies and their purpose.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Test and PR requirements</div>
+      <span class="fc-label">Medium value</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What to document</h4>
+        <p>Test naming convention. Minimum coverage expectations. Which test types are required (unit, integration, contract). Whether tests can use mocks or must use real dependencies. PR title format. Required reviewers. Which labels to apply.</p>
+      </div>
+      <div>
+        <h4>Why it matters</h4>
+        <p>Claude generates tests that fit the documentation. Without it, Claude generates tests that fit generic best practices — which may not match your team's conventions. Every convention mismatch is a review comment that costs tokens to address.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">CLAUDE.md structure that works</h3>
+
+<div class="framework-card" style="margin-top:0">
+  <div class="fc-head">
+    <div class="fc-title">Annotated CLAUDE.md skeleton</div>
+    <span class="fc-label blue">Template</span>
+  </div>
+  <div style="border-top:1px solid var(--line)">
+<pre class="codeblock"><span class="cmt"># CLAUDE.md — [Service Name]</span>
+<span class="cmt"># Keep this under 500 lines. Claude reads the whole thing every session.</span>
+<span class="cmt"># Longer CLAUDE.md = more tokens per session. Be concise.</span>
+
+<span class="key">## Architecture</span>
+<span class="cmt"># 1 paragraph. Entry points, module map, data flow.</span>
+REST API (Spring Boot 3.2) → Service layer → Repository (JPA/Postgres).
+Main entry: PaymentController. Auth via JWT in AuthFilter (before controllers).
+External: Stripe API (StripeGateway), SQS for async events (EventPublisher).
+
+<span class="key">## Non-negotiable conventions</span>
+<span class="cmt"># Short bullet list. Each rule saves 1–3 corrections per session.</span>
+- Monetary values: BigDecimal only. Never double/float.
+- Dates: Instant or ZonedDateTime. Never Date or Calendar.
+- Null: Never return null from public methods. Use Optional.
+- Exceptions: Log with context before rethrowing. Never swallow silently.
+- Logging: SLF4J (log variable, not string concat). Never System.out.
+
+<span class="key">## Testing</span>
+- Unit tests: Mockito mocks for dependencies. Class: FooTest.java.
+- Integration tests: @SpringBootTest, real DB (Testcontainers). Class: FooIT.java.
+- Coverage: 80% minimum on service layer. Check before PR.
+
+<span class="key">## Do not touch</span>
+<span class="cmt"># Files/modules Claude should not edit without explicit instruction.</span>
+- db/migrations/ — migration files are append-only, never edit existing.
+- AuthFilter.java — security-sensitive, requires senior review before change.
+
+<span class="key">## PR format</span>
+Title: [JIRA-KEY] Short description (imperative mood).
+Branch: feat/, fix/, chore/ prefix required.</pre>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>Keep CLAUDE.md under 500 lines.</strong> Every line is loaded every session. A 2,000-line CLAUDE.md adds ~1,600 tokens to every session's input cost. That is ~$0.005 per session — $1.50/month at 10 sessions/day. Small, but it compounds. Write the rules that matter. Remove ones that no longer apply. Treat CLAUDE.md like production code: it earns its weight or it gets cut.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 06 PATTERN LIBRARY ═══ -->
+<section class="section" id="patterns">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">06</div>
+  <div>
+    <div class="section-label">Token-efficient pattern library</div>
+    <h2 class="section-title">Twelve reusable prompt patterns, each measured for token impact. Copy, adapt, apply.</h2>
+    <p class="lead">Good prompts are reusable. These patterns represent the highest-leverage formulations for common engineering tasks. Each reduces token cost by 40–90% compared to the naive version of the same request.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Pattern</th>
+        <th>Template</th>
+        <th>Saving vs naive</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Pinpoint fix</strong></td>
+        <td><code>"Fix [function] in [file]:[line]. Problem: [specific symptom]. Do not change anything else."</code></td>
+        <td class="good">~85%</td>
+      </tr>
+      <tr>
+        <td><strong>Constrained refactor</strong></td>
+        <td><code>"Refactor [function]. Constraints: [list]. Do not change: [list]. Show diff only."</code></td>
+        <td class="good">~70%</td>
+      </tr>
+      <tr>
+        <td><strong>Targeted search</strong></td>
+        <td><code>"In [file or directory], find all [pattern]. Return: file:line only, no prose."</code></td>
+        <td class="good">~80%</td>
+      </tr>
+      <tr>
+        <td><strong>Test-first scaffold</strong></td>
+        <td><code>"Write tests for [function] in [file]. Cover: [cases]. Follow conventions in [test file]."</code></td>
+        <td class="good">~60%</td>
+      </tr>
+      <tr>
+        <td><strong>Triage output</strong></td>
+        <td><code>"Run [command]. Report: failures only. Format: test name | assertion | file:line."</code></td>
+        <td class="good">~75%</td>
+      </tr>
+      <tr>
+        <td><strong>Diff review</strong></td>
+        <td><code>"Review this diff. Flag: correctness issues and security risks only. Skip style."</code></td>
+        <td class="good">~65%</td>
+      </tr>
+      <tr>
+        <td><strong>Bounded exploration</strong></td>
+        <td><code>"In [package], map how [feature] works. Read only files that directly implement it."</code></td>
+        <td class="good">~70%</td>
+      </tr>
+      <tr>
+        <td><strong>Migration plan</strong></td>
+        <td><code>"Plan migration of [X] to [Y] in [file list]. Output: ordered steps only. No prose."</code></td>
+        <td class="good">~55%</td>
+      </tr>
+      <tr>
+        <td><strong>Commit message</strong></td>
+        <td><code>"Write a commit message for this diff. Format: imperative subject &lt;72 chars, blank line, bullets."</code></td>
+        <td class="good">~50%</td>
+      </tr>
+      <tr>
+        <td><strong>Error diagnosis</strong></td>
+        <td><code>"[Stack trace]. Root cause in 1 sentence. Fix in ≤5 lines of code. Nothing else."</code></td>
+        <td class="good">~85%</td>
+      </tr>
+      <tr>
+        <td><strong>Dependency check</strong></td>
+        <td><code>"Check if [library] v[X] has breaking changes vs v[Y]. List breaking changes only."</code></td>
+        <td class="good">~75%</td>
+      </tr>
+      <tr>
+        <td><strong>Security spot-check</strong></td>
+        <td><code>"In [file], check [function] for: SQL injection, path traversal, SSRF. Verdict per risk: safe / unsafe / unknown."</code></td>
+        <td class="good">~70%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="chapter-bridge">
+  <div class="chapter-num">The pattern behind the patterns</div>
+  Every efficient prompt has three parts: <strong>scope</strong> (where to look), <strong>task</strong> (what to do), and <strong>format</strong> (how to return it). The naive version of any prompt omits at least one of these. Adding the missing parts takes 10–20 words and saves 40–85% of the response cost. Memorize the structure. Apply it mechanically. The quality of the output will not decrease — it will improve, because Claude has less ambiguity to resolve.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 07 TEAM BUDGET ═══ -->
+<section class="section" id="budget">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">07</div>
+  <div>
+    <div class="section-label">Team budget and governance</div>
+    <h2 class="section-title">Token spend without visibility is token spend without control. Measure before you optimize.</h2>
+    <p class="lead">Most teams discover their token economics problem when the monthly invoice surprises them. The engineers spending the most are not the least capable — they are often the most ambitious, running the most complex tasks. The goal of budget governance is not to restrict usage but to ensure that high-spend tasks are delivering proportional value.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag">Step 1</span>
+    <h3>Measure first</h3>
+    <p>Enable per-API-key logging in Anthropic's console. Assign one API key per engineer or per workstream. Review usage weekly for the first month. Identify the top 3 cost drivers — they are almost always the same two or three patterns: uncached repeated prompts, unbounded agents, or a few very large exploratory sessions.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag">Step 2</span>
+    <h3>Set a per-engineer reference spend</h3>
+    <p>After 4 weeks of baseline data, calculate the median cost per engineer per day. Set a soft reference (not a hard limit) at 2× median. Engineers above the reference get a conversation, not a cap. The question is always: "Is this spend producing proportional value?" Sometimes yes. Sometimes it reveals an avoidable pattern.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Token budget benchmarks — May 2026</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Engineer profile</th>
+        <th>Daily spend</th>
+        <th>Monthly spend</th>
+        <th>Common drivers</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Junior (learning, exploratory)</td>
+        <td>$2–6</td>
+        <td>$40–120</td>
+        <td>Broad prompts, many iterations, vague tasks. High ROI on coaching.</td>
+      </tr>
+      <tr>
+        <td>Mid-level (standard feature work)</td>
+        <td>$1–3</td>
+        <td>$20–60</td>
+        <td>Efficient single sessions, occasional complex debug. Healthy baseline.</td>
+      </tr>
+      <tr>
+        <td>Senior (architecture, large refactors)</td>
+        <td>$3–12</td>
+        <td>$60–240</td>
+        <td>Intentional high-spend on complex tasks. Usually justified. Verify agent usage.</td>
+      </tr>
+      <tr>
+        <td>Automated (CI, scheduled agents)</td>
+        <td>$5–30</td>
+        <td>$100–600</td>
+        <td>Volume × cost/run. Highest leverage for prompt caching. Audit monthly.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout warn" style="margin-top:28px">
+  <strong>The automated spend problem:</strong> Scheduled agents and CI integrations spend tokens 24/7 without a human deciding each invocation is worth it. A nightly scan that costs $15/run × 30 nights = $450/month. If the scan catches 0 actionable issues in a stable month, that is $450 of zero-value spend. Audit automated workflows quarterly. Apply prompt caching. Adjust scan frequency to match the rate of meaningful code change.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">The five habits that compound into 70% savings</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>1. Name the file and function before Claude does</h4>
+    <p>You know your codebase. Use that knowledge. Pointing Claude at the right file eliminates the entire exploration cost — often 60–80% of total session tokens on codebase analysis tasks.</p>
+  </div>
+  <div class="principle">
+    <h4>2. Write all constraints in the first message</h4>
+    <p>One correction cycle (Claude produces output, you say "actually…", Claude regenerates) costs 2–3× the original task in cumulative context. Constraints stated upfront prevent correction cycles. Pause for 30 seconds before sending. Ask: what will I want to change about Claude's output? State it now.</p>
+  </div>
+  <div class="principle">
+    <h4>3. Request terse output unless you need explanation</h4>
+    <p>Output costs 5× input. A habit of ending prompts with "no explanation unless asked" or "diff only" cuts output by 50–80% on code tasks without reducing the utility of the deliverable. You can always ask for the explanation in a follow-up — and often you find you did not need it.</p>
+  </div>
+  <div class="principle">
+    <h4>4. Cache your system context for repeated tasks</h4>
+    <p>Any workflow you run more than twice in 5 minutes should use prompt caching. Scheduled scans, repeated analyses, CI integrations. Cache creation costs 25% more. Every hit costs 10% of normal. Break-even at 2 hits. Payback compounds with every run.</p>
+  </div>
+  <div class="principle">
+    <h4>5. Maintain a lean CLAUDE.md that eliminates recurring corrections</h4>
+    <p>Every rule in CLAUDE.md is a correction you will never pay for again. Review it monthly. Add rules that eliminated a correction in the past 30 days. Remove rules that no longer apply. Keep it under 500 lines or it starts costing more tokens than it saves.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 08 REFERENCE ═══ -->
+<section class="section" id="reference">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">08</div>
+  <div>
+    <div class="section-label">Reference</div>
+    <h2 class="section-title">Numbers, thresholds, and quick answers for daily use.</h2>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Input $/M</th>
+        <th>Output $/M</th>
+        <th>Cache read $/M</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Claude Haiku 4.5</strong></td>
+        <td>$0.80</td>
+        <td>$4.00</td>
+        <td>$0.08</td>
+        <td>Grep, lint, format, boilerplate, test scaffolding, simple edits</td>
+      </tr>
+      <tr>
+        <td><strong>Claude Sonnet 4.6</strong></td>
+        <td>$3.00</td>
+        <td>$15.00</td>
+        <td>$0.30</td>
+        <td>Debug, refactor, review, explain, plan — most engineering work</td>
+      </tr>
+      <tr>
+        <td><strong>Claude Opus 4.7</strong></td>
+        <td>$15.00</td>
+        <td>$75.00</td>
+        <td>$1.50</td>
+        <td>Complex architecture, adversarial security analysis, multi-constraint optimization</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Answer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>How many tokens is 1 line of Java?</strong></td>
+        <td>~4–8 tokens, depending on identifier length and complexity. A 500-line file ≈ 2,500–4,000 tokens.</td>
+      </tr>
+      <tr>
+        <td><strong>How much does a typical Claude Code session cost?</strong></td>
+        <td>$0.05–$1.00 for focused single-task sessions. $1–$5 for complex multi-file refactors. $5–$30 for multi-agent workflows.</td>
+      </tr>
+      <tr>
+        <td><strong>What is the prompt cache TTL?</strong></td>
+        <td>5 minutes from last use. An active session resets the clock. Idle sessions let the cache expire.</td>
+      </tr>
+      <tr>
+        <td><strong>What is the cache write overhead?</strong></td>
+        <td>25% more than normal on the cache-writing call. Every hit thereafter costs 10% of normal input price. Break-even at 2 hits.</td>
+      </tr>
+      <tr>
+        <td><strong>How long should CLAUDE.md be?</strong></td>
+        <td>Under 500 lines. ~200–300 lines is typical for a well-maintained service. Above 500 lines, the per-session load cost approaches the correction-prevention savings.</td>
+      </tr>
+      <tr>
+        <td><strong>What is the context window size?</strong></td>
+        <td>200,000 tokens for all current models. Approximately 150,000 lines of typical Java, or 500,000 words of prose. For most service-level tasks, this is not a binding constraint.</td>
+      </tr>
+      <tr>
+        <td><strong>When does a multi-agent loop cost less than a single session?</strong></td>
+        <td>When the parallel branches are truly independent and run simultaneously. If Branch A must complete before Branch B starts, it is always cheaper as a single sequential session.</td>
+      </tr>
+      <tr>
+        <td><strong>What is the fastest way to cut costs by 50% today?</strong></td>
+        <td>Add output format instructions to every prompt: "no explanation unless asked," "diff only," "list only failures." This alone cuts 50–80% of output tokens on most engineering tasks.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</section>
+
+</main>
+
+<section class="disclaimer">
+  <div class="disclaimer-inner">
+    <h3>Accuracy and scope</h3>
+    <p>Token pricing reflects Anthropic's published rates as of May 12, 2026. Prices change — verify current rates at Anthropic's pricing page before making budget decisions. Cost estimates in examples are representative calculations, not guarantees; actual costs depend on model selection, prompt structure, and cache hit rates. <strong>Savings percentages are based on representative before/after comparisons</strong>, not controlled benchmarks. Your results will vary based on task type, codebase complexity, and existing habits. Cache TTL, context window limits, and model availability are current as of this writing and subject to change by Anthropic.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  Token Economics — Claude Code Field Guide | May 2026 | Anthropic pricing current as of publication
+</footer>
+
+<script>
+function toggleSection(header) {
+  const section = header.closest('.section');
+  section.classList.toggle('collapsed');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const links = document.querySelector('.topnav').querySelectorAll('a');
+  window.addEventListener('scroll', function() {
+    let current = '';
+    document.querySelectorAll('section[id]').forEach(s => {
+      if (pageYOffset >= s.offsetTop - 200) current = s.getAttribute('id');
+    });
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').slice(1) === current) link.classList.add('active');
+    });
+  });
+
+  /* Animate savings meters on scroll into view */
+  const meters = document.querySelectorAll('.meter-before, .meter-after');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.dataset.w;
+        observer.unobserve(e.target);
+      }
+    });
+  }, {threshold: 0.3});
+  document.querySelectorAll('.meter-before').forEach(m => { m.dataset.w = m.style.width; m.style.width = '0'; observer.observe(m); });
+  document.querySelectorAll('.meter-after').forEach(m => { m.dataset.w = m.style.width; m.style.width = '0'; observer.observe(m); });
+});
+</script>
+</body>
+</html>
