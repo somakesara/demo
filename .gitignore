@@ -42,3 +42,8 @@ temp/
 # Claude/Codex local artifacts
 .claude/
 .codex/
+
+# Audit and documentation artifacts
+REVIEW_AUDIT.md
+style_guide.md
+AI_Productization_Concept.md
