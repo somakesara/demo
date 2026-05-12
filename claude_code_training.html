@@ -1,1402 +1,1224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Code for Junior Engineers — Training & Architecture</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — Engineer's Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191714;
+  --paper:#fbfaf7;
+  --warm:#f4efe6;
+  --warm2:#ebe4d8;
+  --line:#ded6c8;
+  --muted:#766f64;
+  --muted2:#9a9184;
+  --clay:#b65f34;
+  --blue:#245c8c;
+  --green:#26724c;
+  --plum:#6a3f83;
+  --gold:#a77a25;
+  --red:#9e3830;
+  --dark:#15120f;
+  --code:#f0ebe2;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"DM Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;font-weight:300;line-height:1.72;overflow-x:hidden}
+a{color:inherit}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--warm2);border:1px solid var(--line);border-radius:5px;padding:.08rem .32rem}
+pre{margin:0;white-space:pre;overflow-x:auto}
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+/* ── HERO ── */
+.hero{min-height:92vh;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto;color:#fbf5eb;background:radial-gradient(ellipse 64% 58% at 14% 48%,rgba(36,92,140,.32),transparent 62%),radial-gradient(ellipse 52% 68% at 83% 22%,rgba(106,63,131,.28),transparent 60%),linear-gradient(135deg,#0c0f18 0%,#10100f 52%,#14100c 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,black 35%,transparent 100%)}
 
-  <style>
-    :root {
-      --primary: #245c8c;
-      --primary-light: #f0c46d;
-      --ink: #191714;
-      --paper: #fbfaf7;
-      --warm: #f4efe6;
-      --warm2: #ebe4d8;
-      --line: #ded6c8;
-      --muted: #766f64;
-      --muted2: #9a9184;
-      --dark: #15120f;
-      --code: #f0ebe2;
-      --blue: #245c8c;
-      --red: #9e3830;
-      --gold: #a77a25;
-      --serif: "Cormorant Garamond", Georgia, serif;
-      --sans: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --mono: "DM Mono", Consolas, monospace;
-    }
+/* hero right-side terminal animation */
+.hero-terminal{position:absolute;inset:auto 5vw 7vh auto;width:min(460px,40vw);min-width:290px;opacity:.86}
+.term-window{border:1px solid rgba(251,245,235,.14);background:rgba(14,16,20,.82);backdrop-filter:blur(10px);border-radius:10px;overflow:hidden;box-shadow:0 28px 72px rgba(0,0,0,.38)}
+.term-bar{background:rgba(255,255,255,.06);padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.07)}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term-dot.r{background:#ff5f57}
+.term-dot.y{background:#ffbd2e}
+.term-dot.g{background:#28c840}
+.term-title{font-family:var(--mono);font-size:11px;color:rgba(251,245,235,.38);margin-left:6px;letter-spacing:.06em}
+.term-body{padding:16px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.7;color:rgba(251,245,235,.72)}
+.term-line{margin:0;padding:0}
+.t-prompt{color:#7ec8f5}
+.t-cmd{color:#fbf5eb}
+.t-ok{color:#82d9a8}
+.t-dim{color:rgba(251,245,235,.34)}
+.t-plum{color:#c4a4f0}
+.t-gold{color:#f0c46d}
+.t-err{color:#f08080}
+.cursor{display:inline-block;width:7px;height:1em;background:#f0c46d;vertical-align:text-bottom;animation:blink 1s step-end infinite;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.term-line{animation:fadeUp .4s ease forwards;opacity:0}
+.term-line:nth-child(1){animation-delay:.1s}
+.term-line:nth-child(2){animation-delay:.55s}
+.term-line:nth-child(3){animation-delay:1s}
+.term-line:nth-child(4){animation-delay:1.45s}
+.term-line:nth-child(5){animation-delay:1.9s}
+.term-line:nth-child(6){animation-delay:2.35s}
+.term-line:nth-child(7){animation-delay:2.8s}
+.term-line:nth-child(8){animation-delay:3.2s}
+.term-line:nth-child(9){animation-delay:3.6s}
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+.hero-inner{position:relative;z-index:2;width:min(1160px,100%);margin:0 auto;padding:92px 44px 48px;display:grid;align-content:center}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#f0c46d;margin-bottom:18px}
+h1,h2,h3{font-family:var(--serif);font-weight:300;line-height:1.06;letter-spacing:0;margin:0}
+h1{max-width:780px;font-size:clamp(44px,8vw,96px)}
+h1 em{color:#f0c46d;font-style:italic}
+.hero-sub{max-width:640px;margin-top:24px;color:rgba(251,245,235,.66);font-size:clamp(16px,2vw,20px);line-height:1.62}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border:1px solid rgba(251,245,235,.22);border-radius:8px;color:#fbf5eb;background:rgba(251,245,235,.07);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.btn.primary{background:#f0c46d;color:#17130f;border-color:#f0c46d}
+.scroll-hint{position:relative;z-index:2;padding:0 44px 34px;text-align:center;color:rgba(251,245,235,.34);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 
-    body {
-      font-family: var(--sans);
-      font-size: 17px;
-      font-weight: 300;
-      line-height: 1.72;
-      color: var(--ink);
-      background: var(--paper);
-      margin: 0;
-    }
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;background:rgba(251,250,247,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{flex:0 0 auto;padding:15px 18px;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.topnav a:hover,.topnav a.active{color:var(--blue);border-color:var(--blue)}
 
-    h1, h2, h3, h4 {
-      font-family: var(--serif);
-      font-weight: 300;
-      line-height: 1.06;
-      margin: 0;
-    }
+/* ── SECTION COLLAPSE ── */
+.section{border-bottom:1px solid var(--line)}
+.section.collapsed .container>:not(.section-head){display:none}
+.section-head{cursor:pointer;position:relative;padding-right:54px;display:grid;grid-template-columns:84px 1fr;gap:28px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.section-head:focus-within{outline:2px solid rgba(36,92,140,.55);outline-offset:6px}
+.section-head:hover .section-title{color:var(--blue)}
+.section-toggle{cursor:pointer;padding:0;position:absolute;right:0;top:8px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--paper);font-family:var(--mono);font-size:18px;transition:background .2s,color .2s,transform .2s,border-color .2s}
+.section:not(.collapsed) .section-toggle{transform:rotate(45deg);background:var(--dark);color:var(--paper);border-color:var(--dark)}
+.section.collapsed .section-head{padding-bottom:0;border-bottom:0}
+.section.collapsed .container{padding-top:34px;padding-bottom:34px}
+.section-status{margin-top:12px;color:var(--muted2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 
-    h1 { font-size: clamp(44px, 8vw, 96px); }
-    h2 { font-size: clamp(34px, 4.4vw, 56px); }
-    h3 { font-size: 27px; }
-    h4 { font-size: 22px; }
+/* ── LAYOUT ── */
+.container{width:min(1120px,100%);margin:0 auto;padding:72px 44px}
+.section-no{color:var(--blue);opacity:.16;font-family:var(--serif);font-size:78px;line-height:1}
+.section-label{color:var(--blue);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:8px 0}
+.section-title{font-size:clamp(34px,4.4vw,56px);max-width:880px}
+.lead{max-width:760px;color:#4c453d;font-size:18px;margin:18px 0 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:34px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+.stacked{display:grid;grid-template-columns:1fr;gap:18px;margin-top:30px}
 
-    h1 em { color: var(--primary-light); font-style: italic; }
+/* ── PANELS ── */
+.panel{border:1px solid var(--line);background:var(--warm);border-radius:8px;padding:22px}
+.panel.white{background:#fffdfa}
+.panel.dark{background:#1b1713;color:#fbf5eb;border-color:#302720}
+.panel.blue{background:#eaf0f7;border-color:rgba(36,92,140,.2)}
+.panel h3{font-size:27px;margin-bottom:10px}
+.panel p{margin:0;color:#50483f}
+.panel.dark p{color:rgba(251,245,235,.66)}
+.panel.blue p{color:#1e3a52}
 
-    p { margin: 0; color: var(--ink); font-size: 15-17px; line-height: 1.6-1.7; }
-    .lead { font-size: 18px; color: #4c453d; max-width: 760px; }
+/* ── TAGS ── */
+.tag{display:inline-flex;margin-bottom:12px;color:var(--blue);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.tag.green{color:var(--green)}
+.tag.clay{color:var(--clay)}
+.tag.plum{color:var(--plum)}
+.tag.red{color:var(--red)}
+.tag.gold{color:var(--gold)}
 
-    .eyebrow {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .24em;
-      text-transform: uppercase;
-      color: var(--primary-light);
-    }
+/* ── CALLOUTS ── */
+.callout{margin-top:26px;border-left:3px solid var(--green);background:#edf4ee;padding:16px 18px;border-radius:8px;color:#253d2d;line-height:1.7}
+.warn{border-left-color:var(--red);background:#f7ece9;color:#4a2b28}
+.info{border-left-color:var(--blue);background:#eaf0f7;color:#1e3a52}
+.gold-callout{border-left-color:var(--gold);background:#faf5e8;color:#3d2e08}
 
-    .label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: var(--primary);
-    }
+/* ── CODEBLOCK ── */
+pre.codeblock,div.codeblock{margin:0;border:0;border-radius:0;padding:18px 22px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;color:#2a2520;background:var(--code);white-space:pre;word-break:normal;overflow-wrap:normal}
+.codeblock .dim{color:#918779}
+.codeblock .key{color:#8f3d16;font-weight:400}
+.codeblock .ok{color:#1f7045}
+.codeblock .blue{color:#1f5d8d}
+.codeblock .accent{color:#a07020}
+.codeblock .red{color:#9e3830}
+.codeblock .str{color:#2d6b2d}
+.codeblock .cmt{color:#9a9184;font-style:italic}
+.codeblock .plum{color:#6a3f83}
 
-    a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 1px solid var(--primary-light);
-    }
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;margin-top:28px}
+table{width:100%;border-collapse:collapse;min-width:600px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:14px 12px;text-align:left;vertical-align:top}
+th{color:var(--blue);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+td{color:#423c35}
 
-    a:hover { color: var(--primary); }
+/* ── FRAMEWORK CARDS ── */
+.framework-cards{display:grid;gap:18px;margin-top:28px}
+.framework-card{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fffdfa}
+.fc-head{padding:18px 20px;background:var(--warm);border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.fc-title{font-family:var(--serif);font-size:24px;line-height:1.1}
+.fc-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);padding:4px 10px;border-radius:12px;border:1px solid rgba(36,92,140,.4);background:#eaf0f7;white-space:nowrap}
+.fc-label.green{color:var(--green);border-color:rgba(38,114,76,.4);background:#edf4ee}
+.fc-label.red{color:var(--red);border-color:rgba(158,56,48,.4);background:#f7ece9}
+.fc-label.gold{color:var(--gold);border-color:rgba(167,122,37,.4);background:#faf5e8}
+.fc-label.plum{color:var(--plum);border-color:rgba(106,63,131,.4);background:#f6f2f9}
+.fc-body{padding:18px 20px;display:grid;gap:14px}
+.fc-body h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin:0 0 6px}
+.fc-body p{font-size:13.5px;color:#433d36;line-height:1.65;margin:0}
 
-    /* Navigation */
-    .topnav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      display: flex;
-      overflow-x: auto;
-      background: rgba(251,250,247,.94);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--line);
-      scrollbar-width: none;
-    }
+/* ── SCENE ── */
+.scene{margin-top:0;border-left:3px solid var(--blue);padding:18px 22px;background:linear-gradient(to right,#eaf0f7,#fffdfa);border-radius:0 8px 8px 0;font-size:16px;color:#3a3028;line-height:1.8}
+.scene+.scene{margin-top:14px}
+.scene-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
 
-    .topnav a {
-      flex: 0 0 auto;
-      padding: 15px 18px;
-      color: var(--muted);
-      border-bottom: 2px solid transparent;
-      border-top: none;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      transition: color .2s;
-    }
+/* ── PRINCIPLE LIST ── */
+.principle-list{margin-top:28px;display:grid;gap:16px}
+.principle{border:1px solid var(--line);border-radius:8px;padding:20px;background:#fffdfa}
+.principle h4{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink)}
+.principle p{margin:0;color:#514a42;font-size:14px;line-height:1.7}
 
-    .topnav a:hover, .topnav a.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
+/* ── WORKFLOW STEPS ── */
+.workflow{margin-top:32px;display:grid;gap:14px}
+.step{display:grid;grid-template-columns:54px 1fr;gap:18px;border:1px solid var(--line);border-radius:8px;background:#fffdfa;padding:18px}
+.step-no{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--dark);color:var(--paper);font-family:var(--serif);font-size:24px;flex-shrink:0}
+.step h3{font-size:22px;margin-bottom:6px}
+.step p{margin:0;color:#514a42;font-size:14px;line-height:1.65}
 
-    /* Hero */
-    .hero {
-      min-height: 92vh;
-      position: relative;
-      overflow: hidden;
-      color: #fbf5eb;
-      background:
-        radial-gradient(ellipse 60% 55% at 18% 50%, rgba(36,92,140,.28), transparent 60%),
-        radial-gradient(ellipse 50% 65% at 82% 20%, rgba(167,122,37,.32), transparent 58%),
-        linear-gradient(135deg, #0f130f 0%, #0f1218 54%, #141410 100%);
-      display: grid;
-      grid-template-rows: 1fr auto;
-    }
+/* ── COMPARE ROW ── */
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:24px}
+.compare-cell{background:var(--paper);padding:20px 22px;font-size:14px;color:#3a3028;line-height:1.65}
+.compare-cell.head{background:var(--warm);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);padding:13px 22px}
+.compare-cell.head.red{color:var(--red)}
 
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-      background-size: 64px 64px;
-      mask-image: radial-gradient(ellipse 85% 75% at 50% 45%, black 35%, transparent 100%);
-    }
+/* ── TRACE ── */
+.trace{margin-top:28px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.trace-head{padding:14px 18px;background:var(--dark);color:#fbf5eb;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:flex;gap:10px;align-items:center}
+.trace-dot{width:8px;height:8px;border-radius:50%;background:#7ec8f5;flex-shrink:0}
+.trace-dot.pulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.trace-row{display:grid;grid-template-columns:130px 1fr;border-bottom:1px solid var(--line)}
+.trace-row:last-child{border-bottom:0}
+.trace-who{padding:14px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--line);display:flex;align-items:flex-start;padding-top:16px;flex-shrink:0}
+.trace-who.user{color:var(--blue);background:#f2f6fb}
+.trace-who.claude{color:var(--clay);background:#fff8f2}
+.trace-who.tool{color:var(--green);background:#f0f7f2}
+.trace-who.out{color:var(--plum);background:#f6f2f9}
+.trace-who.warn{color:var(--red);background:#fdf1ef}
+.trace-what{padding:14px 18px;font-size:14px;color:#3a3028;line-height:1.65;background:#fffdfa}
+.trace-what code{font-size:.83em}
+.trace-what .outcome{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:2px 8px;border-radius:10px}
+.outcome.pass{background:#edf4ee;color:var(--green);border:1px solid rgba(38,114,76,.3)}
+.outcome.active{background:#eaf0f7;color:var(--blue);border:1px solid rgba(36,92,140,.3)}
+.outcome.blocked{background:#fdf1ef;color:var(--red);border:1px solid rgba(158,56,48,.3)}
 
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 72px 44px;
-      max-width: 900px;
-    }
+/* ── CHAPTER BRIDGE ── */
+.chapter-bridge{margin:40px 0 0;padding:22px 24px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,#f9f5ef,#f0f6ff);font-size:16px;color:#3a3028;line-height:1.82}
+.chapter-bridge strong{color:var(--blue)}
+.chapter-num{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
 
-    .hero-content .eyebrow {
-      color: var(--primary-light);
-      margin-bottom: 18px;
-    }
+/* ── DISCLAIMER / FOOTER ── */
+.disclaimer{background:#f7ece9;border-top:1px solid var(--line);padding:28px 44px}
+.disclaimer-inner{width:min(1120px,100%);margin:0 auto;font-size:14px;color:#4a2b28;line-height:1.7}
+.disclaimer-inner h3{font-family:var(--serif);margin:0 0 14px;font-size:22px;font-weight:400}
+.disclaimer-inner p{margin:0 0 12px}
+.disclaimer-inner p:last-child{margin-bottom:0}
+.footer{padding:28px 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 
-    .hero-content h1 {
-      margin-bottom: 28px;
-      font-size: clamp(44px, 8vw, 72px);
-    }
-
-    .hero-content .lead {
-      color: rgba(251,245,235,.85);
-      max-width: 720px;
-      margin-bottom: 36px;
-    }
-
-    .hero-cta {
-      display: inline-block;
-      padding: 16px 28px;
-      background: var(--primary-light);
-      color: #0f130f;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-weight: 500;
-      transition: background .2s, transform .2s;
-      border: none;
-      cursor: pointer;
-      width: fit-content;
-    }
-
-    .hero-cta:hover {
-      background: #ffd580;
-      transform: translateY(-2px);
-    }
-
-    /* Container */
-    .container {
-      width: min(1120px, 100%);
-      margin: 0 auto;
-      padding: 72px 44px;
-    }
-
-    /* Sections */
-    .section {
-      border-bottom: 1px solid var(--line);
-    }
-
-    .section.collapsed .container > :not(.section-head) {
-      display: none;
-    }
-
-    .section-head {
-      cursor: pointer;
-      display: grid;
-      grid-template-columns: 84px 1fr;
-      gap: 28px;
-      padding: 36px 0;
-      border-bottom: 1px solid var(--line);
-      position: relative;
-      align-items: start;
-    }
-
-    .section-head:hover .section-title {
-      color: var(--primary);
-      transition: color .2s;
-    }
-
-    .section-head:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-    .section-no {
-      color: var(--primary);
-      opacity: .16;
-      font-family: var(--serif);
-      font-size: 78px;
-    }
-
-    .section-title {
-      font-size: 34px;
-      font-family: var(--serif);
-      font-weight: 300;
-      line-height: 1.1;
-      margin: 0;
-      transition: color .2s;
-    }
-
-    .section-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 34px;
-      height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: var(--paper);
-      color: var(--muted);
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      transition: background .2s, color .2s, transform .2s;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .section:not(.collapsed) .section-toggle {
-      transform: rotate(45deg);
-      background: var(--dark);
-      color: var(--paper);
-    }
-
-    /* Grids */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 34px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-top: 30px;
-    }
-
-    /* Panels */
-    .panel {
-      border: 1px solid var(--line);
-      background: var(--warm);
-      border-radius: 8px;
-      padding: 22px;
-      transition: background .2s;
-    }
-
-    .panel.white { background: #fffdfa; }
-    .panel.dark { background: #1b1713; color: #fbf5eb; border-color: #302720; }
-    .panel.blue { background: #eaf0f7; border-color: rgba(36,92,140,.2); }
-
-    .panel h3 { font-size: 27px; margin-bottom: 10px; }
-    .panel p { color: #50483f; font-size: 15px; line-height: 1.6; margin: 0; }
-    .panel.dark p { color: rgba(251,245,235,.66); }
-
-    /* Tags */
-    .tag {
-      display: inline-block;
-      color: var(--primary);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    /* Callouts */
-    .callout {
-      margin-top: 26px;
-      border-left: 3px solid var(--primary);
-      background: #edf4ee;
-      padding: 16px 18px;
-      border-radius: 8px;
-      color: #253d2d;
-      line-height: 1.7;
-    }
-
-    .callout.info {
-      border-left-color: var(--blue);
-      background: #eaf0f7;
-      color: #1e3a52;
-    }
-
-    .callout.warn {
-      border-left-color: var(--red);
-      background: #f7ece9;
-      color: #4a2b28;
-    }
-
-    /* Code blocks */
-    pre.codeblock, div.codeblock {
-      padding: 18px 22px;
-      overflow-x: auto;
-      font-family: var(--mono);
-      font-size: 12.5px;
-      line-height: 1.72;
-      color: #2a2520;
-      background: var(--code);
-      border-radius: 0;
-      margin: 0;
-      margin-top: 18px;
-    }
-
-    .codeblock .dim { color: #918779; }
-    .codeblock .key { color: #8f3d16; font-weight: 400; }
-    .codeblock .ok { color: #1f7045; }
-    .codeblock .blue { color: #1f5d8d; }
-    .codeblock .red { color: #9e3830; }
-    .codeblock .str { color: #2d6b2d; }
-    .codeblock .cmt { color: #9a9184; font-style: italic; }
-
-    /* Scene blocks */
-    .scene {
-      margin-top: 18px;
-      border-left: 3px solid var(--primary);
-      padding: 18px 22px;
-      background: linear-gradient(to right, #eaf0f7, #fffdfa);
-      border-radius: 0 8px 8px 0;
-      font-size: 16px;
-      color: #3a3028;
-      line-height: 1.8;
-    }
-
-    .scene-label {
-      color: var(--primary);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    /* Framework cards */
-    .framework-cards { display: grid; gap: 18px; margin-top: 28px; }
-
-    .framework-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fffdfa;
-    }
-
-    .fc-head {
-      padding: 18px 20px;
-      background: var(--warm);
-      border-bottom: 1px solid var(--line);
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .fc-title {
-      font-family: var(--serif);
-      font-size: 24px;
-      line-height: 1.1;
-    }
-
-    .fc-label {
-      color: var(--primary);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border: 1px solid rgba(36,92,140,.4);
-      background: #eaf0f7;
-      border-radius: 12px;
-      white-space: nowrap;
-    }
-
-    .fc-body {
-      padding: 18px 20px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .fc-body h4 {
-      color: var(--primary);
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      margin: 0 0 6px;
-    }
-
-    .fc-body p {
-      font-size: 13.5px;
-      color: #433d36;
-      line-height: 1.65;
-      margin: 0;
-    }
-
-    /* Tables */
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 28px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 600px;
-      font-size: 14px;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 14px 12px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--primary);
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      font-weight: 400;
-    }
-
-    td { color: #423c35; }
-
-    /* Responsive */
-    @media(max-width: 880px) {
-      .container { padding: 54px 24px; }
-      .hero-content { padding: 54px 24px; }
-      .section-head { grid-template-columns: 60px 1fr; gap: 18px; }
-      .section-no { font-size: 56px; }
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    }
-
-    @media(max-width: 680px) {
-      body { font-size: 16px; }
-      .container { padding: 36px 16px; }
-      .hero-content { padding: 36px 16px; }
-      h1 { font-size: clamp(32px, 6vw, 48px); }
-      h2 { font-size: clamp(24px, 3.5vw, 36px); }
-      .hero-content h1 { font-size: 44px; }
-      .section-head { grid-template-columns: 1fr; }
-      .section-no { display: none; }
-      .section-toggle { position: static; transform: rotate(0) !important; margin-top: 18px; }
-    }
-  </style>
+@media(max-width:880px){
+  .hero-terminal{position:relative;inset:auto;width:auto;margin:0 24px 34px}
+  .hero-inner{padding:76px 28px 28px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .trace-row{grid-template-columns:1fr}
+  .trace-who{border-right:0;border-bottom:1px solid var(--line);padding-top:12px}
+  .compare-row{grid-template-columns:1fr}
+  .fc-head{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  body{font-size:16px}
+  .container{padding:54px 24px}
+  .section-head{grid-template-columns:1fr;gap:8px}
+  .section-no{font-size:58px}
+  .topnav a{padding:13px 14px}
+}
+</style>
 </head>
-
 <body>
-  <!-- Navigation -->
-  <nav class="topnav" aria-label="Page sections">
-    <a href="#overview" class="active">Overview</a>
-    <a href="#architecture">Architecture</a>
-    <a href="#capabilities">Capabilities</a>
-    <a href="#economics">Economics</a>
-    <a href="#security">Security</a>
-    <a href="#java-example">Java Example</a>
-    <a href="#limitations">Limitations</a>
-  </nav>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-grid"></div>
-    <div class="hero-content">
-      <div class="eyebrow">Engineer Training</div>
-      <h1>Claude Code:<br><em>A Developer's Guide</em></h1>
-      <p class="lead">Master the architecture, capabilities, and real-world applications of Claude Code. From core features to advanced patterns, this training equips junior engineers with the depth needed to ship production systems powered by AI-assisted development.</p>
-      <button class="hero-cta" onclick="document.getElementById('overview').scrollIntoView({behavior: 'smooth'})">Start Learning</button>
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Engineer Training — May 2026</div>
+    <h1>Claude Code is not a chatbot.<br><em>It is a collaborator.</em></h1>
+    <p class="hero-sub">Every junior engineer on your team has access to something that didn't exist three years ago: a system that reads your entire codebase, reasons about it, executes changes, runs tests, and iterates — all without context switching. This guide covers what it actually is, how it works, and where it breaks. Read it before you ship anything important with it.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#what">What Claude Code is</a>
+      <a class="btn" href="#architecture">Architecture</a>
+      <a class="btn" href="#capabilities">Capabilities</a>
+      <a class="btn" href="#economics">Economics</a>
+      <a class="btn" href="#security">Security</a>
+      <a class="btn" href="#java">Java walkthrough</a>
+      <a class="btn" href="#limits">Limitations</a>
+    </div>
+  </div>
+  <div class="hero-terminal" aria-hidden="true">
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="term-dot r"></div>
+        <div class="term-dot y"></div>
+        <div class="term-dot g"></div>
+        <span class="term-title">claude — payment-service</span>
+      </div>
+      <div class="term-body">
+        <p class="term-line"><span class="t-prompt">›</span> <span class="t-cmd">our payment processor times out under load. what's wrong?</span></p>
+        <p class="term-line"><span class="t-dim">  Reading PaymentService.java, OrderRepository.java…</span></p>
+        <p class="term-line"><span class="t-plum">  Found: processOrder() calls validateCredit() + reserveInventory()</span></p>
+        <p class="term-line"><span class="t-plum">  sequentially. Both hit the database. p99 = 840ms under 200 rps.</span></p>
+        <p class="term-line"><span class="t-gold">  Recommendation: parallelize with CompletableFuture.allOf().</span></p>
+        <p class="term-line"><span class="t-gold">  Projected p99 after: ~310ms. Refactor 4 files. Run tests?</span></p>
+        <p class="term-line"><span class="t-prompt">›</span> <span class="t-cmd">yes, do it and show me the diff first</span></p>
+        <p class="term-line"><span class="t-ok">  ✓ Refactored. 12 tests passed. p99 improved 63%.</span></p>
+        <p class="term-line"><span class="t-prompt">›</span> <span class="t-cmd">commit and open a PR</span><span class="cursor"></span></p>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Each section is self-contained — expand any one to start</div>
+</header>
+
+<nav class="topnav" aria-label="Page sections">
+  <a href="#what">01 What it is</a>
+  <a href="#architecture">02 Architecture</a>
+  <a href="#capabilities">03 Capabilities</a>
+  <a href="#economics">04 Economics</a>
+  <a href="#security">05 Security</a>
+  <a href="#java">06 Java walkthrough</a>
+  <a href="#limits">07 Limitations</a>
+  <a href="#reference">08 Reference</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════ 01 WHAT ═══ -->
+<section class="section" id="what">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">01</div>
+  <div>
+    <div class="section-label">What Claude Code is</div>
+    <h2 class="section-title">Claude Code is an AI-powered terminal that reads your codebase, reasons about it, and executes engineering work — with your approval.</h2>
+    <p class="lead">It is not autocomplete. It is not a search engine over Stack Overflow. It is a system that holds your entire codebase in working memory, understands intent expressed in natural language, and executes changes through a deterministic tool layer — bash, file I/O, git, test runners — while you retain final judgment on every action.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">Why this matters for junior engineers</div>
+  Riya joined a fintech team six months ago. The payment microservice had 28,000 lines of Java she'd never touched. Her senior engineer was on leave. A regression surfaced at 11 PM: transaction confirmations were timing out for users in Southeast Asia. Before Claude Code, she'd have spent three hours tracing call graphs, reading logs, and guessing. Instead, she described the symptom. Claude read the service, found the blocking JDBC call behind a CDN with 300ms added latency for that region, proposed a fix, and ran the integration tests. She shipped a patch at midnight. The senior engineer reviewed it in the morning and called it clean. That is what Claude Code actually does in practice.
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag">What it is</span>
+    <h3>A codebase-aware collaborator</h3>
+    <p>Claude Code reads your entire project — source files, configs, test suites, git history — and maintains that context across a session. When you ask it to fix a bug, it finds the root cause, not just the symptom. When you ask it to refactor, it traces the dependency graph. It knows your code better than any fresh pair of eyes in the first hour.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag red">What it is not</span>
+    <h3>A replacement for engineering judgment</h3>
+    <p>Claude Code proposes. You decide. It generates a diff; you review it. It runs tests; you interpret the results. It drafts a commit message; you approve it. The system is designed to amplify your judgment, not circumvent it. Every destructive action — git push, file deletion, production command — requires explicit approval.</p>
+  </div>
+</div>
+
+<div class="compare-row" style="margin-top:28px">
+  <div class="compare-cell head">Without Claude Code</div>
+  <div class="compare-cell head">With Claude Code</div>
+  <div class="compare-cell">Onboard to a new codebase: 2–4 weeks of reading code, asking colleagues, building a mental model.</div>
+  <div class="compare-cell">Ask Claude to map the architecture. Get a dependency graph, entry points, and critical paths in 5 minutes. Still read the code — but know what to read.</div>
+  <div class="compare-cell">Debug a production regression: open 8 browser tabs, grep logs, read code, form a hypothesis, test manually.</div>
+  <div class="compare-cell">Describe the symptom. Claude reads logs, finds the callsite, proposes a fix, runs the test suite. You review the diff.</div>
+  <div class="compare-cell">Refactor a synchronous service to async: weeks of careful changes, test-driven, high risk of regression.</div>
+  <div class="compare-cell">Claude plans the migration, executes it in phases, runs tests after each phase, rolls back if a phase fails. You review each phase.</div>
+  <div class="compare-cell">Write tests for legacy code: tedious, slow, frequently abandoned because it feels like low-value work.</div>
+  <div class="compare-cell">Claude generates test scaffolding for any function. You review for correctness and add edge cases. Coverage goes up without suffering.</div>
+</div>
+
+<div class="chapter-bridge">
+  <div class="chapter-num">The key mental model</div>
+  Think of Claude Code the way you think of a senior engineer who just joined your team. They are fast, technically strong, and tireless. They will implement exactly what you ask. But they do not know your system's unwritten rules, your team's risk tolerance, or the business context behind a decision. <strong>You provide judgment. Claude provides execution.</strong> The partnership works when the division of responsibility is clear. It breaks when you treat Claude as an oracle rather than a collaborator.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 02 ARCHITECTURE ═══ -->
+<section class="section" id="architecture">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">02</div>
+  <div>
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">Three layers: intent processing, deterministic tool execution, and an adaptive feedback loop.</h2>
+    <p class="lead">Understanding how Claude Code actually works — not the marketing version — tells you where it is reliable, where it can fail, and how to structure your requests to get the best results. The architecture is not magic. It is a language model orchestrating a set of deterministic tools, with a feedback loop that lets it iterate on failures.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="framework-cards">
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 1: Intent Processing</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Natural language → structured reasoning</p>
+      </div>
+      <span class="fc-label">Semantic</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Claude receives your prompt along with the current context window: open files, recent terminal output, git status, any CLAUDE.md documentation you've written. It uses this to build a semantic model of your intent — not keywords, but the goal behind the words.</p>
+      </div>
+      <div>
+        <h4>Why this matters</h4>
+        <p>"Fix the payment bug" and "resolve the NullPointerException in PaymentService line 84" produce very different planning. The richer your context, the more accurate the intent model. Investing 30 minutes in a good CLAUDE.md pays dividends on every session.</p>
+      </div>
+      <div>
+        <h4>What can go wrong here</h4>
+        <p>Ambiguous prompts produce ambiguous plans. If Claude cannot distinguish between "clean up the build artifacts" and "remove all compiled output including shared libraries used by other services," it may choose the wrong interpretation. Specificity is a form of safety.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Section 1: Overview -->
-  <section class="section" id="overview">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">1</div>
-        <div>
-          <h2 class="section-title">What Claude Code Is</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 2: Tool Execution</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Deterministic operations on real systems</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code is Anthropic's integrated development environment for building, debugging, and shipping software powered by Claude's AI capabilities. Launched in 2025, it represents a fundamental shift in how engineers interact with code—not as static text, but as a living, queryable system that responds to natural language intent.</p>
-
-      <p style="margin-bottom: 28px;">Think of it as three things at once: (1) a conversational interface to your codebase, (2) an AI-augmented terminal for execution and debugging, and (3) a coordination layer that orchestrates complex multi-step engineering tasks across tools, files, and systems.</p>
-
-      <div class="callout info">
-        <strong>Key insight:</strong> Claude Code doesn't replace your editor, shell, or git workflow. It enhances them. You stay in control; Claude handles complexity that would otherwise require you to juggle 12 browser tabs and context switches.
+      <span class="fc-label green">Deterministic</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>The tool surface</h4>
+        <p>Claude Code's tools are deterministic: <code>Read</code>, <code>Write</code>, <code>Edit</code>, <code>Glob</code>, <code>Grep</code>, <code>Bash</code>, <code>Git</code> (via Bash), <code>WebFetch</code>, <code>Agent</code>. Each tool has a defined input/output contract. When Claude calls <code>Grep</code>, it receives real filesystem results. When it runs <code>Bash</code>, it gets real stdout/stderr. The model's reasoning is probabilistic; the tools are not.</p>
       </div>
-
-      <div class="grid-2" style="margin-top: 34px;">
-        <div class="panel white">
-          <div class="tag">Mode: Interactive</div>
-          <h3>Chat-Driven Development</h3>
-          <p>Write prompts in natural language. Claude reads your code, understands intent, and executes edits, runs tests, and debugs—all conversationally. No syntax overhead; pure intent.</p>
-        </div>
-        <div class="panel white">
-          <div class="tag">Mode: Terminal</div>
-          <h3>Integrated Execution</h3>
-          <p>Run commands in a first-class shell environment. Claude streams output, parses results, and responds intelligently—treating errors as problems to diagnose, not failures to ignore.</p>
-        </div>
+      <div>
+        <h4>Parallelism</h4>
+        <p>Claude calls independent tools in parallel. When analyzing a service, it might simultaneously grep for all call sites, read the service class, and check test coverage — then synthesize the results. This is why codebase analysis feels fast: it is parallel I/O, not sequential reading.</p>
       </div>
-
-      <div class="grid-2" style="margin-top: 24px;">
-        <div class="panel white">
-          <div class="tag">Mode: Autonomous</div>
-          <h3>Agent-Based Tasks</h3>
-          <p>Launch specialized agents that iterate independently: code review agents, exploratory search agents, planning agents. They parallelize work and reduce your cognitive load.</p>
-        </div>
-        <div class="panel white">
-          <div class="tag">Mode: Remote</div>
-          <h3>Cloud Agents & Hooks</h3>
-          <p>Schedule tasks on remote infrastructure. Set up webhooks that trigger Claude to act on CI failures, GitHub events, or calendar intervals—automation without polling.</p>
-        </div>
+      <div>
+        <h4>Permission layer</h4>
+        <p>Risky tools — anything that modifies files, runs shell commands, or touches remote systems — require your approval unless you've pre-authorized them in <code>.claude/settings.json</code>. You can grant always-allow for specific tools in trusted contexts and require confirmation for everything else. This is your safety layer.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Section 2: Architecture -->
-  <section class="section" id="architecture">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">2</div>
-        <div>
-          <h2 class="section-title">Architecture & Design</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div>
+        <div class="fc-title">Layer 3: Feedback Loop</div>
+        <p style="margin:6px 0 0;font-size:14px;color:#4c453d">Observe → reason → iterate</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code's architecture layers intent, execution, and feedback into a coherent system. Understanding these layers is critical for knowing what Claude can (and cannot) do reliably.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">The Three-Layer Stack</h3>
-
-      <div class="framework-cards">
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Layer 1: Intent Processing</div>
-            <div class="fc-label">Semantic Understanding</div>
-          </div>
-          <div class="fc-body">
-            <h4>Input Parsing</h4>
-            <p>Claude reads your natural language prompt, analyzes your codebase in context, and builds a model of what you're trying to accomplish. This isn't keyword matching—it's semantic understanding of code intent, git history, file structure, and error traces.</p>
-            <h4>Example</h4>
-            <p>"Refactor the payment processor to use async/await" → Claude identifies all sync callsites, dependency graph, tests that validate behavior, migration path, and rollback strategy. Single prompt, deep understanding.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Layer 2: Tool Execution</div>
-            <div class="fc-label">Deterministic Operations</div>
-          </div>
-          <div class="fc-body">
-            <h4>Tool Abstraction</h4>
-            <p>Claude has access to ~40 deterministic tools: file read/write, bash execution, git operations, test runners, MCP servers, etc. Each tool is designed to be predictable and auditable. Claude chooses which tools to invoke based on your intent.</p>
-            <h4>Example</h4>
-            <p>When you ask "is the microservice failing?", Claude might call: docker logs (get latest output), prometheus API (get metrics), git log (find recent deploys), and synthesize a diagnosis. Parallel execution, intelligent sequencing.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Layer 3: Feedback Loop</div>
-            <div class="fc-label">Adaptive Reasoning</div>
-          </div>
-          <div class="fc-body">
-            <h4>Observation & Iteration</h4>
-            <p>Claude observes tool output, parses it semantically (not just raw text), and reasons about success/failure. If a test fails, Claude doesn't abandon the task—it analyzes the failure, identifies the root cause, and iterates intelligently.</p>
-            <h4>Example</h4>
-            <p>A refactor introduces a type error. Instead of asking you to fix it, Claude reads the error, locates the mismatched type, understands the semantic issue, and adjusts the refactor automatically. Feedback is acceleration, not obstruction.</p>
-          </div>
-        </div>
+      <span class="fc-label gold">Adaptive</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>After each tool call, Claude observes the result and updates its reasoning. A test that fails is not a stop condition — it is new information. Claude reads the stack trace, locates the assertion that failed, understands why the refactor broke it, and adjusts. This loop continues until tests pass or Claude hits a genuine blocker.</p>
       </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">The Tool Ecosystem</h3>
-
-      <p style="margin-bottom: 24px;">Claude Code ships with a curated toolkit. These aren't generic utilities—each is designed for software engineering workflows:</p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Tools</th>
-              <th>Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>File Operations</strong></td>
-              <td>Read, Write, Edit, Glob</td>
-              <td>Fast codebase navigation. Glob pattern matching beats repeated file searches. Edit tool sends diffs, not full rewrites.</td>
-            </tr>
-            <tr>
-              <td><strong>Code Search</strong></td>
-              <td>Grep (ripgrep-backed)</td>
-              <td>Regex search optimized for large codebases. Parallel scanning, context windows, output modes (content/files/count).</td>
-            </tr>
-            <tr>
-              <td><strong>Execution</strong></td>
-              <td>Bash, PowerShell</td>
-              <td>Shell-agnostic execution. Stdout/stderr capture. Timeout protection. Real-time streaming for long-running tasks.</td>
-            </tr>
-            <tr>
-              <td><strong>Version Control</strong></td>
-              <td>Git (via Bash)</td>
-              <td>Integrated git workflow. Branch management, commit authoring, PR creation via GitHub CLI. Claude understands diffs semantically.</td>
-            </tr>
-            <tr>
-              <td><strong>Multi-Agent Orchestration</strong></td>
-              <td>Agent, Plan, Explore</td>
-              <td>Spawn specialized agents, parallelize research, plan complex refactors. Subagents have isolated context to avoid token waste.</td>
-            </tr>
-            <tr>
-              <td><strong>External Services</strong></td>
-              <td>MCP, WebFetch, WebSearch</td>
-              <td>Anthropic Messaging Context Protocol (MCP) for integrations. Fetch remote docs, search web for current data.</td>
-            </tr>
-            <tr>
-              <td><strong>Development Infrastructure</strong></td>
-              <td>Monitor, CronCreate, Schedule</td>
-              <td>Watch long-running processes. Schedule recurring tasks on cron or remote agents. Polling loops abstracted into events.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div>
+        <h4>The iteration budget</h4>
+        <p>Claude will iterate on failures, but it has a practical limit. After several failed attempts at the same problem, it will surface the blocker to you rather than continue spinning. This is intentional — it prevents runaway loops that burn tokens without making progress. When Claude says "I'm stuck," take it seriously.</p>
       </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Permission Model & Safety</h3>
-
-      <p style="margin-bottom: 24px;">Claude Code respects strict permission boundaries. Tools are grouped into safe read-only operations and risky mutations. You can grant permissions globally, per-project, or per-session. This prevents accidental destruction while keeping workflow frictionless.</p>
-
-      <div class="scene">
-        <div class="scene-label">Permission Boundaries</div>
-        <strong>Example:</strong> When you ask Claude to "commit this change," it doesn't silently create a commit. Instead, it shows you the diff, drafts a commit message, and asks for permission. If you deny, it doesn't retry—it pauses and asks how to proceed. This is guardrail design: automation that respects human intent.
+      <div>
+        <h4>Context preservation across iterations</h4>
+        <p>The full conversation — every prompt, tool result, and intermediate reasoning step — stays in the context window until it is summarized. This means Claude remembers what it tried, why it failed, and what constraints you gave it. Long sessions eventually compress earlier context; be explicit about critical constraints if a session runs long.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Section 3: Core & Advanced Capabilities -->
-  <section class="section" id="capabilities">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">3</div>
-        <div>
-          <h2 class="section-title">Capabilities: Core to Advanced</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:46px;margin-bottom:18px;font-size:27px">How a real request flows</h3>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot pulse"></div>
+    Execution trace — "find all unhandled exceptions in the order service"
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what">Type: <code>"find all unhandled exceptions in the order service"</code>. Claude receives this with your current context window.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Plans: I need to (1) locate the order service files, (2) grep for exception-related patterns, (3) read surrounding context, (4) classify each as handled or unhandled. Calls Glob and Grep in parallel.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tool">Glob + Grep</div>
+    <div class="trace-what">Glob finds <code>OrderService.java</code>, <code>OrderRepository.java</code>, <code>OrderController.java</code>. Grep scans all three for <code>catch\s*\(Exception</code>, <code>throws</code>, <code>RuntimeException</code>. Returns 23 matches. <span class="outcome active">parallel</span></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Reads 23 matches in context. Identifies 4 catch blocks that silently swallow exceptions (no logging, no rethrow). Reads surrounding method signatures to understand caller expectations.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who out">Output</div>
+    <div class="trace-what">Returns a structured report: 4 unhandled locations, each with file, line number, exception type, and suggested fix (log + rethrow, or return Result type). Asks: "Want me to fix these now?" <span class="outcome pass">done</span></div>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Multi-agent architecture:</strong> For complex tasks — security audits, large refactors, comprehensive code reviews — Claude Code can spawn subagents. Each runs in isolated context, works on a subproblem, and returns results to the orchestrating session. Subagents protect the main context window from being flooded with intermediate results. They cost more tokens but enable work at a scale a single session cannot hold.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 03 CAPABILITIES ═══ -->
+<section class="section" id="capabilities">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">03</div>
+  <div>
+    <div class="section-label">Capabilities</div>
+    <h2 class="section-title">Core capabilities are available on day one. Advanced patterns take two to four weeks to develop fluency with.</h2>
+    <p class="lead">The mistake most junior engineers make is using Claude Code only for autocomplete-scale tasks: "write this function," "explain this line." Those use cases barely touch the capability surface. The real leverage comes from session-scale and codebase-scale tasks — the ones that would normally take days.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Core: Codebase navigation and explanation</h4>
+    <p>Ask Claude to map a service, trace a data flow, or explain a complex function. It reads the relevant files, traces dependencies, and produces a structured explanation in plain language. Especially powerful for onboarding: "explain the auth flow from login request to session token" saves hours of reading.</p>
+  </div>
+  <div class="principle">
+    <h4>Core: Targeted edits with diff preview</h4>
+    <p>Describe the change you want. Claude proposes a diff. You review and approve. The edit tool sends only the changed lines — not a full file rewrite. For small changes in large files, this is both safer and faster than manual editing. Claude won't touch anything outside the scope you described.</p>
+  </div>
+  <div class="principle">
+    <h4>Core: Test execution and failure diagnosis</h4>
+    <p>Tell Claude to run your test suite. It executes, streams output, reads failures, identifies root causes, and iterates on fixes. If a test was flawed (wrong assertion, missing mock), Claude will tell you — it doesn't blindly patch tests to pass. The distinction between a failing test revealing a bug and a failing test revealing a bad test matters, and Claude understands it.</p>
+  </div>
+  <div class="principle">
+    <h4>Core: Git workflow — branches, commits, PRs</h4>
+    <p>Claude authors semantically meaningful commit messages, stages the right files, pushes to the correct branch, and creates pull requests via GitHub CLI. It will not force-push to main, will not commit files that look like secrets, and will not skip pre-commit hooks. These are hard guards, not best-effort reminders.</p>
+  </div>
+  <div class="principle">
+    <h4>Advanced: Multi-phase refactors with rollback planning</h4>
+    <p>For large refactors — async migration, dependency upgrade, API redesign — Claude plans in phases, executes each phase, runs tests, and checkpoints progress. If a phase fails, it can roll back to the last clean state. You approve the plan before execution begins and each phase before it runs.</p>
+  </div>
+  <div class="principle">
+    <h4>Advanced: Parallel multi-agent tasks</h4>
+    <p>Security audits, comprehensive code reviews, large codebase migrations — these require more context than a single session can hold. Spawn specialized agents in parallel: one agent reviews security, another checks performance, a third audits compliance. Results are synthesized into a single report. This is how senior architects work at scale.</p>
+  </div>
+  <div class="principle">
+    <h4>Advanced: Hooks and automated workflows</h4>
+    <p>Claude Code hooks allow you to attach behavior to events: before a tool runs, after Claude stops, when a file changes. Teams use hooks to enforce standards automatically — run the linter before every edit, post a summary to Slack when Claude finishes a session, require security review before any bash execution. Hooks are shell commands, not Claude invocations; they are deterministic and fast.</p>
+  </div>
+  <div class="principle">
+    <h4>Advanced: Remote agents and scheduled tasks</h4>
+    <p>Schedule Claude agents to run on cron — nightly security scans, weekly dependency audits, automated test generation for new code. Remote agents run in Anthropic's infrastructure, not your machine, and post results wherever you configure (Slack, GitHub Issues, email). As of May 2026, this is available in Claude Code's Pro and Enterprise tiers.</p>
+  </div>
+</div>
+
+<div class="callout gold-callout" style="margin-top:28px">
+  <strong>The leverage gradient:</strong> A function-level task saves minutes. A session-level task (debug, refactor a class) saves hours. A codebase-level task (migration, audit, architectural analysis) saves days to weeks. Your time investment in learning Claude Code's advanced patterns pays compounding returns on every large task you face.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 04 ECONOMICS ═══ -->
+<section class="section" id="economics">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">04</div>
+  <div>
+    <div class="section-label">Economics and usage tradeoffs</div>
+    <h2 class="section-title">Token cost is real. Engineer time is more expensive. The math almost always favors Claude Code — but not blindly.</h2>
+    <p class="lead">As of May 2026, Claude's API pricing is approximately $3 per million input tokens and $15 per million output tokens, with prompt cache hits at roughly 10% of input cost. A typical Claude Code session costs $0.05–$2.00. A multi-agent loop on a complex task can reach $10–$30. At senior engineer hourly rates, Claude Code is rarely expensive relative to the time it saves — but careless usage adds up.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Typical cost</th>
+        <th>Time saved</th>
+        <th>ROI signal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Explain a 200-line function</td>
+        <td>$0.02–0.05</td>
+        <td>15–30 min</td>
+        <td>Always positive. Use freely.</td>
+      </tr>
+      <tr>
+        <td>Targeted bug fix in known file</td>
+        <td>$0.05–0.20</td>
+        <td>30–90 min</td>
+        <td>Always positive.</td>
+      </tr>
+      <tr>
+        <td>Debug production regression from logs</td>
+        <td>$0.20–1.00</td>
+        <td>2–6 hours</td>
+        <td>Strongly positive. Downtime cost alone justifies it.</td>
+      </tr>
+      <tr>
+        <td>Refactor a service (10–20 files)</td>
+        <td>$1–5</td>
+        <td>1–3 days</td>
+        <td>Positive. Plan the task carefully to avoid rework.</td>
+      </tr>
+      <tr>
+        <td>Multi-agent security audit</td>
+        <td>$10–30</td>
+        <td>3–5 days</td>
+        <td>Positive if the codebase matters. Expensive if used on throwaway code.</td>
+      </tr>
+      <tr>
+        <td>Nightly scheduled dependency scan</td>
+        <td>$5–15/run</td>
+        <td>Ongoing risk reduction</td>
+        <td>Budget it explicitly. Track cumulative monthly cost.</td>
+      </tr>
+      <tr>
+        <td>Continuous "does my code work" loop</td>
+        <td>Unbounded</td>
+        <td>None</td>
+        <td>Negative. Use your IDE's native feedback. Reserve Claude for genuine complexity.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3 style="margin-top:46px;margin-bottom:18px;font-size:27px">Three economics mistakes junior engineers make</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Mistake 1: Using agents for everything</div>
+      <span class="fc-label red">Costly</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Spawning a multi-agent loop for a task that a single focused prompt could handle. Agents are 3–10× more expensive than single-session interactions. They are the right tool for tasks that require more context than one session can hold — not for every question.</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code's capabilities stack from simple to complex. Junior engineers should master the core layer before venturing into advanced patterns.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Core Capabilities (Day 1)</h3>
-
-      <div class="grid-3" style="margin-top: 24px;">
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Code Navigation</h3>
-          <p>Ask Claude "where is the payment processor?" or "which files handle auth?" Claude globbed the codebase, grepped for symbols, and synthesized a map. No `find` commands needed.</p>
-        </div>
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Explanation & Review</h3>
-          <p>Point to a function. Ask "what does this do?" Claude reads it, traces dependencies, and explains intent in English. Great for onboarding to unfamiliar code.</p>
-        </div>
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Isolated Edits</h3>
-          <p>"Add error handling to the database layer." Claude finds the right files, makes surgical edits (diffs, not rewrites), and explains changes. You review before committing.</p>
-        </div>
-      </div>
-
-      <div class="grid-3" style="margin-top: 18px;">
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Test Execution & Debugging</h3>
-          <p>"Run the integration tests. Show me failures." Claude streams output, parses errors, and highlights root causes—typos, missing mocks, async bugs. Iterates to fix.</p>
-        </div>
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Git Workflows</h3>
-          <p>Create branches, stage changes, author commits with semantic messages, push to remote. Claude understands git history and prevents force-pushes to main.</p>
-        </div>
-        <div class="panel blue">
-          <div class="tag">Capability</div>
-          <h3>Task Tracking</h3>
-          <p>Complex task? Claude breaks it into steps, marks progress, and re-plans if blockers emerge. Like having a senior engineer organize your todos.</p>
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Advanced Capabilities (Week 2+)</h3>
-
-      <div class="panel dark" style="margin-top: 28px;">
-        <h3 style="margin-bottom: 14px;">Multi-Agent Orchestration</h3>
-        <p>For complex tasks (refactoring a monolith, auditing security), spawn specialized agents in parallel. Each operates on a subproblem with isolated context. Results are synthesized. Example: Launch code-review, security-review, and performance-review agents simultaneously on a 2K-line PR.</p>
-        <div class="callout warn" style="margin-bottom: 0;">
-          <strong>Caveat:</strong> Agent output inflates token usage. Reserve for tasks that justify the cost (critical refactors, security audits, complex incidents).
-        </div>
-      </div>
-
-      <div class="panel dark" style="margin-top: 18px;">
-        <h3 style="margin-bottom: 14px;">Planning & Architecture</h3>
-        <p>Ask Claude to plan a non-trivial refactor. It analyzes the codebase, identifies critical files, designs an approach, presents options. You approve or redirect. Then it executes step-by-step with checkpoints. Transforms a scary refactor into a choreographed sequence.</p>
-      </div>
-
-      <div class="panel dark" style="margin-top: 18px;">
-        <h3 style="margin-bottom: 14px;">Autonomous Exploration</h3>
-        <p>Say "find all places where we're not handling X correctly." Claude spawns an Explore agent that greps the codebase, reads relevant files, cross-references, and synthesizes findings. Great for compliance audits, deprecation migrations, pattern discovery.</p>
-      </div>
-
-      <div class="panel dark" style="margin-top: 18px;">
-        <h3 style="margin-bottom: 14px;">Remote Agents & Scheduling</h3>
-        <p>Schedule Claude to run tasks on a cron. Example: "Every morning at 9am, check our GitHub Actions, scan for failing builds, and email the team." Or trigger via webhooks: "When a PR is opened, run security-review and post comments." Automation without writing scripts.</p>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Architectural Patterns</h3>
-
-      <p style="margin-bottom: 24px;">Over time, you'll recognize patterns that Claude excels at:</p>
-
-      <div class="scene">
-        <div class="scene-label">Pattern 1: The Research Loop</div>
-        <p>"Search the codebase for X. For each match, read the context. Summarize findings." Claude parallelizes grep, batches reads, synthesizes. A task you'd spend 2 hours on becomes 2 minutes.</p>
-      </div>
-
-      <div class="scene">
-        <div class="scene-label">Pattern 2: The Refactor Gauntlet</div>
-        <p>"Rename this function across the codebase, update all tests, run the suite, handle new failures." Claude plans a sequence, tracks progress, rolls back if unrecoverable, and commits only when green.</p>
-      </div>
-
-      <div class="scene">
-        <div class="scene-label">Pattern 3: The Incident Postmortem</div>
-        <p>"Analyze the outage: read logs, check metrics, trace the code changes that deployed, run that code path locally, identify the bug." Claude parallelizes, synthesizes, and narrates root cause with confidence.</p>
+      <div>
+        <h4>The fix</h4>
+        <p>Start with a single, well-scoped session. Narrow the scope. If the task genuinely requires 5+ independent research threads that cannot be sequenced, then use agents. Otherwise, a focused session is faster, cheaper, and easier to audit.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Section 4: Economics & Tradeoffs -->
-  <section class="section" id="economics">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">4</div>
-        <div>
-          <h2 class="section-title">Economics & Usage Tradeoffs</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Mistake 2: Broad prompts that force exploration</div>
+      <span class="fc-label red">Wasteful</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>"Refactor the payment system" forces Claude to explore the entire codebase before it can plan. You pay tokens for exploration that you could eliminate by scoping: "Refactor PaymentService.processOrder() to use CompletableFuture. Keep the HTTP contract unchanged."</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code's value isn't measured in tokens—it's measured in velocity. But tokens have a cost. Understanding the tradeoff between automation and expense is critical for building sustainable workflows.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Token Economics</h3>
-
-      <p style="margin-bottom: 24px;">As of May 2026, Claude's pricing is roughly $3 per million input tokens, $15 per million output tokens. A typical interaction costs $0.01–$0.50. An autonomous agent loop might spend $2–$10. Expensive at scale, trivial per-task.</p>
-
-      <div class="grid-2" style="margin-top: 28px;">
-        <div class="panel white">
-          <div class="tag">Cost Profile</div>
-          <h3>Cheap Interactions</h3>
-          <p><strong>Single edits:</strong> $0.01. <strong>Code explanation:</strong> $0.02. <strong>Test debugging:</strong> $0.05. <strong>Git workflows:</strong> $0.01. All negligible. Use liberally.</p>
-        </div>
-        <div class="panel white">
-          <div class="tag">Cost Profile</div>
-          <h3>Expensive Operations</h3>
-          <p><strong>Multiagent loops:</strong> $5–$20 (research + review + planning). <strong>Large refactors:</strong> $2–$5. <strong>Scheduled agents:</strong> Add up. Budget intentionally.</p>
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">When to Use Claude Code (and When Not To)</h3>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Scenario</th>
-              <th>Use Claude Code?</th>
-              <th>Why</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>One-off bug fix in a file you know well</td>
-              <td><strong>Yes</strong> (but maybe overkill)</td>
-              <td>Cheap. Frees your hands. Worth it even if you could do it faster.</td>
-            </tr>
-            <tr>
-              <td>Navigate unfamiliar codebase, understand structure</td>
-              <td><strong>Yes</strong> (strongly)</td>
-              <td>Claude's codebase understanding accelerates onboarding dramatically. ROI is weeks of productivity.</td>
-            </tr>
-            <tr>
-              <td>Refactor a large subsystem across 20+ files</td>
-              <td><strong>Yes</strong> (with planning)</td>
-              <td>Manual refactor = weeks. Claude with planning + execution = days. Cost is negligible relative to time saved.</td>
-            </tr>
-            <tr>
-              <td>Debug a production incident, log traces, metrics, code</td>
-              <td><strong>Yes</strong> (absolutely)</td>
-              <td>Claude synthesizes disparate signals. Cost is irrelevant; saved downtime pays for itself 1000x.</td>
-            </tr>
-            <tr>
-              <td>Continuous "check if my code works" loop</td>
-              <td><strong>Maybe</strong> (use IDE, not Claude)</td>
-              <td>Your IDE's real-time feedback is instant and free. Use Claude only when you're truly stuck.</td>
-            </tr>
-            <tr>
-              <td>Automated code review on every PR</td>
-              <td><strong>Maybe</strong> (schedule it off-peak)</td>
-              <td>Great for scaling reviews, but costs add up. Schedule as remote agents on a nightly cron, not synchronously.</td>
-            </tr>
-            <tr>
-              <td>Compliance audit: find all places where data is logged unsafely</td>
-              <td><strong>Yes</strong> (with Explore agent)</td>
-              <td>Manual audit is error-prone and slow. Claude + Explore agent = high confidence. Cost is trivial vs. audit liability.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Token Optimization Strategies</h3>
-
-      <p style="margin-bottom: 24px;">Over time, you'll develop habits that stretch your token budget:</p>
-
-      <div class="framework-cards" style="margin-top: 28px;">
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Strategy: Scoping</div>
-            <div class="fc-label">Conservation</div>
-          </div>
-          <div class="fc-body">
-            <h4>Precision Reduces Token Spend</h4>
-            <p>Instead of "refactor this entire service," say "refactor the payment handler function to use async/await, keep the HTTP contract unchanged." Narrow scope = narrower context window = lower cost and faster execution.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Strategy: Batching</div>
-            <div class="fc-label">Efficiency</div>
-          </div>
-          <div class="fc-body">
-            <h4>Combine Related Tasks</h4>
-            <p>"Add logging, add error handling, add metrics to the request handler" (one interaction) vs. three separate requests. Batching amortizes context load, reducing total tokens.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Strategy: Caching</div>
-            <div class="fc-label">Anthropic SDK Feature</div>
-          </div>
-          <div class="fc-body">
-            <h4>Prompt Cache for Repeated Tasks</h4>
-            <p>For repeated analyses of the same codebase (e.g., daily security reviews, nightly test runs), use Claude's prompt cache. First run pays full cost; subsequent runs within 5 minutes cost 10% of input tokens. Scales audit costs sublinearly.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="callout warn">
-        <strong>Common mistake:</strong> Running multiagent loops for every task. Agents are great for complex decisions (code review, planning), but expensive for routine edits. Use single-agent interactions for 80% of work; reserve agents for high-leverage decisions.
+      <div>
+        <h4>The fix</h4>
+        <p>Know your codebase well enough to point Claude at the right files. Use Claude to explore unfamiliar code, then use that knowledge to scope future tasks tightly. Exploration is a one-time cost; tight prompts pay it back on every subsequent task.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Section 5: Security Architecture -->
-  <section class="section" id="security">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">5</div>
-        <div>
-          <h2 class="section-title">Security Architecture & Risk Model</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Mistake 3: Ignoring prompt cache for repeated tasks</div>
+      <span class="fc-label red">Missed savings</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Running the same analysis repeatedly — daily security reviews, nightly test runs — without using prompt caching. The first call costs full price. Subsequent calls within 5 minutes cost 10% of input tokens. For scheduled agents, cache hits can reduce costs by 80–90%.</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code executes commands, reads sensitive files, and has API access. Understanding its security model is critical—especially in regulated environments (fintech, healthcare, defense).</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Trust Boundaries</h3>
-
-      <p style="margin-bottom: 24px;">Claude Code operates at the intersection of three trust domains. A breach in any one affects the others:</p>
-
-      <div class="grid-3" style="margin-top: 28px;">
-        <div class="panel white">
-          <div class="tag">Domain 1</div>
-          <h3>Your Local Machine</h3>
-          <p>Claude reads your files, executes your shell, accesses your git history. If your laptop is compromised, Claude is compromised. Defense: standard hygiene (keep OS updated, strong credentials).</p>
-        </div>
-        <div class="panel white">
-          <div class="tag">Domain 2</div>
-          <h3>Anthropic's API</h3>
-          <p>Your code and context flow to Anthropic servers. Anthropic is SOC2 Type II certified and commits not to train on customer API data. But it's still the cloud—not zero-trust. Defense: don't send prod credentials; use environment-specific API keys with narrow scope.</p>
-        </div>
-        <div class="panel white">
-          <div class="tag">Domain 3</div>
-          <h3>Third-Party Integrations</h3>
-          <p>MCP servers (GitHub, Google Drive, cloud CLIs) extend Claude's reach. Each integration is a trust extension. Defense: audit integrations, use least-privilege credentials, rotate keys regularly.</p>
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Threat Model & Mitigations</h3>
-
-      <div class="framework-cards" style="margin-top: 28px;">
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Prompt Injection</div>
-            <div class="fc-label">Via Untrusted Input</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>An attacker inserts a jailbreak into a code comment, error message, or test output. Claude parses it and changes behavior—e.g., creates a backdoor, exfiltrates data.</p>
-            <h4>Mitigation</h4>
-            <p>Claude's training makes this difficult but not impossible. Defense: don't ask Claude to act on untrusted output (e.g., error messages from compromised CI). Keep attack surface minimal.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Credential Leakage</div>
-            <div class="fc-label">In Git History or Files</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>Claude reads a .env file or git commit that contains an API key. The key is sent to Anthropic's servers. Later, Anthropic is breached, or logs are subpoenaed.</p>
-            <h4>Mitigation</h4>
-            <p>Use proper secrets management (.env.local, AWS Secrets Manager, HashiCorp Vault). Claude Code respects .gitignore—never commit secrets. If you leak a secret, rotate it immediately.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Unintended Execution</div>
-            <div class="fc-label">Claude Runs a Destructive Command</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>You ask Claude "clean up the build artifacts," and Claude infers (incorrectly) that `rm -rf /` is the right interpretation. Catastrophic.</p>
-            <h4>Mitigation</h4>
-            <p>Claude Code's permission model requires approval for risky operations. Be specific: "remove *.o files from the build/ directory." Avoid ambiguous commands. Test in a safe environment first.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Data Exfiltration</div>
-            <div class="fc-label">Via MCP or Third-Party Services</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>Claude integrates with Google Drive, GitHub, or a custom MCP server. A compromised server or an attacker-controlled MCP leaks sensitive data.</p>
-            <h4>Mitigation</h4>
-            <p>Audit MCP integrations before enabling. Use OAuth with minimal scopes. Don't integrate Claude Code with systems holding sensitive PII or credentials. Disable integrations you don't actively use.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Supply Chain (Transitive)</div>
-            <div class="fc-label">Claude Commits Vulnerable Code</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>Claude generates code with a subtle SQL injection or XSS vulnerability. You don't catch it in review. It ships to prod.</p>
-            <h4>Mitigation</h4>
-            <p>Claude is not infallible. Always review code before merging, even if Claude generated it. Use static analyzers (SAST), security linters, and tests to catch issues. Treat Claude as a code contributor, not an authority.</p>
-          </div>
-        </div>
-
-        <div class="framework-card">
-          <div class="fc-head">
-            <div class="fc-title">Threat: Model Output Poisoning</div>
-            <div class="fc-label">Claude's Training Data or Fine-Tuning</div>
-          </div>
-          <div class="fc-body">
-            <h4>Risk</h4>
-            <p>Anthropic's training data or fine-tuning is poisoned by an attacker. Claude consistently recommends unsafe patterns.</p>
-            <h4>Mitigation</h4>
-            <p>Anthropic invests heavily in data quality and safety. But no ML system is 100% safe. Diversity of tools mitigates: use linters, type checkers, fuzz testing, and human review. Don't rely on Claude alone for security.</p>
-          </div>
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Deployment Considerations</h3>
-
-      <div class="callout info" style="margin-top: 28px;">
-        <strong>PCI DSS / HIPAA / FedRAMP:</strong> Before deploying Claude Code in a regulated environment, work with your security and compliance teams. Data flows to Anthropic's API, which may not meet your regulatory requirements. For highly sensitive code, consider running Claude Code in an air-gapped environment or use an on-premise solution (if available).
-      </div>
-
-      <div class="callout warn" style="margin-top: 18px;">
-        <strong>Production Access:</strong> Never give Claude Code credentials with production access unless absolutely necessary. Instead: (1) use read-only credentials that can view logs and metrics, (2) require manual approval for any production mutations, (3) audit all Claude Code executions against prod systems, (4) rotate credentials frequently.
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Best Practices Checklist</h3>
-
-      <div style="margin-top: 28px;">
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Secrets: Use env vars, not hardcoded strings. Rotate aggressively.</p>
-        </div>
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Code Review: Always review AI-generated code before merge, especially security-critical paths.</p>
-        </div>
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Permissions: Grant Claude Code the minimum permissions needed. Deny risky operations by default.</p>
-        </div>
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Auditing: Log all Claude Code interactions. Review logs for anomalies.</p>
-        </div>
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Testing: Comprehensive test suite catches issues Claude might miss. SAST + dynamic testing.</p>
-        </div>
-        <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--primary); background: #edf4ee; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-          <p style="margin: 0; color: #253d2d;">✓ Integrations: Audit MCP servers and third-party tools. Disable what you don't use.</p>
-        </div>
+      <div>
+        <h4>The fix</h4>
+        <p>For scheduled or repeated tasks, structure your system prompt to be cache-friendly: stable content first, variable content last. The Anthropic SDK supports prompt caching directly. Teams running nightly audits cut costs from $20/run to $3/run with this pattern alone.</p>
       </div>
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- Section 6: Java Microservices Example -->
-  <section class="section" id="java-example">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">6</div>
-        <div>
-          <h2 class="section-title">Real World: Java Microservices Refactor</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+<div class="callout info" style="margin-top:28px">
+  <strong>Track your costs:</strong> Anthropic's console shows token usage per API key. Set a monthly budget. Review it weekly until you understand your team's usage pattern. Most teams find their costs stabilize after 4–6 weeks as engineers develop better prompting habits. Runaway costs almost always trace to one of the three mistakes above.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 05 SECURITY ═══ -->
+<section class="section" id="security">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">05</div>
+  <div>
+    <div class="section-label">Security architecture and risks</div>
+    <h2 class="section-title">Claude Code operates across three trust boundaries. Understanding them is not optional if you work with sensitive code.</h2>
+    <p class="lead">Claude Code reads your files, executes shell commands, and sends context to Anthropic's API. In a regulated environment — fintech, healthcare, defense — this is not a minor detail. The system has strong defaults, but you need to understand where the trust boundaries are and what they mean for your specific risk profile.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-3" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag">Boundary 1</span>
+    <h3>Your local machine</h3>
+    <p>Claude Code reads files and executes commands with your user permissions. If your machine is compromised, Claude Code is compromised. Standard hygiene applies: locked screen, strong credentials, full-disk encryption, no running Claude Code as root.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag">Boundary 2</span>
+    <h3>Anthropic's API</h3>
+    <p>Your prompts and codebase context travel to Anthropic's servers for inference. Anthropic is SOC 2 Type II certified and contractually commits not to train on customer API data. This is still the cloud — not zero-trust. Treat it as a trusted third party, not your own datacenter.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag">Boundary 3</span>
+    <h3>Third-party integrations</h3>
+    <p>MCP servers extend Claude's reach to GitHub, Google Drive, cloud CLIs, internal APIs. Each integration is a trust extension. Every server you add expands the blast radius of a compromise. Audit each one. Grant minimum necessary scope.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:46px;margin-bottom:18px;font-size:27px">Threat model</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Prompt injection via untrusted content</div>
+      <span class="fc-label red">Real risk</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>How it works</h4>
+        <p>An attacker embeds instructions in a code comment, error message, or file that Claude reads. If Claude treats the embedded content as instructions rather than data, it may take unintended actions — exfiltrating code, modifying files, or changing behavior to mask a backdoor.</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Theory is one thing. Shipping is another. Let's walk through a concrete example: refactoring a legacy Java microservices codebase to use async I/O, improving both latency and resource utilization. This is typical of work junior engineers inherit.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">The Setup</h3>
-
-      <p style="margin-bottom: 24px;">You've inherited a Payment Service microservice (30K lines of Spring Boot). It's synchronous throughout: database calls block, HTTP calls block, message queue consumption blocks. Under load, threads exhaust, requests timeout, customers get angry.</p>
-
-      <p style="margin-bottom: 28px;">Your task: migrate to async/await without breaking the contract. Scope: three critical paths (order processing, payment verification, refund handling). Timeline: 6 weeks. Risk: high (payment system = money).</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 1: Codebase Exploration (Without Claude)</h3>
-
-      <p style="margin-bottom: 18px;">Manually:</p>
-      <ul style="margin-left: 20px; margin-bottom: 28px; color: #423c35;">
-        <li>Clone repo. Run `find . -name "*.java" | wc -l`. 2K files. Overwhelming.</li>
-        <li>Search for "payment" in codebase. 1.2K matches. Which are the critical paths?</li>
-        <li>Read PaymentService.java. 500 lines. It calls UserService, OrderService, DatabaseRepository, SQS queue.</li>
-        <li>Trace each dependency. Each calls multiple services. Dependency graph = complex.</li>
-        <li>Estimate: 2–3 weeks just to understand the scope.</li>
-      </ul>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 1: Codebase Exploration (With Claude Code)</h3>
-
-      <p style="margin-bottom: 24px;"><strong>You say:</strong> "Explore this codebase. What are the three critical payment paths (order processing, payment verification, refund)? For each, map the call graph (which services/repos are called), identify which calls block, and estimate the scope of async migration."</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code's approach:</strong></p>
-
-      <div class="codeblock" style="margin-bottom: 28px;">
-        <div class="dim">// Conceptual flow (Claude executes these steps automatically)</div>
-        <div class="ok">1. Glob: Find all Java files. Identify by naming: PaymentService*, OrderProcessor*, RefundHandler*</div>
-        <div class="ok">2. Grep: Search for "order.*processing", "payment.*verification", "refund" across codebase</div>
-        <div class="ok">3. Read: Parse PaymentService.java, identify public endpoints and their dependencies</div>
-        <div class="ok">4. Grep: For each dependency (UserService, OrderService, etc.), find its definition</div>
-        <div class="ok">5. Analyze: Identify I/O calls (database, HTTP, SQS)</div>
-        <div class="ok">6. Synthesize: Build call graph, flag blocking calls, estimate async scope</div>
-        <div class="dim">// Total time: <5 minutes. Manual equivalent: 2–3 weeks.</div>
+      <div>
+        <h4>Claude's protection</h4>
+        <p>Claude Code's training includes prompt injection resistance. It is more robust than a naive LLM, but not theoretically immune. Adversarial content crafted specifically to exploit this attack surface remains a realistic concern in high-value targets.</p>
       </div>
-
-      <p style="margin-bottom: 24px;"><strong>Output:</strong> Claude returns a detailed report:</p>
-
-      <div class="scene">
-        <div class="scene-label">Claude's Analysis</div>
-        <p><strong>Path 1: Order Processing</strong> → PaymentService.processOrder() → calls UserService.validateCredit() (HTTP, 100–500ms), OrderService.reserveInventory() (DB, 50–200ms), SQS.publish() (IO, 10–50ms). All synchronous. Single request blocks thread for 160–750ms. Under load, thread pool saturates.</p>
-        <p style="margin-top: 12px;"><strong>Path 2: Payment Verification</strong> → PaymentService.verify() → calls ExternalGateway.queryStatus() (HTTP, 500–2000ms), DatabaseRepository.logTransaction() (DB, 50–100ms). Synchronous. 550–2100ms per request.</p>
-        <p style="margin-top: 12px;"><strong>Path 3: Refund Handling</strong> → PaymentService.refund() → calls ExternalGateway.initiateRefund() (HTTP, 200–1000ms), DatabaseRepository.updateBalance() (DB, 50–150ms), NotificationService.sendEmail() (HTTP, 100–500ms). 350–1650ms per request. Can be async—no external contracts depend on immediate completion.</p>
-      </div>
-
-      <p style="margin-top: 28px;"><strong>Scope estimate from Claude:</strong> Path 1 = 2–3 weeks (complex, critical). Path 2 = 1 week (well-isolated). Path 3 = 3–5 days (async-friendly). Total: 4–5 weeks if sequential, 2–3 weeks if parallelized by engineer.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 2: Planning the Refactor</h3>
-
-      <p style="margin-bottom: 24px;"><strong>You say:</strong> "Plan the refactor of Path 1 (order processing) to async/await. Keep the HTTP contract identical. Constraints: (1) database must use async driver (r2dbc), (2) no change to the queue publishing contract, (3) must be tested and green before merging."</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code:</strong> Invokes the Plan agent. It analyzes PaymentService.processOrder(), designs a step-by-step refactor, identifies test coverage gaps, and presents a plan:</p>
-
-      <div class="scene">
-        <div class="scene-label">Refactor Plan (from Claude)</div>
-        <p><strong>Phase 1 (Setup):</strong></p>
-        <p style="margin-top: 6px; margin-bottom: 6px;">- Add r2dbc dependency to pom.xml. Configure async connection pool.</p>
-        <p style="margin-bottom: 6px;">- Create CompletableFuture wrapper for SQS publishing (async).</p>
-        <p style="margin-bottom: 12px;">- Add integration test that validates async behavior (verify order is processed in parallel, not sequentially).</p>
-        <p><strong>Phase 2 (Refactor):</strong></p>
-        <p style="margin-top: 6px; margin-bottom: 6px;">- Convert PaymentService.processOrder() return type: `Order` → `CompletableFuture&lt;Order&gt;`. Change DB calls from JdbcTemplate to R2dbcEntityTemplate (returns async).</p>
-        <p style="margin-bottom: 6px;">- Parallelize UserService and OrderService calls using `CompletableFuture.allOf()`. Net effect: 100–500ms + 50–200ms reduced to max(100–500ms, 50–200ms) = 100–500ms.</p>
-        <p style="margin-bottom: 12px;">- Update SQS publish to async (non-blocking).</p>
-        <p><strong>Phase 3 (Test &amp; Validate):</strong></p>
-        <p style="margin-top: 6px; margin-bottom: 6px;">- Run existing unit tests. All should pass (interface unchanged).</p>
-        <p style="margin-bottom: 6px;">- Run integration tests. Validate latency improvement (measure new p99).</p>
-        <p style="margin-bottom: 12px;">- Load test: 100 req/s sustained. Verify thread pool doesn't saturate. Check memory/CPU.</p>
-      </div>
-
-      <p style="margin-top: 28px;"><strong>You approve the plan.</strong> Now Claude executes.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 3: Implementation</h3>
-
-      <p style="margin-bottom: 24px;"><strong>You say:</strong> "Execute Phase 1 (setup). Add r2dbc dependency, configure connection pool, create async SQS wrapper. Show me changes before committing."</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code:</strong></p>
-
-      <ul style="margin-left: 20px; margin-bottom: 28px; color: #423c35;">
-        <li>Reads pom.xml. Identifies version of Spring Boot.</li>
-        <li>Adds r2dbc dependency compatible with your Spring version.</li>
-        <li>Reads application.yaml. Understands your connection pool config.</li>
-        <li>Adds async connection pool config (new file or update existing).</li>
-        <li>Creates AsyncSqsPublisher.java wrapper. Handles backpressure, error handling.</li>
-        <li>Creates integration test that validates async behavior.</li>
-        <li>Runs `mvn test`. All new tests pass.</li>
-        <li>Shows you the diff. You review. Approve or request changes.</li>
-      </ul>
-
-      <p style="margin-bottom: 28px;"><strong>You say:</strong> "Good. But the SQS backpressure handling is incomplete. Add exponential backoff for retries. Also, reduce the connection pool from 20 to 10 (we're already optimized on the client side)."</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code:</strong> Updates the SqsPublisher with backoff logic. Updates connection pool config. Reruns tests. All pass. Shows you the updated diff. You merge.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 4: The Refactor Loop (Phases 2 & 3)</h3>
-
-      <p style="margin-bottom: 24px;">Phase 2 is the meat of the work. Refactoring a 500-line synchronous function to async is error-prone. Claude becomes indispensable:</p>
-
-      <p style="margin-bottom: 24px;"><strong>You say:</strong> "Refactor PaymentService.processOrder() to async/await (CompletableFuture). Parallelize UserService.validateCredit() and OrderService.reserveInventory(). Keep the contract identical (HTTP endpoint still returns JSON synchronously, but internally uses async)."</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code's approach:</strong></p>
-
-      <div class="codeblock">
-        <div class="ok">1. Read PaymentService.processOrder(). Parse dependencies and return type.</div>
-        <div class="ok">2. Identify all DB calls. Map to r2dbc equivalents (blocking → async).</div>
-        <div class="ok">3. Change return type: Order → CompletableFuture&lt;Order&gt;.</div>
-        <div class="ok">4. Replace sequential calls with CompletableFuture.supplyAsync() + allOf().</div>
-        <div class="ok">5. Test: Run unit tests. If failures, analyze, iterate.</div>
-        <div class="dim">// This is where humans get stuck. Claude iterates automatically.</div>
-      </div>
-
-      <p style="margin-top: 28px;"><strong>Test failures emerge.</strong> A test expects the order to be saved synchronously before returning. But now it's async. Claude reads the test, understands the intent, and adjusts: wraps the async operation in a sync wrapper for this specific test, or updates the test to handle async. Iteration happens in seconds, not hours.</p>
-
-      <p style="margin-bottom: 28px;"><strong>Phase 3 runs integration tests and load tests.</strong> Claude streams the output, parses metrics, identifies bottlenecks. If latency isn't improved, Claude reads the code, spots the issue (e.g., "UserService calls are still synchronous—inherited from a library"), and suggests next steps. You decide whether to dig deeper or defer.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Step 5: Validation</h3>
-
-      <p style="margin-bottom: 24px;"><strong>You say:</strong> "Compare before/after latency. Before: 75th percentile 250ms, 99th percentile 800ms. After: what do we get? Also, analyze CPU and memory usage. Did we improve?"</p>
-
-      <p style="margin-bottom: 28px;"><strong>Claude Code:</strong> Runs load tests on both versions (you maintain a benchmark branch). Parses metrics. Generates a comparison table. Reports 40% improvement in p99 latency, 30% reduction in thread pool utilization, same memory footprint. Validates the refactor was worth it.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">The Payoff</h3>
-
-      <p style="margin-bottom: 28px;"><strong>Without Claude Code:</strong> You'd spend 4–6 weeks on this. Manual refactoring, debugging test failures, running benchmarks, iterating. By the end, you'd know async/await deeply. But you'd be exhausted.</p>
-
-      <p style="margin-bottom: 28px;"><strong>With Claude Code:</strong> You spend 2 weeks. Claude handles the boilerplate, iteration, and benchmarking. You focus on architecture and validation. You learn async/await by *reading* Claude's code, not by painful trial-and-error. You're fresher. You ship faster. Everyone wins.</p>
-
-      <div class="callout info" style="margin-top: 36px;">
-        <strong>Lesson:</strong> Claude Code doesn't replace engineering judgment. It amplifies it. You still make the big decisions (async vs. reactive streams, connection pool size, error handling strategy). Claude handles execution at scale.
+      <div>
+        <h4>Your mitigation</h4>
+        <p>Do not ask Claude to act on untrusted content without inspection. Never pipe raw API responses, user-supplied data, or external log files directly into a Claude session without reviewing them first. Treat this like SQL injection: the defense is architectural, not just relying on the framework.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Section 7: Limitations & Failure Modes -->
-  <section class="section" id="limitations">
-    <div class="container">
-      <div class="section-head" tabindex="0">
-        <div class="section-no">7</div>
-        <div>
-          <h2 class="section-title">Limitations & Known Failure Modes</h2>
-        </div>
-        <button class="section-toggle" aria-label="toggle section">+</button>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Credential and secret exposure</div>
+      <span class="fc-label red">Real risk</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>How it works</h4>
+        <p>Claude reads a <code>.env</code> file, a hardcoded credential in a config file, or an AWS key in git history. That content travels to Anthropic's API. Even with contractual data protections, this is an unnecessary exposure vector.</p>
       </div>
-
-      <p style="margin-top: 36px; margin-bottom: 28px;">Claude Code is powerful. It's also not magic. Knowing where it fails prevents painful surprises in production.</p>
-
-      <h3 style="margin-top: 36px; margin-bottom: 18px;">Class 1: Context Window Limits</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Codebase Understanding is Bounded</h3>
-        <p>Claude's context window is 200K tokens (~150K lines of code). A large monolith (500K lines) doesn't fit. Claude sees the files you ask about, but loses global context. Impact: might miss a critical dependency in a distant part of the codebase.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Use the Explore agent or Glob+Grep to identify dependencies before asking Claude to refactor. Narrow scope: don't ask Claude to refactor "the payment system" (too broad); ask it to refactor "the order validation function" (narrow, contextualizable).
-        </div>
-      </div>
-
-      <div class="panel white" style="margin-top: 18px;">
-        <div class="tag">Limitation</div>
-        <h3>Long-Running Loops Lose Context</h3>
-        <p>Conversation length matters. After 50+ messages, earlier context is summarized. Claude might forget decisions you made early in the conversation. Impact: inconsistent refactoring, missed constraints.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Periodically summarize constraints. "Reminder: we're async-first, no blocking calls, no changes to the public API." Breaks long loops into shorter focused sessions.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Class 2: Semantic Misunderstanding</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Claude Misinterprets Intent</h3>
-        <p>You ask: "Clean up this function." Claude removes dead code, adds logging, refactors variable names—all reasonable, none explicitly requested. You wanted just dead code removal. Result: unnecessary churn.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Be specific. "Remove only the unused variables and dead code paths. Don't change function logic or add logging." Constraints, not suggestions.
-        </div>
-      </div>
-
-      <div class="panel white" style="margin-top: 18px;">
-        <div class="tag">Limitation</div>
-        <h3>Claude Misses Implicit Requirements</h3>
-        <p>Your codebase has unwritten conventions: all new code must have X-Ray instrumentation, all database calls must timeout after Y ms, etc. Claude might miss these and generate code that violates them.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Codify conventions in CLAUDE.md. Document style guide, test requirements, deployment constraints. Claude learns from CLAUDE.md and applies it consistently.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Class 3: Security & Correctness Risks</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Claude Generates Vulnerable Code</h3>
-        <p>Claude generates code that passes tests but has a subtle SQL injection, XSS, or race condition. Tests don't catch it because they don't exercise that path.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> (1) Always review generated code before merge, especially security-critical paths. (2) Use SAST tools (SonarQube, Semgrep) to catch common patterns. (3) Fuzz test and dynamic analysis. Claude is a contributor, not an authority.
-        </div>
-      </div>
-
-      <div class="panel white" style="margin-top: 18px;">
-        <div class="tag">Limitation</div>
-        <h3>Claude Hallucinates API or Library Details</h3>
-        <p>Claude references a method that doesn't exist, or uses an API incorrectly. The code compiles but fails at runtime.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Let tests be the truth. If tests fail, Claude iterates. But don't assume Claude's explanation of an API is correct—check the docs yourself. Use IDE autocomplete to validate API surfaces.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Class 4: Tool Execution Failures</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Claude Can't Execute Arbitrary Commands</h3>
-        <p>You ask Claude to "deploy to production." Claude needs credentials, complex orchestration, approval workflows. It can't do this without explicit integration.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Use remote agents + webhook integrations for complex workflows. Or ask Claude to generate a deployment script, you review and execute manually. Accept that some tasks require human approval.
-        </div>
-      </div>
-
-      <div class="panel white" style="margin-top: 18px;">
-        <div class="tag">Limitation</div>
-        <h3>Claude Can't Understand Non-Text Formats</h3>
-        <p>You want Claude to analyze a diagram, architecture image, or video. It can't—no vision support in Code (as of May 2026). Claude reads code and text, not media.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Describe diagrams in text. "Our architecture has a monolith → three services → database." Claude works with that description. Or use Claude's vision API separately (outside Code) to analyze images, then paste the description into Code.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Class 5: Decision-Making Failures</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Claude Might Choose Suboptimal Architectures</h3>
-        <p>You ask Claude to "design the payment system architecture." Claude might recommend a sound approach, but not the *best* approach given your team's expertise, infrastructure, and constraints. It optimizes for general best practices, not your specific context.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Claude is great at execution, not great at high-level strategy. For architectural decisions, use Claude to *explore options* and *assess tradeoffs*, but make final decisions as a team. Use Claude as input to human judgment, not as an oracle.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">Class 6: Cost Surprises</h3>
-
-      <div class="panel white">
-        <div class="tag">Limitation</div>
-        <h3>Autonomous Loops Can Be Expensive</h3>
-        <p>You ask Claude to "explore the codebase and find all instances of pattern X." Claude launches an Explore agent. It loops, grepping thousands of files, iterating on context. Before you know it, you've spent $50.</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-          <strong style="color: var(--primary);">Mitigation:</strong> Be intentional about agent launches. Use single-agent interactions for 80% of work. Reserve agents for complex tasks that justify the cost. Monitor token usage. Set a personal monthly budget.
-        </div>
-      </div>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">When Claude Code Fails: Red Flags</h3>
-
-      <p style="margin-bottom: 24px;">Watch for these signals. They indicate Claude is out of its depth:</p>
-
-      <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--red); background: #f7ece9; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #4a2b28;"><strong>🚩 Red Flag 1:</strong> Claude generates code that compiles but fails all tests, and it doesn't understand why. (Likely semantic misunderstanding of requirements.)</p>
-      </div>
-
-      <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--red); background: #f7ece9; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #4a2b28;"><strong>🚩 Red Flag 2:</strong> Claude repeatedly makes the same mistake after you correct it. (Likely context window issue or misaligned constraints.)</p>
-      </div>
-
-      <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--red); background: #f7ece9; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #4a2b28;"><strong>🚩 Red Flag 3:</strong> Claude generates code that looks correct but has a subtle security vulnerability. (Tests don't catch it, humans miss it in review.)</p>
-      </div>
-
-      <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--red); background: #f7ece9; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #4a2b28;"><strong>🚩 Red Flag 4:</strong> Claude's explanation of a design decision doesn't align with your team's values or constraints. (Architecture chosen without context.)</p>
-      </div>
-
-      <div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--red); background: #f7ece9; padding: 16px 18px; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #4a2b28;"><strong>🚩 Red Flag 5:</strong> Claude's autonomous loop generates enormous token bills for what should be simple tasks. (Likely inefficient agent usage.)</p>
-      </div>
-
-      <p style="margin-top: 28px;">When you see these flags, pause. Reassess. Often, the solution is narrower scope, clearer constraints, or switching to manual work. Claude Code is a multiplier, not a replacement for judgment.</p>
-
-      <h3 style="margin-top: 46px; margin-bottom: 18px;">The Meta-Limitation: It's Still ML</h3>
-
-      <p style="margin-bottom: 28px;">Claude is a language model. It's not a symbolic system with guaranteed correctness. It can fail in surprising ways. It can be confident and wrong. This is inherent to the technology. No amount of engineering eliminates this risk; it only manages it.</p>
-
-      <div class="callout warn">
-        <strong>Philosophy:</strong> Treat Claude Code as a powerful junior engineer. It's fast, smart, and tireless. But it's not infallible. You (or a more senior engineer) must audit its work. That's not a failure of the tool—it's how we build reliable systems.
+      <div>
+        <h4>Your mitigation</h4>
+        <p>Never store secrets in files Claude can read. Use proper secrets management: AWS Secrets Manager, HashiCorp Vault, environment variables injected at runtime (not stored in files). Add <code>.env</code> and credential patterns to your <code>.gitignore</code> and verify Claude Code respects it. If you accidentally expose a secret, rotate it immediately — assume it is compromised.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Footer -->
-  <section style="border-top: 1px solid var(--line); padding: 72px 44px;">
-    <div style="width: min(1120px, 100%); margin: 0 auto;">
-      <h2 style="margin-bottom: 24px; font-size: 34px;">Next Steps for Junior Engineers</h2>
-      <p style="margin-bottom: 18px; max-width: 760px;">This training covers the foundations of Claude Code. To deepen your expertise:</p>
-      <ul style="margin-left: 20px; margin-bottom: 28px; color: #423c35;">
-        <li><strong>Hands-on:</strong> Start with simple tasks (code explanation, isolated edits). Graduate to refactors, multi-file changes, autonomous agents.</li>
-        <li><strong>Read the docs:</strong> Anthropic publishes detailed guides on capabilities, hooks, MCP, and remote agents. The official docs are canonical.</li>
-        <li><strong>Study failure modes:</strong> Pay attention when Claude makes mistakes. Learn what went wrong. Update your mental model of its limits.</li>
-        <li><strong>Contribute feedback:</strong> File issues on Claude Code's GitHub. Anthropic actively incorporates feedback into the product.</li>
-        <li><strong>Build memory:</strong> Document patterns that work. Share with your team. Collective learning beats individual discovery.</li>
-      </ul>
-      <p style="color: var(--muted); font-size: 15px;">Created on May 12, 2026. Information current as of Claude Haiku 4.5 and Claude Code (2025 release). For the latest updates, consult <a href="#">Anthropic's official documentation</a>.</p>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Claude generates vulnerable code</div>
+      <span class="fc-label gold">Persistent risk</span>
     </div>
-  </section>
+    <div class="fc-body">
+      <div>
+        <h4>How it works</h4>
+        <p>Claude generates code that passes your tests but contains a SQL injection, path traversal, SSRF, or race condition. Your tests don't exercise that path. The code ships. The vulnerability is discovered in production.</p>
+      </div>
+      <div>
+        <h4>Why this persists</h4>
+        <p>Claude is not a security scanner. It produces code that is plausible and functional but does not perform formal security verification. Security properties that require reasoning about adversarial inputs — trust boundaries, injection vectors, authorization checks — are exactly the places where language model generation is weakest.</p>
+      </div>
+      <div>
+        <h4>Your mitigation</h4>
+        <p>Review all AI-generated code on security-critical paths. Run SAST (SonarQube, Semgrep) on every PR. Fuzz test input handling code. Treat Claude as a junior contributor who is technically strong but has never operated under adversarial conditions.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Destructive command misinterpretation</div>
+      <span class="fc-label">Manageable</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>How it works</h4>
+        <p>An ambiguous prompt produces a destructive interpretation. "Clean up old data" becomes a command that drops a production table. "Remove the test environment" removes more than intended.</p>
+      </div>
+      <div>
+        <h4>Claude's protection</h4>
+        <p>Claude Code requires explicit approval for destructive operations. It will show you the command before running it, flag irreversible operations, and refuse to force-push to main or skip pre-commit hooks without your explicit request.</p>
+      </div>
+      <div>
+        <h4>Your mitigation</h4>
+        <p>Be specific. "Remove all <code>*.o</code> files from the <code>build/</code> directory" is unambiguous. "Clean up old data" is not. The specificity of your prompt is your first line of defense against misinterpretation. Never approve a bash command you have not read.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    // Navigation: Highlight active link based on scroll
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.topnav a');
+<div class="callout warn" style="margin-top:28px">
+  <strong>Regulated environments:</strong> PCI DSS, HIPAA, FedRAMP, and similar frameworks impose constraints on where customer data can travel. Before using Claude Code in a regulated environment, work with your security and compliance team to understand whether codebase context (which may include PII-adjacent data structures, schema definitions, or configuration) is permissible to send to Anthropic's API. For highly sensitive systems, consider whether air-gapped or on-premise alternatives exist.
+</div>
 
-    function updateActiveNav() {
-      let current = '';
-      for (const section of sections) {
-        const sectionTop = section.offsetTop;
-        if (window.pageYOffset >= sectionTop - 100) {
-          current = section.getAttribute('id');
-        }
+</div>
+</section>
+
+<!-- ═══════════════ 06 JAVA WALKTHROUGH ═══ -->
+<section class="section" id="java">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">06</div>
+  <div>
+    <div class="section-label">Real-world walkthrough</div>
+    <h2 class="section-title">A Java payment microservice: from synchronous bottleneck to async throughput, step by step.</h2>
+    <p class="lead">This walkthrough follows a real class of problem: a legacy Java service with synchronous I/O that degrades under load. The goal is an async migration using CompletableFuture. The walkthrough shows exactly what you type, what Claude does, and what decisions remain yours — not as a summary, but as a trace of the actual session flow.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">The situation</div>
+  You are three months into the job. The <code>payment-service</code> has been escalated by the SRE team: p99 latency is 840ms under 200 requests per second. The SLA is 500ms. The service was written four years ago by engineers who are no longer at the company. It has 31,000 lines of Java, one architecture diagram that is out of date, and test coverage at 61%. Your senior engineer is at a conference. You have a week to ship a fix.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:14px;font-size:27px">Step 1 — Understand the system</h3>
+<p style="color:#514a42;font-size:15px;margin-bottom:18px">You do not start by reading 31,000 lines. You start by asking Claude to orient you.</p>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot"></div>
+    Session — initial codebase orientation
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Map the critical path for a payment request — from HTTP entry point to database write. Show me which classes are involved and where the blocking I/O is."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tool">Glob + Grep</div>
+    <div class="trace-what">Locates <code>PaymentController.java</code>, <code>PaymentService.java</code>, <code>OrderRepository.java</code>, <code>UserCreditService.java</code>. Greps for <code>@PostMapping</code>, <code>JdbcTemplate</code>, <code>RestTemplate</code>, <code>EntityManager</code>. <span class="outcome active">parallel</span></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Reads the four files. Traces: <code>POST /payments</code> → <code>PaymentController.process()</code> → <code>PaymentService.processOrder()</code> → sequential calls: <code>UserCreditService.validateCredit()</code> (HTTP, 120–480ms) then <code>OrderRepository.reserveInventory()</code> (JDBC, 60–210ms) then <code>SqsClient.publish()</code> (IO, 15–50ms). All three are sequential and blocking. Thread held for 195–740ms per request before any response is sent.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who out">Output</div>
+    <div class="trace-what">Returns a structured call graph with timing estimates, flags the three sequential blocking operations, and notes that <code>validateCredit()</code> and <code>reserveInventory()</code> have no data dependency on each other — they can be parallelized. <span class="outcome pass">mapped</span></div>
+  </div>
+</div>
+
+<div class="chapter-bridge">
+  <div class="chapter-num">What just happened</div>
+  Claude found in 90 seconds what would have taken a junior engineer half a day of reading. More importantly, it identified the <strong>structural insight</strong> — the two calls have no data dependency, so they can run in parallel — which requires understanding the semantic relationship between operations, not just finding them. This is where language model reasoning adds value that grep alone cannot.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:14px;font-size:27px">Step 2 — Plan the migration</h3>
+<p style="color:#514a42;font-size:15px;margin-bottom:18px">You now understand the problem. You ask Claude to design the solution before touching a line of code.</p>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot"></div>
+    Session — refactor planning
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Plan a migration to parallelize validateCredit() and reserveInventory() using CompletableFuture.allOf(). Constraints: (1) HTTP contract unchanged, (2) no change to database transaction semantics, (3) all existing tests must pass."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Reads <code>PaymentServiceTest.java</code> (coverage: 14 test cases). Checks current transaction annotations (<code>@Transactional</code> on <code>processOrder()</code>). Identifies that <code>reserveInventory()</code> participates in the same transaction — parallelizing it requires moving transaction boundary. This is a non-trivial constraint.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who out">Output</div>
+    <div class="trace-what">Returns a two-phase plan: Phase 1 — extract credit validation out of the transaction boundary (it is read-only, no transaction needed). Phase 2 — parallelize the extracted credit call with the inventory reservation using <code>CompletableFuture.allOf()</code>, join results before the transaction commits. Estimates p99 improvement to 280–420ms. Asks for approval before proceeding. <span class="outcome pass">planned</span></div>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:18px">
+  <strong>The constraint catch:</strong> Claude identified that the <code>@Transactional</code> annotation on the method meant naive parallelization would not work. It found this by reading the test cases and the Spring Boot transaction semantics, not by you explaining it. This is the kind of implicit constraint that junior engineers routinely miss in manual refactors. Claude surfaced it in the planning phase, not after writing broken code.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:14px;font-size:27px">Step 3 — Execute Phase 1</h3>
+<p style="color:#514a42;font-size:15px;margin-bottom:18px">You approved the plan. You ask Claude to execute Phase 1 and show you the diff.</p>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot"></div>
+    Session — Phase 1 execution
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Execute Phase 1. Show me the diff before writing anything."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Produces the diff: removes <code>@Transactional</code> from <code>processOrder()</code>, adds it only to <code>reserveInventory()</code> and <code>updateBalance()</code>. Extracts <code>validateCredit()</code> call to before the transaction scope. 23 lines changed across 2 files.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Apply the diff and run the test suite."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tool">Bash</div>
+    <div class="trace-what">Runs <code>mvn test -pl payment-service</code>. 14 tests. 2 failures: <code>PaymentServiceTest.testConcurrentOrders</code> and <code>PaymentServiceTest.testRollbackOnCreditFailure</code>.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Reads both failing tests. <code>testConcurrentOrders</code> assumed the credit check was inside the transaction (it mocked the transaction boundary incorrectly). <code>testRollbackOnCreditFailure</code> assumed a rollback would revert a credit check that is now outside the transaction — the rollback test assumption is wrong, not the code. Explains both. Asks: "Fix both tests, or do you want to review the rollback test first?"</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"The rollback test assumption sounds wrong. Fix the concurrent test automatically. Show me the rollback test for my review."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who out">Output</div>
+    <div class="trace-what">Fixes <code>testConcurrentOrders</code> automatically. Displays <code>testRollbackOnCreditFailure</code> with annotation explaining what the test assumed and why that assumption is no longer valid. You review, confirm the fix, Claude applies it. 14/14 tests pass. <span class="outcome pass">phase 1 complete</span></div>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:14px;font-size:27px">Step 4 — Execute Phase 2 and validate</h3>
+<p style="color:#514a42;font-size:15px;margin-bottom:18px">Phase 1 cleaned the transaction boundary. Phase 2 adds the parallelism.</p>
+
+<div class="trace">
+  <div class="trace-head">
+    <div class="trace-dot"></div>
+    Session — Phase 2 + validation
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Execute Phase 2. Add the CompletableFuture.allOf() parallelism. Run tests. Then run the load test profile and report p99."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who claude">Claude</div>
+    <div class="trace-what">Modifies <code>PaymentService.processOrder()</code>: wraps <code>validateCredit()</code> and <code>reserveInventory()</code> in <code>CompletableFuture.supplyAsync()</code>, joins with <code>CompletableFuture.allOf()</code>, extracts results, proceeds to <code>SqsClient.publish()</code>. Adds a <code>ForkJoinPool</code> with bounded thread count to prevent unbounded thread growth under sustained load.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tool">Bash</div>
+    <div class="trace-what">Runs test suite: 14/14 pass. Runs load test profile (<code>mvn gatling:test -Dgatling.simulationClass=PaymentLoadTest</code>). 200 rps, 5 minutes sustained. Output: p99 = 312ms. Previous p99: 840ms. Improvement: 63%.</div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who out">Output</div>
+    <div class="trace-what">Reports p99 improvement, thread pool utilization (peak 18 threads, well within pool size), no test failures, no timeout errors under load. Asks: "Create a commit and open a PR?" <span class="outcome pass">validated</span></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who user">You</div>
+    <div class="trace-what"><code>"Yes. Commit message should explain the async migration and the p99 improvement. Branch: fix/async-payment-processing."</code></div>
+  </div>
+  <div class="trace-row">
+    <div class="trace-who tool">Bash (git)</div>
+    <div class="trace-what">Creates branch, stages changed files (<code>PaymentService.java</code>, <code>PaymentServiceTest.java</code>, <code>pom.xml</code>), commits with message: "Parallelize credit validation and inventory reservation in payment processing. Uses CompletableFuture.allOf() with bounded ForkJoinPool. p99 latency reduced from 840ms to 312ms under 200 rps. Tests: 14/14 pass." Opens PR via GitHub CLI. <span class="outcome pass">shipped</span></div>
+  </div>
+</div>
+
+<div class="scene" style="margin-top:28px">
+  <div class="scene-label">The total time investment</div>
+  The session above, including reading time and decision points, took approximately 90 minutes. The same task done manually — reading the codebase, identifying the dependency, planning the transaction boundary change, implementing the parallelism, debugging the test failures, running the load test, writing the PR — would have taken a junior engineer 3–5 days. The senior engineer reviewing the PR in the morning noted one thing: the <code>ForkJoinPool</code> size should be configurable from environment variables, not hardcoded. Claude added that in 10 minutes. Total senior review time: 20 minutes.
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 07 LIMITATIONS ═══ -->
+<section class="section" id="limits">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">07</div>
+  <div>
+    <div class="section-label">Limitations and failure modes</div>
+    <h2 class="section-title">Claude Code fails in predictable ways. Knowing the patterns is what separates engineers who ship safely from engineers who get surprised.</h2>
+    <p class="lead">Every capability has a failure mode. Some failures are correctable mid-session. Others require you to step back and change your approach entirely. The engineers who get into trouble with Claude Code are not the ones who expect too little — they are the ones who expect too much, in the wrong direction.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="framework-cards">
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 1: Context window exhaustion</div>
+      <span class="fc-label red">High impact</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Claude's context window is 200,000 tokens (~150,000 lines of code). Large monolithic codebases exceed this. When Claude cannot fit all relevant files into context simultaneously, it sees only part of the picture. It may miss a dependency in a distant module, an override in a parent class, or a constraint defined in a file it hasn't read.</p>
+      </div>
+      <div>
+        <h4>How to recognize it</h4>
+        <p>Claude produces a change that is locally correct but breaks something elsewhere. Claude asks clarifying questions about things that are defined clearly in another file. Claude's plan ignores a component you know is relevant.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>Narrow scope before starting. Point Claude at specific files rather than asking it to explore broadly. Use the Explore subagent to identify relevant files first, then scope the main session tightly. For very large codebases, break tasks into sequenced sessions with explicit handoff context.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 2: Implicit constraint blindness</div>
+      <span class="fc-label red">Common</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Your codebase has unwritten rules: all database calls must complete within 200ms, all new endpoints require X-Ray tracing, all monetary amounts must be handled with <code>BigDecimal</code>, never <code>double</code>. Claude does not know these rules unless you tell it. It will generate code that violates them.</p>
+      </div>
+      <div>
+        <h4>How to recognize it</h4>
+        <p>Code review catches things Claude missed. Your CI linter fails on patterns Claude used. A senior engineer asks "why isn't this using <code>BigDecimal</code>?" You feel like you're constantly correcting the same class of mistakes.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>Write a <code>CLAUDE.md</code> in your project root. Document conventions, non-obvious constraints, team decisions, and anti-patterns. Claude reads this file at the start of every session. 30 minutes invested in a good <code>CLAUDE.md</code> eliminates a category of recurring corrections permanently.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 3: Confident hallucination of API details</div>
+      <span class="fc-label gold">Subtle</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>Claude references a library method that does not exist in your version, uses a configuration key that was deprecated in a release after its training cutoff, or describes a framework behavior that applies to a different major version. The code compiles but fails at runtime in a non-obvious way.</p>
+      </div>
+      <div>
+        <h4>Why this is hard to catch</h4>
+        <p>Claude is confident and fluent. It does not hedge on things it is wrong about. A hallucinated API call looks identical to a correct one in the generated code. You need a running system — not a language model — to validate API surfaces.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>Tests are your ground truth. If code compiles but tests fail on a specific method call, check the actual API documentation — do not accept Claude's explanation of the failure as authoritative. Use your IDE's autocomplete to validate API surfaces before approving a diff.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 4: Scope creep in "cleanup" tasks</div>
+      <span class="fc-label">Annoying</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>You ask Claude to "clean up this function." It removes dead code, refactors variable names, adds logging, and reorganizes the method — none of which you asked for. The diff is large, the review is harder than it should be, and the PR has changes you didn't intend.</p>
+      </div>
+      <div>
+        <h4>Why Claude does this</h4>
+        <p>Claude optimizes for "helpful" by default. A function with dead code and inconsistent variable names looks like an invitation to improve. Without explicit scope constraints, Claude treats adjacent improvements as part of the task.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>Constrain scope explicitly: "Remove only the unused variables in <code>processPayment()</code>. Do not change logic, add logging, or rename anything else." The more specific the exclusion, the cleaner the diff. Always read the full diff before approving — not just the lines you expected.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 5: Architectural authority confusion</div>
+      <span class="fc-label gold">Strategic risk</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>You ask Claude to "design the caching layer" or "choose the right database for this use case." Claude produces a confident, well-structured answer — but it is optimizing for general best practices, not your team's operational expertise, infrastructure constraints, or organizational risk tolerance.</p>
+      </div>
+      <div>
+        <h4>The real problem</h4>
+        <p>Claude does not know that your team has no experience with Redis Cluster, that your SRE team will not support Cassandra, or that your compliance framework requires all data at rest to stay in a specific region. These constraints are not in your codebase. They are in your organization.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>Use Claude to explore options and articulate tradeoffs. Use your team to make architectural decisions. "What are the tradeoffs between Redis and Memcached for our session cache use case?" is a great Claude task. "Which should we use?" is a team decision.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Failure mode 6: Long session drift</div>
+      <span class="fc-label">Manageable</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What happens</h4>
+        <p>After 50+ messages, the earliest context in the session is compressed into a summary. Constraints you stated early in the session — "never modify the public API," "all monetary values use BigDecimal" — may be summarized away. Claude's behavior drifts from your original requirements.</p>
+      </div>
+      <div>
+        <h4>How to recognize it</h4>
+        <p>Claude repeats a mistake you corrected an hour ago. Claude proposes something that violates a constraint you stated at the beginning of the session. The behavior feels inconsistent with earlier turns.</p>
+      </div>
+      <div>
+        <h4>Mitigation</h4>
+        <p>For long tasks, repeat critical constraints periodically: "Reminder: we are not changing the public API." Break very long tasks into discrete sessions with explicit handoff summaries. A fresh session with a clear brief is often more effective than a stale session with drifted context.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h3 style="margin-top:46px;margin-bottom:18px;font-size:27px">Red flags in a live session</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>🚩 Claude generates code that compiles but fails all tests, with no clear diagnosis</h4>
+    <p>This usually means semantic misunderstanding at the planning stage. Stop. Restart with a narrower scope and more explicit constraints. Do not ask Claude to iterate blindly — that burns tokens without converging.</p>
+  </div>
+  <div class="principle">
+    <h4>🚩 Claude repeats the same mistake after you correct it twice</h4>
+    <p>The constraint is not being held in context. State it explicitly at the top of your next message. If it happens a third time, add it to <code>CLAUDE.md</code> and start a fresh session.</p>
+  </div>
+  <div class="principle">
+    <h4>🚩 Claude's explanation of a framework behavior doesn't match the official documentation</h4>
+    <p>Trust the documentation, not Claude. Correct Claude explicitly and watch whether it adjusts. If it re-hallucinates, add the correct information as a constraint in your prompt.</p>
+  </div>
+  <div class="principle">
+    <h4>🚩 Claude proposes an architectural change you weren't expecting</h4>
+    <p>Do not approve it without understanding it fully. Ask Claude to explain the tradeoffs. Then take the decision to your team. Unexplained architectural proposals are exactly the place where good-sounding-but-wrong decisions get shipped.</p>
+  </div>
+  <div class="principle">
+    <h4>🚩 The token cost for this session is 5× what you expected</h4>
+    <p>You have likely allowed Claude to explore broadly when it could have been scoped tightly. Review what drove the cost. Adjust the task structure before continuing.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══════════════ 08 REFERENCE ═══ -->
+<section class="section" id="reference">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">08</div>
+  <div>
+    <div class="section-label">Reference</div>
+    <h2 class="section-title">Quick reference for daily use. The questions that come up in week one, answered directly.</h2>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Answer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>What models does Claude Code use?</strong></td>
+        <td>As of May 2026: Claude Haiku 4.5 for fast/cheap tasks, Claude Sonnet 4.6 as the default for most interactions, Claude Opus 4.7 for complex reasoning. The CLI selects models based on task complexity unless you override with <code>/model</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>How do I set conventions Claude always follows?</strong></td>
+        <td>Write a <code>CLAUDE.md</code> in your project root. Claude reads it at session start. Document code style, naming conventions, forbidden patterns, test requirements, and architectural decisions. This is the highest-leverage 30 minutes you can invest.</td>
+      </tr>
+      <tr>
+        <td><strong>Can Claude access the internet?</strong></td>
+        <td>Yes, via <code>WebFetch</code> (fetch a URL) and <code>WebSearch</code> (search the web). Both require approval unless pre-authorized. Use for fetching current documentation, checking API changes, or verifying library versions. Do not use to pull untrusted content directly into code.</td>
+      </tr>
+      <tr>
+        <td><strong>How do I control which tools Claude can use?</strong></td>
+        <td><code>.claude/settings.json</code> (project-level) and <code>~/.claude/settings.json</code> (user-level) define allowed and denied tools. You can create an allowlist for specific tools, require confirmation for others, and block specific commands entirely.</td>
+      </tr>
+      <tr>
+        <td><strong>What is a hook?</strong></td>
+        <td>A shell command that runs automatically on a Claude Code event: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>Stop</code>. Hooks enforce standards deterministically — they run regardless of what Claude proposes. Use them for linting, audit logging, and team notifications.</td>
+      </tr>
+      <tr>
+        <td><strong>When should I use a subagent?</strong></td>
+        <td>When the task requires parallel independent research (security + performance + compliance review simultaneously), when results from multiple tools would overflow a single context window, or when you want to protect the main session from intermediate noise. Not for routine edits or single-thread tasks.</td>
+      </tr>
+      <tr>
+        <td><strong>How does prompt caching work?</strong></td>
+        <td>If the same large prompt prefix (system prompt + stable context) is used within a 5-minute TTL, subsequent calls cost ~10% of input tokens for the cached portion. Set up with the Anthropic SDK's <code>cache_control</code> parameter. Scheduled agents should always use this for repeated analyses.</td>
+      </tr>
+      <tr>
+        <td><strong>What should I never send to Claude Code?</strong></td>
+        <td>Production credentials, API keys, private keys, PII, unredacted customer data, or anything that would cause a compliance violation if it appeared in an Anthropic server log. Use environment variable injection, secrets management systems, and .gitignore. When in doubt, check with your security team before the session, not after.</td>
+      </tr>
+      <tr>
+        <td><strong>Claude proposed something I don't understand. What do I do?</strong></td>
+        <td">Ask it to explain before approving. <code>"Explain this change and why you chose this approach over alternatives."</code> If the explanation doesn't satisfy you, don't approve the change. You are responsible for what goes into the codebase, not Claude.</td>
+      </tr>
+      <tr>
+        <td><strong>Where do I report bugs or give feedback?</strong></td>
+        <td>GitHub: <code>github.com/anthropics/claude-code/issues</code>. For enterprise support, use your account manager or Anthropic's support portal.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+</section>
+
+</main>
+
+<section class="disclaimer">
+  <div class="disclaimer-inner">
+    <h3>Accuracy and scope</h3>
+    <p>This training material reflects Claude Code capabilities and pricing as of May 12, 2026. Token pricing, model availability, and feature set are subject to change — always verify current pricing at Anthropic's pricing page before making budget decisions. <strong>The Java walkthrough is a realistic composite scenario, not a documented case study.</strong> Actual performance improvements depend on your specific codebase, infrastructure, and workload profile. <strong>Security guidance reflects general best practice</strong> and should be reviewed against your organization's specific compliance requirements before applying in regulated environments. Claude Code's behavior, permissions model, and safety properties continue to evolve — consult Anthropic's official documentation for the authoritative current state.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  Claude Code Engineer Training | May 2026 | Current as of Claude Code CLI, Claude Haiku 4.5 / Sonnet 4.6 / Opus 4.7
+</footer>
+
+<script>
+function toggleSection(header) {
+  const section = header.closest('.section');
+  section.classList.toggle('collapsed');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const nav = document.querySelector('.topnav');
+  const links = nav.querySelectorAll('a');
+
+  window.addEventListener('scroll', function() {
+    let current = '';
+    document.querySelectorAll('section[id]').forEach(section => {
+      if (pageYOffset >= section.offsetTop - 200) {
+        current = section.getAttribute('id');
       }
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-          link.classList.add('active');
-        }
-      });
-    }
-
-    // Collapsible sections
-    const sectionHeads = document.querySelectorAll('.section-head');
-    sectionHeads.forEach(head => {
-      head.addEventListener('click', () => {
-        const section = head.closest('.section');
-        section.classList.toggle('collapsed');
-      });
-      head.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          head.click();
-        }
-      });
     });
-
-    window.addEventListener('scroll', updateActiveNav);
-    updateActiveNav();
-  </script>
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').slice(1) === current) {
+        link.classList.add('active');
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
