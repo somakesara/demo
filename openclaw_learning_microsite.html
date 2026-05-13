@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw — Build Your Own AI Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191714;
+  --paper:#fbfaf7;
+  --warm:#f4efe6;
+  --warm2:#ebe4d8;
+  --line:#ded6c8;
+  --muted:#766f64;
+  --muted2:#9a9184;
+  --clay:#b65f34;
+  --blue:#245c8c;
+  --green:#26724c;
+  --plum:#6a3f83;
+  --gold:#a77a25;
+  --red:#9e3830;
+  --dark:#15120f;
+  --code:#f0ebe2;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"DM Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"DM Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;font-weight:300;line-height:1.72;overflow-x:hidden}
+a{color:inherit}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--warm2);border:1px solid var(--line);border-radius:5px;padding:.08rem .32rem}
+blockquote{margin:16px 0;padding:14px 18px;border-left:4px solid var(--gold);background:rgba(167,122,37,.08);font-style:italic;color:#5a5550;line-height:1.82}
+blockquote p{margin:0}
+blockquote strong{color:var(--ink);font-style:normal}
+pre{margin:0;white-space:pre;overflow-x:auto}
+
+/* ── HERO ── */
+.hero{min-height:92vh;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto;color:#fbf5eb;background:radial-gradient(ellipse 68% 58% at 12% 50%,rgba(38,114,76,.34),transparent 60%),radial-gradient(ellipse 50% 62% at 84% 20%,rgba(167,122,37,.26),transparent 58%),linear-gradient(135deg,#0c130f 0%,#0f120a 54%,#141008 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,black 35%,transparent 100%)}
+
+/* hero feature panel */
+.hero-panel{position:absolute;inset:auto 5vw 7vh auto;width:min(440px,38vw);min-width:280px;opacity:.9;display:grid;gap:12px}
+.feature-card{border:1px solid rgba(251,245,235,.14);background:rgba(14,20,14,.82);backdrop-filter:blur(10px);border-radius:10px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.36)}
+.feature-card-head{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.feature-card-head.highlight{color:#82d9a8;background:rgba(38,114,76,.18)}
+.feature-card-body{padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;color:rgba(251,245,235,.72)}
+.feature-card-body .dim{color:rgba(251,245,235,.34)}
+.feature-card-body .highlight{color:#82d9a8}
+.feature-badge{font-family:var(--mono);font-size:12px;font-weight:400;padding:2px 8px;border-radius:8px;background:rgba(38,114,76,.3);color:#82d9a8}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.feature-card{animation:fadeUp .5s ease forwards;opacity:0}
+.feature-card:nth-child(1){animation-delay:.2s}
+.feature-card:nth-child(2){animation-delay:.8s}
+.feature-card:nth-child(3){animation-delay:1.4s}
+
+.hero-inner{position:relative;z-index:2;width:min(1160px,100%);margin:0 auto;padding:92px 44px 48px;display:grid;align-content:center}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#82d9a8;margin-bottom:18px}
+h1,h2,h3{font-family:var(--serif);font-weight:300;line-height:1.06;letter-spacing:0;margin:0}
+h1{max-width:780px;font-size:clamp(44px,8vw,96px)}
+h1 em{color:#82d9a8;font-style:italic}
+.hero-sub{max-width:620px;margin-top:24px;color:rgba(251,245,235,.66);font-size:clamp(16px,2vw,20px);line-height:1.62}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border:1px solid rgba(251,245,235,.22);border-radius:8px;color:#fbf5eb;background:rgba(251,245,235,.07);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.btn.primary{background:#82d9a8;color:#0c130f;border-color:#82d9a8}
+.scroll-hint{position:relative;z-index:2;padding:0 44px 34px;text-align:center;color:rgba(251,245,235,.34);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:20;display:flex;gap:0;overflow-x:auto;background:rgba(251,250,247,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{flex:0 0 auto;padding:15px 18px;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.topnav a:hover,.topnav a.active{color:var(--green);border-color:var(--green)}
+
+/* ── SECTION COLLAPSE ── */
+.section{border-bottom:1px solid var(--line)}
+.section.collapsed .container>:not(.section-head){display:none}
+.section-head{cursor:pointer;position:relative;padding-right:54px;display:grid;grid-template-columns:84px 1fr;gap:28px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.section-head:focus-within{outline:2px solid rgba(38,114,76,.55);outline-offset:6px}
+.section-head:hover .section-title{color:var(--green)}
+.section-toggle{cursor:pointer;padding:0;position:absolute;right:0;top:8px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--paper);font-family:var(--mono);font-size:18px;transition:background .2s,color .2s,transform .2s,border-color .2s}
+.section:not(.collapsed) .section-toggle{transform:rotate(45deg);background:var(--dark);color:var(--paper);border-color:var(--dark)}
+.section.collapsed .section-head{padding-bottom:0;border-bottom:0}
+.section.collapsed .container{padding-top:34px;padding-bottom:34px}
+.section-status{margin-top:12px;color:var(--muted2);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ── LAYOUT ── */
+.container{width:min(1120px,100%);margin:0 auto;padding:72px 44px}
+.section-no{color:var(--green);opacity:.16;font-family:var(--serif);font-size:78px;line-height:1}
+.section-label{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:8px 0}
+.section-title{font-size:clamp(34px,4.4vw,56px);max-width:880px}
+.lead{max-width:760px;color:#4c453d;font-size:18px;margin:18px 0 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:34px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+
+/* ── PANELS ── */
+.panel{border:1px solid var(--line);background:var(--warm);border-radius:8px;padding:22px}
+.panel.white{background:#fffdfa}
+.panel.dark{background:#1b1713;color:#fbf5eb;border-color:#302720}
+.panel.green{background:#edf4ee;border-color:rgba(38,114,76,.2)}
+.panel h3{font-size:27px;margin-bottom:10px}
+.panel p{margin:0;color:#50483f}
+.panel.dark p{color:rgba(251,245,235,.66)}
+.panel.green p{color:#253d2d}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;margin-bottom:12px;color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.tag.red{color:var(--red)}
+.tag.gold{color:var(--gold)}
+.tag.blue{color:var(--blue)}
+
+/* ── CALLOUTS ── */
+.callout{margin-top:26px;border-left:3px solid var(--green);background:#edf4ee;padding:16px 18px;border-radius:8px;color:#253d2d;line-height:1.7}
+.warn{border-left-color:var(--red);background:#f7ece9;color:#4a2b28}
+.info{border-left-color:var(--blue);background:#eaf0f7;color:#1e3a52}
+
+/* ── CODE BLOCKS ── */
+pre.codeblock,div.codeblock{margin:0;border:0;border-radius:0;padding:18px 22px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;color:#2a2520;background:var(--code);white-space:pre;word-break:normal;overflow-wrap:normal}
+.codeblock .dim{color:#918779}
+.codeblock .key{color:#8f3d16;font-weight:400}
+.codeblock .ok{color:#1f7045}
+.codeblock .blue{color:#1f5d8d}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;margin-top:28px}
+table{width:100%;border-collapse:collapse;min-width:600px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:14px 12px;text-align:left;vertical-align:top}
+th{color:var(--green);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+td{color:#423c35}
+td.good{color:var(--green);font-weight:400}
+
+/* ── FRAMEWORK CARDS ── */
+.framework-cards{display:grid;gap:18px;margin-top:28px}
+.framework-card{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fffdfa}
+.fc-head{padding:18px 20px;background:var(--warm);border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.fc-title{font-family:var(--serif);font-size:24px;line-height:1.1}
+.fc-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:12px;white-space:nowrap;color:var(--green);border:1px solid rgba(38,114,76,.4);background:#edf4ee}
+.fc-body{padding:18px 20px;display:grid;gap:14px}
+.fc-body h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin:0 0 6px}
+.fc-body p{font-size:13.5px;color:#433d36;line-height:1.65;margin:0}
+
+/* ── SCENE ── */
+.scene{margin-top:0;border-left:3px solid var(--green);padding:18px 22px;background:linear-gradient(to right,#edf4ee,#fffdfa);border-radius:0 8px 8px 0;font-size:16px;color:#3a3028;line-height:1.8}
+.scene+.scene{margin-top:14px}
+.scene-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+
+/* ── PRINCIPLE LIST ── */
+.principle-list{margin-top:28px;display:grid;gap:16px}
+.principle{border:1px solid var(--line);border-radius:8px;padding:20px;background:#fffdfa}
+.principle h4{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink)}
+.principle p{margin:0;color:#514a42;font-size:14px;line-height:1.7}
+
+/* ── DISCLAIMER / FOOTER ── */
+.disclaimer{background:#f7ece9;border-top:1px solid var(--line);padding:28px 44px}
+.disclaimer-inner{width:min(1120px,100%);margin:0 auto;font-size:14px;color:#4a2b28;line-height:1.7}
+.disclaimer-inner h3{font-family:var(--serif);margin:0 0 14px;font-size:22px;font-weight:400}
+.disclaimer-inner p{margin:0 0 12px}
+.disclaimer-inner p:last-child{margin-bottom:0}
+.footer{padding:28px 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+@media(max-width:880px){
+  .hero-panel{position:relative;inset:auto;width:auto;margin:0 24px 34px}
+  .hero-inner{padding:76px 28px 28px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  body{font-size:16px}
+  .container{padding:54px 24px}
+  .section-head{grid-template-columns:1fr;gap:8px}
+  .section-no{font-size:58px}
+  .topnav a{padding:13px 14px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">OpenClaw — May 2026</div>
+    <h1>Your own <em>personal AI assistant.</em> Any OS. Any platform.</h1>
+    <p class="hero-sub">OpenClaw is a free, open-source AI agent that runs locally on your devices and answers you on the channels you already use — Signal, Telegram, Discord, WhatsApp. Build, configure, and own your AI without vendor lock-in.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#what-is">What is OpenClaw</a>
+      <a class="btn" href="#quickstart">Quick start</a>
+      <a class="btn" href="#architecture">Architecture</a>
+      <a class="btn" href="#integrations">Integrations</a>
+      <a class="btn" href="#resources">Resources</a>
+    </div>
+  </div>
+  <div class="hero-panel" aria-hidden="true">
+    <div class="feature-card">
+      <div class="feature-card-head highlight">
+        <span>Self-hosted</span>
+        <span class="feature-badge">Local first</span>
+      </div>
+      <div class="feature-card-body">
+        <div class="highlight">Runs on your machine</div>
+        <div class="dim">Data stays local. No cloud lock-in.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-head highlight">
+        <span>Open source</span>
+        <span class="feature-badge">Free forever</span>
+      </div>
+      <div class="feature-card-body">
+        <div class="highlight">Full control over code</div>
+        <div class="dim">MIT license. Contribute or fork.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-head highlight">
+        <span>Multi-channel</span>
+        <span class="feature-badge">Your platform</span>
+      </div>
+      <div class="feature-card-body">
+        <div class="highlight">Works anywhere you chat</div>
+        <div class="dim">Signal, Telegram, Discord, WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Each section is self-contained — expand any one to start</div>
+</header>
+
+<nav class="topnav" aria-label="Page sections">
+  <a href="#what-is">01 What is OpenClaw</a>
+  <a href="#quickstart">02 Quick start</a>
+  <a href="#architecture">03 Architecture</a>
+  <a href="#integrations">04 Integrations</a>
+  <a href="#concepts">05 Core concepts</a>
+  <a href="#config">06 Configuration</a>
+  <a href="#usecases">07 Use cases</a>
+  <a href="#limitations">08 Limitations</a>
+  <a href="#security">09 Security</a>
+  <a href="#resources">10 Resources</a>
+</nav>
+
+<main>
+
+<!-- ═══ 01 WHAT IS OPENCLAW ═══ -->
+<section class="section" id="what-is">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">01</div>
+  <div>
+    <div class="section-label">Foundation</div>
+    <h2 class="section-title">OpenClaw is a personal AI assistant you control. It runs on your device, answers on your channels, and keeps your data yours.</h2>
+    <p class="lead">Born from the desire for AI that respects privacy and local autonomy, OpenClaw lets you build intelligent workflows without depending on closed platforms or cloud providers. Fork it, modify it, own it.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel green">
+    <span class="tag">Core value</span>
+    <h3>Self-hosted ownership</h3>
+    <p>Configuration and interaction history live on your machine. Your assistant learns from your behavior. Your data never touches a vendor's cloud. This is not a feature — it is the whole point.</p>
+  </div>
+  <div class="panel green">
+    <span class="tag">Technical reality</span>
+    <h3>LLM-agnostic</h3>
+    <p>OpenClaw works with Claude, GPT, DeepSeek, or any compatible LLM API. You choose the model. You own the API keys. Swap providers without lock-in or rebuilding your assistant.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">What OpenClaw does</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>Chat interface via your platforms</h4>
+    <p>Connect Signal, Telegram, Discord, or WhatsApp. OpenClaw listens for messages, interprets intent via LLM, executes actions, and responds — all through the messaging apps you already use daily.</p>
+  </div>
+  <div class="principle">
+    <h4>Persistent context across sessions</h4>
+    <p>OpenClaw remembers your conversation history. It learns preferences, recurring tasks, and context about your life and work. Your assistant gets better the longer you use it.</p>
+  </div>
+  <div class="principle">
+    <h4>Extensible tool calling</h4>
+    <p>Define custom tools and integrations. Trigger scripts, query APIs, control smart home devices, manage calendars — anything you can hook into code, OpenClaw can invoke through natural language.</p>
+  </div>
+  <div class="principle">
+    <h4>Privacy-first by design</h4>
+    <p>No analytics. No data collection. No telemetry. OpenClaw does not know who you are unless you tell it. Your data is not aggregated, sold, or used to train other systems.</p>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>The GitHub momentum:</strong> OpenClaw topped 250K GitHub stars in 60 days — faster adoption than React. The community has built hundreds of integrations, plugins, and forks. Most-starred software project on GitHub as of May 2026.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 02 QUICK START ═══ -->
+<section class="section" id="quickstart">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">02</div>
+  <div>
+    <div class="section-label">Getting started</div>
+    <h2 class="section-title">From zero to talking with your assistant in under 10 minutes.</h2>
+    <p class="lead">OpenClaw is designed to be installed and configured with minimal friction. Clone, configure, run. The hardest part is deciding which messaging platform to start with.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Setup journey</h3>
+
+<pre style="background:#fafaf8;padding:20px;border-radius:8px;border:1px solid #ddd;overflow-x:auto">
+1. Clone & Install    2. Configure       3. Messenger       4. Start Service   5. Test            6. Ready
+   (0-2 min)            (2-5 min)          (2-3 min)          (&lt;1 min)           (1-2 sec)          ✓
+        │                    │                   │                  │                 │                │
+   git clone          Add .env vars      Add token           openclaw start    Send "Hello"    Listening
+   pip install        Set API_KEY        (Telegram/Signal)   Service listens    Get response ✓  Build tools
+                                         (Or Discord/Slack)                                     Deploy
+        │────────────────────────────────────────────────────────────────────────────────────────│
+
+REQUIRED CONFIG:
+  • LLM_PROVIDER: Claude (recommended) / GPT-4 / DeepSeek + valid API_KEY
+  • MESSENGER_TOKENS: Signal or Telegram / Discord / WhatsApp / Slack (choose ≥1)
+  • DATABASE_URL: SQLite (default, local) or PostgreSQL (optional, cloud)</pre>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Three-step setup</h3>
+
+<div class="framework-cards">
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Step 1: Clone and install</div>
+      <span class="fc-label">5 minutes</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>What to do</h4>
+        <p>Clone the OpenClaw repository. Install dependencies using your platform's package manager (Python, Node, or Rust — pick one). The project is lightweight and has minimal external requirements.</p>
+      </div>
+      <div>
+        <h4>What you need</h4>
+        <p>Git. Python 3.9+ or Node 18+. An API key from Claude, GPT, or your chosen LLM provider. A messaging app account (Signal, Telegram, Discord, or WhatsApp).</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Step 2: Configure LLM and messenger</div>
+      <span class="fc-label">3 minutes</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>LLM setup</h4>
+        <p>Create <code>.env</code> with your LLM API key and model choice. OpenClaw supports Claude (recommended), GPT-4, and other models with compatible APIs.</p>
+      </div>
+      <div>
+        <h4>Messenger setup</h4>
+        <p>Connect your messaging platform. For Telegram: create a bot token via BotFather. For Discord: generate an app token. For Signal: link your phone. Each takes 2–3 minutes.</p>
+      </div>
+    </div>
+  </div>
+  <div class="framework-card">
+    <div class="fc-head">
+      <div class="fc-title">Step 3: Run and test</div>
+      <span class="fc-label">2 minutes</span>
+    </div>
+    <div class="fc-body">
+      <div>
+        <h4>Start the agent</h4>
+        <p>Run <code>openclaw start</code>. The assistant connects to your messaging platform and begins listening. Send a test message. Verify it responds.</p>
+      </div>
+      <div>
+        <h4>First interaction</h4>
+        <p>Try: "What time is it?" or "Remind me to check email." The assistant responds via your messaging app. Congratulations — you now have a personal AI assistant.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Local vs. cloud:</strong> OpenClaw runs entirely on your hardware by default. Your LLM calls go to your chosen provider (Claude, OpenAI, etc.) over HTTPS. The provider never knows about your assistant's configuration or history — just the individual queries you send.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 03 ARCHITECTURE ═══ -->
+<section class="section" id="architecture">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">03</div>
+  <div>
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Three layers: Messaging, reasoning, and action. Understanding the flow helps you build better tools and workflows.</h2>
+    <p class="lead">OpenClaw's architecture is deliberately simple. A message arrives. The LLM reasons about intent. Actions execute. Results return. No complex orchestration, no hidden magic.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Architecture overview</h3>
+
+<pre style="background:#fafaf8;padding:20px;border-radius:8px;border:1px solid #ddd;overflow-x:auto">
+INPUT CHANNELS        NORMALIZE              CONTEXT ASSEMBLY        REASONING          EXECUTION         DELIVER
+Signal                ⚙ Message              📜 History              🧠 Claude          ✓ Validate        📤 Save
+Telegram              Translator             👤 Preferences          GPT-4              ✓ Execute         Log interaction
+Discord                                      🔧 Tools                DeepSeek           ✓ Capture         Update history
+WhatsApp              Platform-specific    ⚙ System Prompt        Decides:            ✓ Return          Send Response
+Slack                 → Unified format       🎯 Current Intent      • Response                            Via messenger
+Email                                       (~2K-10K tokens)        • Tool call         Optional:
+                      100-200ms              200-300ms              • Clarify           loop back
+                                             50-100ms               200-800ms           100-5000ms        50-100ms</pre>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">The execution flow</h3>
+
+<pre style="background:#fafaf8;padding:20px;border-radius:8px;border:1px solid #ddd;overflow-x:auto">
+              REQUEST → DECISION → EXECUTION
+
+1. Receive      2. Normalize    3. Load Context   4. Send to LLM    5. LLM Decides
+Message         Format          +History          Claude             │
+│               │               │                 │                 ├─→ No Tool → Format Reply → Deliver (Path A)
+│               │               │                 │                 │
+v               v               v                 v                 └─→ Tool → Execute (Sandbox) → Deliver (Path B)
+100ms           150ms           50ms              400ms                    ↓ (optional loop back)
+
+6. Save & Deliver    7. Response Delivered
+DB + Send            (~1-2 sec, no tool)
+100ms                (~2-10 sec, with tools)
+50ms
+
+PATH A (No tool):    Direct response → 1-2 seconds total
+PATH B (With tools): Execute tools in sandbox → 2-10 seconds | Optional: loop back to LLM for refinement</pre>
+
+<div class="scene">
+  <div class="scene-label">Message in, action out</div>
+  <strong>1. Receive:</strong> Message arrives via Signal, Telegram, Discord, or WhatsApp. OpenClaw's listener captures it. <strong>2. Reason:</strong> Message and conversation history are sent to your LLM (Claude recommended). The LLM decides: respond directly, call a tool, or ask for clarification. <strong>3. Act:</strong> If a tool is needed, OpenClaw executes it — run a script, query an API, control a device, manage a file. <strong>4. Reply:</strong> Result is formatted and sent back via the same channel within seconds.
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag">Component</span>
+    <h3>Messenger adapters</h3>
+    <p>Pluggable drivers for Signal, Telegram, Discord, WhatsApp. Each translates platform-specific message formats into OpenClaw's internal representation. Add support for new platforms by writing a new adapter.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag">Component</span>
+    <h3>LLM interface</h3>
+    <p>Abstraction layer over LLM APIs. Handles prompt formatting, token counting, context management, and tool calling. Swappable — swap Claude for GPT-4 in one line of configuration.</p>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:18px">
+  <div class="panel white">
+    <span class="tag">Component</span>
+    <h3>Tool registry</h3>
+    <p>Central catalog of available actions. Tools can be built-in (send email, query database) or custom (your scripts, webhooks). The LLM knows what tools exist and when to invoke them.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag">Component</span>
+    <h3>State & persistence</h3>
+    <p>Conversation history, user preferences, learned behaviors — all stored locally in SQLite or your choice of database. State persists across restarts and learns from repeated interactions.</p>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>Key design principle:</strong> OpenClaw does not attempt to be a general-purpose agent framework. It is optimized for a single user (or small team) with a personal assistant over messaging. This constraint makes it fast, simple, and privacy-respecting — unlike larger frameworks that serve many users and require cloud infrastructure.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 04 INTEGRATIONS ═══ -->
+<section class="section" id="integrations">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">04</div>
+  <div>
+    <div class="section-label">Extend and customize</div>
+    <h2 class="section-title">OpenClaw is a platform. Build tools, plugins, and custom workflows that fit your life and work.</h2>
+    <p class="lead">The tool ecosystem grows with community contributions. Every integration you write becomes available across all your messaging channels instantly.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Built-in and community tools</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Examples</th>
+        <th>Setup complexity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Productivity</strong></td>
+        <td>Calendar management, task tracking, note taking, reminders</td>
+        <td class="good">Low — most are 1-line integrations</td>
+      </tr>
+      <tr>
+        <td><strong>Communication</strong></td>
+        <td>Email, Slack, GitHub notifications, Twitter/X posting</td>
+        <td class="good">Low — API keys + configuration</td>
+      </tr>
+      <tr>
+        <td><strong>Data & search</strong></td>
+        <td>Google Search, Wikipedia, weather, news feeds</td>
+        <td class="good">Low — HTTP requests, caching included</td>
+      </tr>
+      <tr>
+        <td><strong>Smart home</strong></td>
+        <td>Lights, thermostats, locks (Home Assistant compatible)</td>
+        <td class="good">Medium — depends on your setup</td>
+      </tr>
+      <tr>
+        <td><strong>Code & DevOps</strong></td>
+        <td>Git commands, CI/CD triggers, Docker, Kubernetes</td>
+        <td class="good">Medium — requires permissions</td>
+      </tr>
+      <tr>
+        <td><strong>Custom scripts</strong></td>
+        <td>Run arbitrary Python, Bash, or Node scripts via messaging</td>
+        <td class="good">Medium — write once, call from chat</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Write a custom tool in 5 minutes</h3>
+
+<div class="framework-card" style="margin-top:0">
+  <div class="fc-head">
+    <div class="fc-title">Example: Weather tool</div>
+    <span class="fc-label blue">Python</span>
+  </div>
+  <div style="border-top:1px solid var(--line)">
+<pre class="codeblock"><span class="key">import</span> requests
+<span class="key">from</span> openclaw <span class="key">import</span> Tool
+
+<span class="key">class</span> WeatherTool(Tool):
+    name = <span class="str">"weather"</span>
+    description = <span class="str">"Get current weather for any city"</span>
+
+    <span class="key">def</span> execute(self, city: <span class="key">str</span>) -> <span class="key">str</span>:
+        <span class="dim"># Fetch from API</span>
+        response = requests.get(
+            <span class="str">f"https://api.weather.example.com/current"</span>,
+            params={<span class="str">"city"</span>: city}
+        )
+        data = response.json()
+        <span class="key">return</span> <span class="str">f"{city}: {data['temp']}°C, {data['condition']}"</span>
+
+<span class="dim"># Register with OpenClaw</span>
+openclaw.register_tool(WeatherTool())</pre>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>Tool discovery:</strong> OpenClaw automatically exposes registered tools to the LLM. When you ask "What's the weather in Berlin?", the LLM sees that a <code>weather</code> tool exists, calls it with <code>city="Berlin"</code>, and returns the result. You write tools in Python, Node, or Rust — OpenClaw handles the LLM integration.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Tool ecosystem and example workflow</h3>
+
+<pre style="background:#fafaf8;padding:20px;border-radius:8px;border:1px solid #ddd;overflow-x:auto">
+USER REQUEST: "Schedule meeting with Alice at 2pm, then Slack her"
+                          │
+                          ▼
+                   LLM Analysis
+            (Determines: 4 tools needed)
+                          │
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+   Tool 1: Query     Tool 2: Check      Tool 3: Slack
+   Calendar         Availability        (parallel)
+   Find Alice's     Confirm both        Notify Alice
+   free time        attendees           Result: Sent ✓
+   Result: 2pm ✓    Result: OK ✓
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          │ (all complete)
+                          ▼
+                 Tool 4: Create Event
+                 Schedule at 2pm
+                 Result: ID-12345 ✓
+                          │
+                          ▼
+                  Compile & Return
+                  "Meeting scheduled"
+                   (~1-2 seconds total)
+
+EXECUTION STRATEGY:
+  • Tools 1-2: Sequential (Tool 2 needs Tool 1 result)
+  • Tool 3: Parallel (independent, runs while 1-2 execute)
+  • Tool 4: Sequential (waits for Tools 1-3)
+  • Total: Parallel execution cuts time in half</pre>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Advanced: Chaining tools and error handling</h3>
+
+<div class="framework-card" style="margin-top:0">
+  <div class="fc-head">
+    <div class="fc-title">Example: Multi-step workflow tool</div>
+    <span class="fc-label blue">Python</span>
+  </div>
+  <div style="border-top:1px solid var(--line)">
+<pre class="codeblock"><span class="key">class</span> MeetingSchedulerTool(Tool):
+    name = <span class="str">"schedule_meeting"</span>
+    description = <span class="str">"Schedule a meeting: check availability, find a slot, send invites"</span>
+
+    <span class="key">def</span> execute(self, attendees: <span class="key">list</span>, duration: <span class="key">int</span>) -> <span class="key">str</span>:
+        <span class="key">try</span>:
+            <span class="dim"># Step 1: Query calendar for all attendees</span>
+            slots = self.find_common_slots(attendees, duration)
+            <span class="key">if</span> <span class="key">not</span> slots:
+                <span class="key">return</span> <span class="str">"No common availability found"</span>
+
+            <span class="dim"># Step 2: Book the earliest slot</span>
+            best_slot = slots[0]
+            meeting_id = self.create_meeting(best_slot)
+
+            <span class="dim"># Step 3: Send invites to all attendees</span>
+            self.send_invites(meeting_id, attendees)
+
+            <span class="key">return</span> <span class="str">f"Meeting scheduled: {best_slot}"</span>
+        <span class="key">except</span> Exception <span class="key">as</span> e:
+            <span class="key">return</span> <span class="str">f"Failed to schedule: {str(e)}"</span></pre>
+  </div>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Tool best practices</h4>
+    <p><strong>Idempotency:</strong> Tools should be safe to call multiple times with the same input. If creating a calendar event fails and retries, don't create a duplicate. <strong>Error clarity:</strong> Return human-readable error messages, not stack traces. <strong>Timeout handling:</strong> Long operations should return intermediate results or a status to check later. <strong>Logging:</strong> Log tool inputs and outputs for debugging (not secrets).</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 05 CORE CONCEPTS ═══ -->
+<section class="section" id="concepts">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">05</div>
+  <div>
+    <div class="section-label">Mental models</div>
+    <h2 class="section-title">A few core ideas that unlock the power of OpenClaw.</h2>
+    <p class="lead">These concepts recur across documentation, examples, and community discussions. Internalizing them helps you build better assistants.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Intent over literal commands</h4>
+    <p>OpenClaw's LLM infers intent from conversational language, not syntax. You say "remind me to call mom tomorrow" not "register_reminder(person='mom', time='tomorrow')". The assistant parses intent and maps it to tools.</p>
+  </div>
+  <div class="principle">
+    <h4>Context as memory</h4>
+    <p>OpenClaw maintains conversation history and learned state. Each message carries context of previous exchanges. This lets the assistant infer what you mean from brief follow-ups ("Yeah, do it Tuesday" understands the implicit referent).</p>
+  </div>
+  <div class="principle">
+    <h4>Tools are capabilities, not APIs</h4>
+    <p>A tool is not a raw API — it is a capability the assistant can invoke. "Send an email" is a tool. "POST to /api/email" is not. The distinction matters for natural language understanding and safety.</p>
+  </div>
+  <div class="principle">
+    <h4>Local-first architecture</h4>
+    <p>OpenClaw prioritizes local computation and storage. Your assistant learns locally. Data is yours. Integrations with external services are opt-in, not mandatory. This is a design choice, not a limitation.</p>
+  </div>
+  <div class="principle">
+    <h4>Privacy as a non-negotiable</h4>
+    <p>No tracking. No analytics. No data sharing. OpenClaw does not phone home. Your interactions with your assistant are yours alone. This is enforced in code, not just policy.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 06 CONFIGURATION ═══ -->
+<section class="section" id="config">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">06</div>
+  <div>
+    <div class="section-label">Configuration essentials</div>
+    <h2 class="section-title">Make OpenClaw yours by tuning its behavior, model choice, and available tools.</h2>
+    <p class="lead">Configuration is split between environment variables (deployment) and <code>config.yaml</code> (behavior). Most users need to change only a few values.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Essential .env variables</h3>
+
+<div class="framework-card" style="margin-top:0">
+  <div class="fc-head">
+    <div class="fc-title">.env template</div>
+    <span class="fc-label">Copy and fill</span>
+  </div>
+  <div style="border-top:1px solid var(--line)">
+<pre class="codeblock"><span class="dim"># LLM configuration</span>
+LLM_PROVIDER=<span class="str">anthropic</span>  <span class="dim"># anthropic, openai, deepseek</span>
+LLM_API_KEY=<span class="str">sk-ant-...</span>
+LLM_MODEL=<span class="str">claude-sonnet-4-6</span>
+
+<span class="dim"># Messaging platform — choose one or more</span>
+TELEGRAM_BOT_TOKEN=<span class="str">123456:ABC-...</span>
+<span class="dim"># SIGNAL_PHONE=+1234567890</span>
+<span class="dim"># DISCORD_TOKEN=...</span>
+
+<span class="dim"># Database</span>
+DATABASE_URL=<span class="str">sqlite:///openclaw.db</span>
+
+<span class="dim"># Logging</span>
+LOG_LEVEL=<span class="str">INFO</span>  <span class="dim"># DEBUG, INFO, WARN, ERROR</span>
+DEBUG=<span class="str">false</span></pre>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Behavior tuning in config.yaml</h3>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag blue">Personality</span>
+    <h3>Assistant traits</h3>
+    <p><code>tone</code>: professional, casual, witty. <code>personality</code>: brief or verbose. <code>system_prompt</code>: custom instructions (e.g., "You are a software engineer focused on Python"). These shape how the assistant responds.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag blue">Capability</span>
+    <h3>Enabled tools</h3>
+    <p>List which tools are available to your assistant. You can disable tools you do not trust or need. This is your security boundary — only enable integrations you want.</p>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:18px">
+  <div class="panel white">
+    <span class="tag blue">Safety</span>
+    <h3>Guardrails</h3>
+    <p><code>max_tool_calls_per_message</code>: limit tool invocations to prevent loops. <code>allowed_domains</code>: restrict web access. <code>timeout</code>: kill long-running tools. Sensible defaults are provided.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag blue">Learning</span>
+    <h3>Persistence</h3>
+    <p><code>remember_history</code>: keep conversation history (default: true). <code>context_window_size</code>: how much history to send to LLM. Trade off between learning and token cost.</p>
+  </div>
+</div>
+
+<div class="callout info" style="margin-top:28px">
+  <strong>Model choice matters:</strong> Claude (Anthropic) is recommended for reasoning, safety, and instruction-following. GPT-4 is strong for coding tasks. DeepSeek is cost-effective for simple queries. Most users stick with one model, but you can mix — use Claude for complex tasks, cheaper models for simple ones.
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Cost analysis and token efficiency</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Input cost (1M tokens)</th>
+        <th>Output cost (1M tokens)</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Claude Sonnet 4.6</strong></td>
+        <td>$3</td>
+        <td>$15</td>
+        <td class="good">Default choice — best reasoning/cost tradeoff</td>
+      </tr>
+      <tr>
+        <td><strong>Claude Opus 4.7</strong></td>
+        <td>$15</td>
+        <td>$75</td>
+        <td>Complex reasoning, research tasks</td>
+      </tr>
+      <tr>
+        <td><strong>GPT-4o</strong></td>
+        <td>$5</td>
+        <td>$15</td>
+        <td>Coding, vision tasks</td>
+      </tr>
+      <tr>
+        <td><strong>DeepSeek</strong></td>
+        <td>$0.14</td>
+        <td>$0.28</td>
+        <td class="good">High volume, simple queries, budget-constrained</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Cost optimization tactics</h4>
+    <p><strong>1. Implement context pruning:</strong> Keep conversation history under 10K tokens. Archive old chats monthly. <strong>2. Use batch APIs:</strong> For non-real-time tasks (reports, summaries), use batch APIs (10x cheaper). <strong>3. Route intelligently:</strong> Simple queries (weather, time) hit cheap models. Complex queries (reasoning, planning) hit Claude Sonnet. <strong>4. Cache system prompts:</strong> Use prompt caching if your provider supports it — repeating system instructions are 90% cheaper.</p>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:28px">
+  <strong>Real cost example:</strong> A user running OpenClaw 8 hours/day with Claude Sonnet costs ~$12/month (assuming average query is 500 input tokens, 200 output tokens). Comparable commercial AI assistants cost $20+/month. Self-hosted option (Ollama + local LLM) costs $0/month but requires a GPU.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 07 USE CASES & WORKFLOWS ═══ -->
+<section class="section" id="usecases">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">07</div>
+  <div>
+    <div class="section-label">Real-world patterns</div>
+    <h2 class="section-title">OpenClaw in practice. Proven workflows that users are building right now.</h2>
+    <p class="lead">These examples show how different users leverage OpenClaw for their specific needs. Each is self-contained and runnable with a few API calls.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Use case: Personal productivity assistant</h3>
+
+<div class="scene">
+  <div class="scene-label">Workflow: Daily standup automation</div>
+  <strong>Setup:</strong> Connect OpenClaw to your calendar and task manager. Enable the email and task-creation tools. <strong>Pattern:</strong> Every morning at 9am, message OpenClaw: "Give me my daily standup." The assistant queries your calendar, pending tasks, and recent activity, then formats a standup summary. <strong>Result:</strong> 30-second daily status that's ready to paste into Slack or email.
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Use case: Smart home orchestration</h3>
+
+<div class="scene">
+  <div class="scene-label">Workflow: Evening shutdown routine</div>
+  <strong>Setup:</strong> Connect OpenClaw to Home Assistant. Create a custom tool that triggers a "goodnight" scene. <strong>Pattern:</strong> Message: "Set up for bed." OpenClaw locks doors, arms the alarm, adjusts thermostats, and turns off lights in sequence. One message, multiple coordinated actions. <strong>Benefit:</strong> Natural language control over complex automations without separate apps.
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Use case: Development workflow acceleration</h3>
+
+<div class="scene">
+  <div class="scene-label">Workflow: Git operations via chat</div>
+  <strong>Setup:</strong> Enable the Git and shell execution tools (with sandboxing). <strong>Pattern:</strong> "Create a branch for feature X and push it." OpenClaw executes: <code>git checkout -b feature-x</code>, commits a placeholder, and pushes. CI runs automatically. <strong>Constraint:</strong> Dangerous commands (force push, destructive resets) require confirmation prompts.
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Use case: Information aggregation and synthesis</h3>
+
+<div class="scene">
+  <div class="scene-label">Workflow: Weekly digest generation</div>
+  <strong>Setup:</strong> Connect RSS feeds, GitHub, and your calendar. <strong>Pattern:</strong> "Summarize this week." OpenClaw pulls recent commits, open PRs, calendar events, and news, then synthesizes a weekly digest. <strong>Output:</strong> Markdown document or Slack message with key updates, metrics, and action items.
+</div>
+
+<h3 style="margin-top:28px;margin-bottom:16px;font-size:27px">Use case: Multi-channel customer support</h3>
+
+<div class="scene">
+  <div class="scene-label">Workflow: Support ticket triage</div>
+  <strong>Setup:</strong> Connect Telegram, Discord, and email. Enable a tool to query your support database and create tickets. <strong>Pattern:</strong> Incoming support questions on any channel are logged, classified by severity, and routed to your team via a single hub. Supporters reply once — response propagates to all channels the customer used.
+</div>
+
+<div class="principle-list" style="margin-top:28px">
+  <div class="principle">
+    <h4>Who uses OpenClaw</h4>
+    <p><strong>Developers:</strong> Automate repetitive CLI tasks without leaving their chat app. <strong>Makers:</strong> Orchestrate smart home devices and IoT integrations. <strong>Teams:</strong> Centralize notifications from multiple tools into one message hub. <strong>Solo founders:</strong> Handle customer support, scheduling, and automation without hiring support staff. <strong>Data analysts:</strong> Query databases and generate reports from Slack or Discord.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 08 LIMITATIONS & FAILURE MODES ═══ -->
+<section class="section" id="limitations">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">08</div>
+  <div>
+    <div class="section-label">When it breaks</div>
+    <h2 class="section-title">OpenClaw fails in predictable ways. Knowing these patterns prevents surprises in production.</h2>
+    <p class="lead">No software is bulletproof. Understanding failure modes helps you design safer workflows and set appropriate expectations.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="principle-list" style="margin-top:28px;display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+  <div class="principle" style="border-left:4px solid #9e3830;padding:16px;background:#fef9f7;border-radius:4px">
+    <h4 style="margin-top:0;color:#9e3830">1. LLM hallucination and tool misuse</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> Wrong tool invoked or parameters misunderstood. "Create user" → delete operation.<br><strong>Fix:</strong> Confirmation prompts for destructive ops. Unambiguous tool descriptions. Staging tests. Audit logs.</p>
+  </div>
+  <div class="principle" style="border-left:4px solid #9e3830;padding:16px;background:#fef9f7;border-radius:4px">
+    <h4 style="margin-top:0;color:#9e3830">2. Tool latency and timeouts</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> Tool takes >30s, LLM retries, duplicate actions occur. Email sent twice.<br><strong>Fix:</strong> Per-tool timeout settings. Idempotent tools. Job queues for long ops.</p>
+  </div>
+  <div class="principle" style="border-left:4px solid #b65f34;padding:16px;background:#faf8f5;border-radius:4px">
+    <h4 style="margin-top:0;color:#b65f34">3. Context window exhaustion</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> Conversation grows too large, context overflows, assistant forgets prior decisions.<br><strong>Fix:</strong> Configure context_window_size. Archive old chats. Auto-summarize long contexts.</p>
+  </div>
+  <div class="principle" style="border-left:4px solid #b65f34;padding:16px;background:#faf8f5;border-radius:4px">
+    <h4 style="margin-top:0;color:#b65f34">4. Credential exposure</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> API keys logged, leaked in errors, or sent to untrusted services.<br><strong>Fix:</strong> Never log secrets. Use .env (gitignored). Rotate regularly. Short-lived tokens only.</p>
+  </div>
+  <div class="principle" style="border-left:4px solid #245c8c;padding:16px;background:#faf8fd;border-radius:4px">
+    <h4 style="margin-top:0;color:#245c8c">5. Network unavailability</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> LLM provider unreachable, messenger disconnects, messages lost.<br><strong>Fix:</strong> Local LLM fallbacks. Message queuing. Graceful offline handling.</p>
+  </div>
+  <div class="principle" style="border-left:4px solid #245c8c;padding:16px;background:#faf8fd;border-radius:4px">
+    <h4 style="margin-top:0;color:#245c8c">6. Tool permission escalation</h4>
+    <p style="margin-bottom:0;font-size:14px"><strong>Pattern:</strong> Innocent request chains tools for unintended action. "What's in my email?" → forwarded elsewhere.<br><strong>Fix:</strong> Least privilege. Segregate sensitive tools. Opt-in for multi-step.</p>
+  </div>
+</div>
+
+<div class="callout warn" style="margin-top:28px">
+  <strong>Safe production rule:</strong> Never give OpenClaw access to tools it doesn't absolutely need. Start with read-only tools (fetch, query, summarize). Only enable write operations (send, modify, delete) after proven testing. Audit logs are not optional — they're your safety net.
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 09 SECURITY ARCHITECTURE ═══ -->
+<section class="section" id="security">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">09</div>
+  <div>
+    <div class="section-label">Threat model and defenses</div>
+    <h2 class="section-title">OpenClaw operates across three trust boundaries. Understanding them is non-negotiable for sensitive use cases.</h2>
+    <p class="lead">Local-first architecture simplifies security, but does not eliminate risk. Here's where risks lie and how to mitigate them.</p>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="grid-2" style="margin-top:28px">
+  <div class="panel white">
+    <span class="tag red">Boundary 1</span>
+    <h3>Local machine</h3>
+    <p>Your assistant runs on your device. If the device is compromised (malware, physical access), the assistant can be weaponized. Mitigation: Use OS-level security (firewall, file permissions, disk encryption). Run OpenClaw in a restricted user account, not as admin.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag red">Boundary 2</span>
+    <h3>LLM provider</h3>
+    <p>Messages are sent to Claude, GPT, or your chosen provider. The provider can theoretically see all queries. Mitigation: Anthropic's Claude does not train on API calls by default. Use on-device models (Ollama, LLaMA) for maximum privacy. Redact sensitive data before sending.</p>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:18px">
+  <div class="panel white">
+    <span class="tag red">Boundary 3</span>
+    <h3>External tools and APIs</h3>
+    <p>Tools integrate with third-party services (GitHub, Slack, email). These tools see requests and responses. Mitigation: Minimize tool scope. Never pass full credentials — use API keys with narrow scopes. Use VPNs and encrypted channels for sensitive APIs.</p>
+  </div>
+  <div class="panel white">
+    <span class="tag red">Risk: Credential theft</span>
+    <h3>API keys in config</h3>
+    <p>If <code>.env</code> or <code>config.yaml</code> is exposed (git, backup, screen sharing), all credentials are compromised. Mitigation: Never commit secrets. Use <code>.gitignore</code>. Rotate keys after any exposure. Use secret management tools (Vault, 1Password) instead of plain files.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Security checklist for production</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>✓ Secrets management</h4>
+    <p>Store API keys in environment variables, not config files. Use a secret manager (Vault, 1Password Secrets) for shared teams. Rotate keys monthly. Monitor for exposed keys in git history.</p>
+  </div>
+  <div class="principle">
+    <h4>✓ Tool whitelisting</h4>
+    <p>Enable only tools your workflow needs. Document which tools have write access. Require explicit confirmation for destructive operations (delete, modify, send).</p>
+  </div>
+  <div class="principle">
+    <h4>✓ Audit logging</h4>
+    <p>Log all tool invocations, parameters, and results. Store logs securely. Review them weekly. Alerts should fire on unusual patterns (mass deletions, unexpected API calls).</p>
+  </div>
+  <div class="principle">
+    <h4>✓ Message encryption</h4>
+    <p>For sensitive channels (Signal is built-in), ensure end-to-end encryption. Avoid SMS or unencrypted Telegram. Store conversation history encrypted at rest.</p>
+  </div>
+  <div class="principle">
+    <h4>✓ Network isolation</h4>
+    <p>Run OpenClaw on a dedicated, low-privilege user account. Use firewalls to restrict which APIs it can reach. Consider network segmentation for multi-tool deployments.</p>
+  </div>
+  <div class="principle">
+    <h4>✓ Monitoring and alerting</h4>
+    <p>Alert on token limit hits (context exhaustion). Alert on API errors and retries. Alert on unusual tool chaining. Set up dead-man's switch to verify assistant is healthy.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ═══ 10 RESOURCES ═══ -->
+<section class="section" id="resources">
+<div class="container">
+<div class="section-head" onclick="toggleSection(this)" tabindex="0">
+  <div class="section-no">10</div>
+  <div>
+    <div class="section-label">Learn more</div>
+    <h2 class="section-title">Documentation, community, and places to find help.</h2>
+    <div class="section-status">Collapse ↑ / Expand ↓</div>
+  </div>
+  <button class="section-toggle" aria-label="toggle section">+</button>
+</div>
+
+<div class="table-wrap" style="margin-top:28px">
+  <table>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Purpose</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong><a href="https://github.com/openclaw/openclaw" target="_blank" style="color:var(--blue);text-decoration:underline">GitHub repository</a></strong></td>
+        <td>Source code, issues, releases, community forks</td>
+        <td>Installation, contributing, checking latest features</td>
+      </tr>
+      <tr>
+        <td><strong><a href="https://openclaw.ai/" target="_blank" style="color:var(--blue);text-decoration:underline">Official website</a></strong></td>
+        <td>Homepage, high-level overview, getting started</td>
+        <td>First-time visitors, understanding the vision</td>
+      </tr>
+      <tr>
+        <td><strong><a href="https://github.com/openclaw/openclaw/wiki" target="_blank" style="color:var(--blue);text-decoration:underline">Wiki & guides</a></strong></td>
+        <td>Tutorials, FAQ, troubleshooting, best practices</td>
+        <td>Setup help, common problems, workflow patterns</td>
+      </tr>
+      <tr>
+        <td><strong>Community Discord</strong></td>
+        <td>Real-time chat with maintainers and users</td>
+        <td>Live help, plugin announcements, feature requests</td>
+      </tr>
+      <tr>
+        <td><strong>Issues & Discussions</strong></td>
+        <td>Bug reports, feature requests, design discussions</td>
+        <td>Reporting problems, proposing improvements</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3 style="margin-top:36px;margin-bottom:18px;font-size:27px">Next steps</h3>
+
+<div class="principle-list">
+  <div class="principle">
+    <h4>1. Install OpenClaw locally</h4>
+    <p>Clone the repository. Install dependencies. Run the quickstart. Get your assistant talking within 10 minutes. Failure to do this is the biggest blocker — actually running it builds intuition no docs can provide.</p>
+  </div>
+  <div class="principle">
+    <h4>2. Connect one messaging platform</h4>
+    <p>Pick Signal, Telegram, Discord, or WhatsApp. Link it. Send a test message. Verify the assistant responds. One platform is enough to start.</p>
+  </div>
+  <div class="principle">
+    <h4>3. Write your first tool</h4>
+    <p>Something small: fetch weather, query a custom API, trigger a script. 10–20 lines of code. Register it. Call it from chat. This moves OpenClaw from toy to useful in your workflow.</p>
+  </div>
+  <div class="principle">
+    <h4>4. Tune personality and behavior</h4>
+    <p>Update <code>config.yaml</code> with your preferences. Adjust the system prompt. Disable tools you do not need. Shape the assistant to feel like it is yours.</p>
+  </div>
+</div>
+
+</div>
+</section>
+
+</main>
+
+<section class="disclaimer">
+  <div class="disclaimer-inner">
+    <h3>About this guide</h3>
+    <p>This microsite is an educational overview of OpenClaw as of May 2026. OpenClaw is actively developed. Features, APIs, and integrations evolve. Refer to the <a href="https://github.com/openclaw/openclaw" target="_blank" style="color:var(--blue);text-decoration:underline">official GitHub repository</a> and documentation for the most current information. This guide is not affiliated with the OpenClaw project — it is a community learning resource.</p>
+  </div>
+</section>
+
+<section class="references" style="margin:48px 0;padding:32px 0;border-top:1px solid var(--line)">
+  <div class="container" style="max-width:820px;margin:0 auto;padding:0 32px">
+    <h3 style="margin-top:0;color:var(--gold);font-family:var(--serif);font-size:28px;font-weight:400;margin-bottom:24px">References</h3>
+    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:14px">
+      <li><strong>OpenClaw GitHub:</strong> <a href="https://github.com/openclaw/openclaw" target="_blank" style="color:var(--blue);text-decoration:none;border-bottom:1px solid currentColor">github.com/openclaw/openclaw</a></li>
+      <li><strong>OpenClaw Official:</strong> <a href="https://openclaw.ai/" target="_blank" style="color:var(--blue);text-decoration:none;border-bottom:1px solid currentColor">openclaw.ai</a></li>
+      <li><strong>Framework Overview:</strong> <a href="https://openclaw.im/" target="_blank" style="color:var(--blue);text-decoration:none;border-bottom:1px solid currentColor">openclaw.im</a></li>
+      <li><strong>Architecture Deep Dive:</strong> <a href="https://ppaolo.substack.com/p/openclaw-system-architecture-overview" target="_blank" style="color:var(--blue);text-decoration:none;border-bottom:1px solid currentColor">ppaolo.substack.com/p/openclaw-system-architecture-overview</a></li>
+      <li><strong>What OpenClaw Is (DigitalOcean):</strong> <a href="https://www.digitalocean.com/resources/articles/what-is-openclaw" target="_blank" style="color:var(--blue);text-decoration:none;border-bottom:1px solid currentColor">digitalocean.com/resources/articles/what-is-openclaw</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  OpenClaw Learning Microsite | May 2026 | Community-driven educational resource
+</footer>
+
+<script>
+function toggleSection(header) {
+  const section = header.closest('.section');
+  section.classList.toggle('collapsed');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const links = document.querySelector('.topnav').querySelectorAll('a');
+  window.addEventListener('scroll', function() {
+    let current = '';
+    document.querySelectorAll('section[id]').forEach(s => {
+      if (pageYOffset >= s.offsetTop - 200) current = s.getAttribute('id');
+    });
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').slice(1) === current) link.classList.add('active');
+    });
+  });
+});
+</script>
+</body>
+</html>
