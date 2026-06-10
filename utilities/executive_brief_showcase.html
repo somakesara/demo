@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Brief — Pulse &amp; Highlight Picker</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 20px 64px; background: #E8EEF4; font-family: 'Segoe UI', Arial, sans-serif; color: #1A1A2E; }
+    .page { max-width: 760px; margin: 0 auto; }
+    .page-header { background: #0A2E5C; color: #fff; padding: 28px 32px; border-radius: 8px 8px 0 0; border-top: 4px solid #00A3E0; }
+    .page-header h1 { margin: 0 0 8px; font-size: 22px; }
+    .page-header p { margin: 0; font-size: 14px; color: #94C8E8; line-height: 1.5; }
+    .group { background: #fff; border: 1px solid #E2E8F0; border-top: none; box-shadow: 0 4px 20px rgba(10,46,92,0.08); }
+    .group-title { padding: 14px 24px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .group-actions { display: flex; gap: 6px; }
+    .group-actions button { font-size: 10px; font-weight: 600; padding: 4px 10px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; color: #0A2E5C; cursor: pointer; font-family: inherit; }
+    .group-actions button:hover { background: #F0F7FF; border-color: #00A3E0; }
+    /* Composer */
+    .composer { border-radius: 0; }
+    .composer-body { padding: 20px 24px 24px; }
+    .composer-hint { font-size: 13px; color: #475569; margin: 0 0 14px; line-height: 1.55; }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .presets button { font-size: 12px; font-weight: 600; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; background: #0A2E5C; color: #fff; }
+    .presets button:hover { background: #0D4A7A; }
+    .presets button.secondary { background: #E8EEF4; color: #0A2E5C; border: 1px solid #CBD5E1; }
+    .presets button.secondary:hover { background: #F0F7FF; }
+    #composed-pulse { background: #E8EEF4; border: 2px solid #00A3E0; border-radius: 8px; padding: 16px; min-height: 80px; }
+    .composed-empty { font-size: 13px; color: #64748B; text-align: center; padding: 20px 12px; font-style: italic; }
+    .composed-row { margin-bottom: 14px; }
+    .composed-row:last-child { margin-bottom: 0; }
+    .composed-row-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0A2E5C; margin-bottom: 8px; padding-left: 2px; }
+    .composed-count { font-size: 12px; color: #64748B; margin: 12px 0 0; }
+    .composed-count strong { color: #0A2E5C; }
+    /* Pulse items */
+    .pulse-item { border-bottom: 1px solid #E2E8F0; }
+    .pulse-item:last-child { border-bottom: none; }
+    .pulse-item.selected { background: #F0FDF4; }
+    .pulse-item.selected .pulse-bar { border-left: 3px solid #22C55E; }
+    .pulse-bar { display: flex; align-items: stretch; gap: 0; }
+    .include-wrap { display: flex; align-items: center; gap: 8px; padding: 14px 12px 14px 20px; flex-shrink: 0; cursor: pointer; border-right: 1px solid #F1F5F9; background: #FAFAFA; user-select: none; }
+    .include-wrap input { width: 16px; height: 16px; accent-color: #00A3E0; cursor: pointer; }
+    .include-wrap span { font-size: 11px; font-weight: 600; color: #64748B; white-space: nowrap; }
+    .pulse-item.selected .include-wrap span { color: #166534; }
+    .accordion-trigger { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px 14px 16px; border: none; background: transparent; cursor: pointer; text-align: left; font-family: inherit; }
+    .accordion-trigger:hover { background: #F8FAFC; }
+    .accordion-trigger.open { background: #F0F7FF; }
+    .accordion-trigger .label { font-size: 15px; font-weight: 600; color: #0A2E5C; }
+    .accordion-trigger .desc { font-size: 12px; color: #64748B; margin-top: 2px; }
+    .accordion-trigger .chevron { flex-shrink: 0; width: 28px; height: 28px; border-radius: 6px; background: #E8EEF4; color: #0A2E5C; font-size: 14px; line-height: 28px; text-align: center; transition: transform 0.2s; }
+    .accordion-trigger.open .chevron { transform: rotate(180deg); background: #00A3E0; color: #fff; }
+    .accordion-panel { display: none; padding: 0 24px 24px 24px; background: #F8FAFC; border-top: 1px solid #E2E8F0; }
+    .accordion-panel.open { display: block; }
+    .panel-note { font-size: 12px; color: #64748B; margin: 16px 0 14px; line-height: 1.5; }
+    .preview-wrap { background: #E8EEF4; padding: 20px; border-radius: 8px; border: 1px dashed #CBD5E1; }
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; margin-bottom: 12px; }
+    .tag-use { background: #DCFCE7; color: #166534; }
+    .tag-status { background: #E0F2FE; color: #0369A1; }
+    .kpi-row { width: 100%; border-collapse: collapse; }
+    .kpi-row td { vertical-align: top; }
+    .kpi-gap { width: 6px; font-size: 0; }
+    .kpi-mini { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); text-align: center; padding: 14px 8px; }
+    .kpi-mini .val { font-size: 22px; font-weight: 700; color: #0A2E5C; margin: 0; }
+    .kpi-mini .lbl { font-size: 10px; color: #64748B; margin: 5px 0 6px; }
+    .kpi-mini .trnd { font-size: 10px; font-weight: 600; margin: 0; }
+    .kpi-mini .trnd.up { color: #22C55E; } .kpi-mini .trnd.warn { color: #F59E0B; } .kpi-mini .trnd.dn { color: #22C55E; }
+    .kpi-mini .trnd.neu { color: #64748B; } .kpi-mini .trnd.bad { color: #EF4444; }
+    .stripe-green { border-top: 3px solid #22C55E; } .stripe-blue { border-top: 3px solid #00A3E0; }
+    .stripe-amber { border-top: 3px solid #F59E0B; } .stripe-red { border-top: 3px solid #EF4444; }
+    /* Highlights */
+    .accordion-item { border-bottom: 1px solid #E2E8F0; }
+    .accordion-item:last-child { border-bottom: none; }
+    .hl-only .accordion-trigger { width: 100%; padding: 18px 24px; background: #fff; }
+    .hl-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 16px 18px; }
+    .hl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .hl-cat { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #64748B; }
+    .hl-pill { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; white-space: nowrap; }
+    .hl-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; color: #1A1A2E; }
+    .hl-body { font-size: 13px; line-height: 1.5; color: #475569; margin: 0 0 8px; }
+    .hl-owner { font-size: 11px; color: #94A3B8; margin: 0; }
+    .hl-on-track { border-left: 4px solid #22C55E; } .hl-on-track .hl-pill { background: #DCFCE7; color: #166534; }
+    .hl-done { border-left: 4px solid #00A3E0; } .hl-done .hl-pill { background: #E0F2FE; color: #0369A1; }
+    .hl-at-risk { border-left: 4px solid #F59E0B; background: #FFFBEB; border-color: #FDE68A; border-left-color: #F59E0B !important; }
+    .hl-at-risk .hl-cat { color: #92400E; } .hl-at-risk .hl-pill { background: #FEF3C7; color: #92400E; }
+    .hl-critical { border-left: 4px solid #EF4444; background: #FEF2F2; border-color: #FECACA; border-left-color: #EF4444 !important; }
+    .hl-critical .hl-cat { color: #B91C1C; } .hl-critical .hl-pill { background: #FEE2E2; color: #B91C1C; }
+    .hl-blocked { border-left: 4px solid #DC2626; background: #FFF1F2; border-color: #FECDD3; border-left-color: #DC2626 !important; }
+    .hl-blocked .hl-cat { color: #9F1239; } .hl-blocked .hl-pill { background: #FFE4E6; color: #9F1239; }
+    .hl-on-hold { border-left: 4px solid #94A3B8; background: #F8FAFC; } .hl-on-hold .hl-pill { background: #F1F5F9; color: #475569; }
+    .hl-cancelled { border-left: 4px solid #64748B; opacity: 0.85; } .hl-cancelled .hl-pill { background: #E2E8F0; color: #475569; }
+    .hl-cancelled .hl-title { text-decoration: line-through; color: #64748B; }
+    .legend { margin-top: 0; padding: 12px 14px; background: #fff; border-radius: 6px; font-size: 11px; color: #64748B; line-height: 1.6; }
+    .legend strong { color: #0A2E5C; }
+    @media (max-width: 600px) {
+      .pulse-bar { flex-direction: column; }
+      .include-wrap { border-right: none; border-bottom: 1px solid #F1F5F9; }
+      .kpi-row tr { display: block; } .kpi-row td { display: block; width: 100% !important; padding-bottom: 8px; }
+      .kpi-gap { display: none; }
+      .presets button { flex: 1 1 calc(50% - 8px); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Executive Brief — Design Picker</h1>
+    <p>Check pulse rows for your edition · expand any variant to preview · use monthly presets or mix multiple rows.</p>
+  </div>
+
+  <!-- ═══ COMPOSED PREVIEW ═══ -->
+  <div class="group composer">
+    <div class="group-title">Your edition — live pulse preview</div>
+    <div class="composer-body">
+      <p class="composer-hint">
+        <strong>Most months:</strong> select 1 pulse row.<br />
+        <strong>Dual-focus months:</strong> stack 2 rows (e.g. delivery + governance during audit).<br />
+        <strong>Rare:</strong> 3+ rows only for quarterly reviews — keep the brief scannable.
+      </p>
+      <div class="presets">
+        <button type="button" data-preset="sprint">Monthly sprint</button>
+        <button type="button" data-preset="balanced">Balanced month</button>
+        <button type="button" data-preset="audit">Audit season</button>
+        <button type="button" data-preset="hiring">Campus / hiring</button>
+        <button type="button" data-preset="qbr">QBR / outcomes</button>
+        <button type="button" data-preset="dual">Dual focus (2)</button>
+        <button type="button" data-preset="all">All 5 rows</button>
+        <button type="button" class="secondary" data-preset="clear">Clear</button>
+      </div>
+      <div id="composed-pulse">
+        <div class="composed-empty">No rows selected — check boxes below or click a monthly preset.</div>
+      </div>
+      <p class="composed-count">Selected for this edition: <strong id="pulse-count">0</strong> pulse row(s)</p>
+    </div>
+  </div>
+
+  <!-- ═══ ALL PULSE VARIANTS — independent collapsible + checkbox ═══ -->
+  <div class="group">
+    <div class="group-title">
+      <span>All pulse variants — expand any · select any combination</span>
+      <span class="group-actions">
+        <button type="button" id="expand-all-pulse">Expand all</button>
+        <button type="button" id="collapse-all-pulse">Collapse all</button>
+      </span>
+    </div>
+
+    <!-- 1 Hiring -->
+    <div class="pulse-item" data-pulse-id="hiring" data-pulse-label="Hiring &amp; talent">
+      <div class="pulse-bar">
+        <label class="include-wrap"><input type="checkbox" class="pulse-include" /><span>Include</span></label>
+        <button type="button" class="accordion-trigger" data-collapse="independent" aria-expanded="false">
+          <div><div class="label">1. Hiring &amp; talent</div><div class="desc">Headcount · TAT · open reqs · attrition · CSAT</div></div>
+          <span class="chevron">&#9660;</span>
+        </button>
+      </div>
+      <div class="accordion-panel">
+        <p class="panel-note"><span class="tag tag-use">Monthly use</span> Campus intake months, workforce planning reviews, attrition spikes. Pair with delivery row during scaling quarters.</p>
+        <div class="preview-wrap pulse-kpi-source">
+          <table class="kpi-row" role="presentation"><tr>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">1,240</p><p class="lbl">Headcount</p><p class="trnd up">&#9650; 3.2%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">18</p><p class="lbl">Hiring TAT</p><p class="trnd dn">&#9660; 4 days</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-amber"><p class="val">34</p><p class="lbl">Open reqs</p><p class="trnd warn">&#9650; 6</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">8.2%</p><p class="lbl">Attrition YTD</p><p class="trnd dn">&#9660; 0.4%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-blue"><p class="val">4.6</p><p class="lbl">CSAT / 5</p><p class="trnd up">&#9650; 0.2</p></div></td>
+          </tr></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 Delivery -->
+    <div class="pulse-item" data-pulse-id="delivery" data-pulse-label="Delivery &amp; operations">
+      <div class="pulse-bar">
+        <label class="include-wrap"><input type="checkbox" class="pulse-include" checked /><span>Include</span></label>
+        <button type="button" class="accordion-trigger" data-collapse="independent" aria-expanded="false">
+          <div><div class="label">2. Delivery &amp; operations</div><div class="desc">Sprint · uptime · P1s · savings · US decisions</div></div>
+          <span class="chevron">&#9660;</span>
+        </button>
+      </div>
+      <div class="accordion-panel">
+        <p class="panel-note"><span class="tag tag-use">Monthly use</span> Default for sprint newsletters. Best single row for most editions. <strong>Currently in executive_brief.html.</strong></p>
+        <div class="preview-wrap pulse-kpi-source">
+          <table class="kpi-row" role="presentation"><tr>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">94%</p><p class="lbl">Sprint delivered</p><p class="trnd up">&#9650; 6 pts</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">99.97%</p><p class="lbl">Uptime</p><p class="trnd up">&#9650; 0.02%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">0</p><p class="lbl">P1 incidents</p><p class="trnd neu">30-day</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-blue"><p class="val" style="font-size:18px;">$1.2M</p><p class="lbl">Cost savings</p><p class="trnd up">cloud</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-amber"><p class="val">1</p><p class="lbl">US decision</p><p class="trnd warn">&#9888; High</p></div></td>
+          </tr></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Outcomes -->
+    <div class="pulse-item" data-pulse-id="outcomes" data-pulse-label="Business outcomes">
+      <div class="pulse-bar">
+        <label class="include-wrap"><input type="checkbox" class="pulse-include" /><span>Include</span></label>
+        <button type="button" class="accordion-trigger" data-collapse="independent" aria-expanded="false">
+          <div><div class="label">3. Business outcomes</div><div class="desc">SLA · CSAT · savings · automation · releases</div></div>
+          <span class="chevron">&#9660;</span>
+        </button>
+      </div>
+      <div class="accordion-panel">
+        <p class="panel-note"><span class="tag tag-use">Monthly use</span> QBR months, budget reviews, AI ROI updates. Strong when finance audience joins the read.</p>
+        <div class="preview-wrap pulse-kpi-source">
+          <table class="kpi-row" role="presentation"><tr>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">99.2%</p><p class="lbl">SLA adherence</p><p class="trnd up">&#9650; 0.8%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">4.6</p><p class="lbl">CSAT / 5</p><p class="trnd up">&#9650; 0.2</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-blue"><p class="val" style="font-size:18px;">$1.2M</p><p class="lbl">Cost savings</p><p class="trnd up">YTD</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">40%</p><p class="lbl">Hours saved</p><p class="trnd up">AI pilot</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">3/3</p><p class="lbl">Releases</p><p class="trnd up">on track</p></div></td>
+          </tr></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Governance -->
+    <div class="pulse-item" data-pulse-id="governance" data-pulse-label="Governance &amp; risk">
+      <div class="pulse-bar">
+        <label class="include-wrap"><input type="checkbox" class="pulse-include" /><span>Include</span></label>
+        <button type="button" class="accordion-trigger" data-collapse="independent" aria-expanded="false">
+          <div><div class="label">4. Governance &amp; risk</div><div class="desc">SOC 2 · vulns · SLA · audit · escalations</div></div>
+          <span class="chevron">&#9660;</span>
+        </button>
+      </div>
+      <div class="accordion-panel">
+        <p class="panel-note"><span class="tag tag-use">Monthly use</span> Audit prep months (Jun–Aug), post-pen-test, or when CISO/legal are on the distribution. Stack with delivery row during audit season.</p>
+        <div class="preview-wrap pulse-kpi-source">
+          <table class="kpi-row" role="presentation"><tr>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">85%</p><p class="lbl">SOC 2 ready</p><p class="trnd up">&#9650; 12%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">0</p><p class="lbl">Critical vulns</p><p class="trnd neu">open</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">99.2%</p><p class="lbl">SLA met</p><p class="trnd up">&#9650; 0.8%</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-amber"><p class="val">2</p><p class="lbl">Audit findings</p><p class="trnd warn">medium</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-red"><p class="val">1</p><p class="lbl">US escalation</p><p class="trnd bad">&#9888; Open</p></div></td>
+          </tr></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Balanced -->
+    <div class="pulse-item" data-pulse-id="balanced" data-pulse-label="Balanced executive">
+      <div class="pulse-bar">
+        <label class="include-wrap"><input type="checkbox" class="pulse-include" /><span>Include</span></label>
+        <button type="button" class="accordion-trigger" data-collapse="independent" aria-expanded="false">
+          <div><div class="label">5. Balanced executive</div><div class="desc">Delivery · uptime · CSAT · savings · US action</div></div>
+          <span class="chevron">&#9660;</span>
+        </button>
+      </div>
+      <div class="accordion-panel">
+        <p class="panel-note"><span class="tag tag-use">Monthly use</span> When audience is mixed and no single story dominates. Good alternative to delivery row for executive committee editions.</p>
+        <div class="preview-wrap pulse-kpi-source">
+          <table class="kpi-row" role="presentation"><tr>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">94%</p><p class="lbl">Program delivery</p><p class="trnd up">&#9650; 6 pts</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-green"><p class="val">99.97%</p><p class="lbl">Uptime</p><p class="trnd neu">steady</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-blue"><p class="val">4.6</p><p class="lbl">CSAT / 5</p><p class="trnd up">&#9650; 0.2</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-blue"><p class="val" style="font-size:18px;">$1.2M</p><p class="lbl">Savings YTD</p><p class="trnd up">on plan</p></div></td><td class="kpi-gap">&nbsp;</td>
+            <td width="19%"><div class="kpi-mini stripe-amber"><p class="val">1</p><p class="lbl">US action</p><p class="trnd warn">needed</p></div></td>
+          </tr></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HIGHLIGHTS — one open at a time ═══ -->
+  <div class="group hl-only" style="margin-top:24px;border-radius:0 0 8px 8px;overflow:hidden;">
+    <div class="group-title">Highlight status examples — one open at a time</div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#9679; On Track <span style="color:#22C55E;">— green</span></div><div class="desc">Progressing as planned</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-on-track">
+          <div class="hl-head"><span class="hl-cat">Delivery</span><span class="hl-pill">&#9679; On Track</span></div>
+          <p class="hl-title">Cloud Phase 2 closed 11 days early — on track for Q3 cost savings</p>
+          <p class="hl-body">42 workloads migrated with zero downtime. Projected $1.2M annual savings.</p>
+          <p class="hl-owner">Priya Menon &middot; Infrastructure Lead</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#10003; Done <span style="color:#00A3E0;">— blue</span></div><div class="desc">Completed this period</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-done">
+          <div class="hl-head"><span class="hl-cat">Innovation</span><span class="hl-pill">&#10003; Done</span></div>
+          <p class="hl-title">AI Center of Excellence chartered and staffed</p>
+          <p class="hl-body">12-person pod operational. GPU infra live. First use case in pilot.</p>
+          <p class="hl-owner">Arjun Reddy &middot; AI CoE Lead</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#9888; At Risk <span style="color:#F59E0B;">— amber</span></div><div class="desc">Slipping · mitigation in progress</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-at-risk">
+          <div class="hl-head"><span class="hl-cat">Vendor</span><span class="hl-pill">&#9888; At Risk</span></div>
+          <p class="hl-title">SaaS renewal delayed — 38 days to contract expiry</p>
+          <p class="hl-body">MSA agreed with vendor. US legal review outstanding. Contingency needs 3 weeks.</p>
+          <p class="hl-owner">Rahul Sharma &middot; Vendor Management</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#9888; Critical <span style="color:#EF4444;">— red</span></div><div class="desc">US decision overdue · imminent impact</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-critical">
+          <div class="hl-head"><span class="hl-cat">Vendor · US action required</span><span class="hl-pill">&#9888; Critical</span></div>
+          <p class="hl-title">Dev platform access ends July 18 — MSA unsigned, escalation unanswered 14 days</p>
+          <p class="hl-body">180 engineers across 3 US teams lose tooling if contract lapses. Sign-by date June 24. No contingency within timeline.</p>
+          <p class="hl-owner">Rahul Sharma &middot; Vendor Management</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#10007; Blocked <span style="color:#DC2626;">— deep red</span></div><div class="desc">Work stopped · external blocker</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-blocked">
+          <div class="hl-head"><span class="hl-cat">Release</span><span class="hl-pill">&#10007; Blocked</span></div>
+          <p class="hl-title">Payments API release halted — US security sign-off pending 3 weeks</p>
+          <p class="hl-body">Frozen at code-complete. Pen test submitted June 1; no US approver assigned.</p>
+          <p class="hl-owner">James O'Brien &middot; US Product Owner</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#9208; On Hold <span style="color:#64748B;">— gray</span></div><div class="desc">Paused by leadership</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-on-hold">
+          <div class="hl-head"><span class="hl-cat">Product</span><span class="hl-pill">&#9208; On Hold</span></div>
+          <p class="hl-title">Executive dashboard v2 deferred to Q4</p>
+          <p class="hl-body">Capacity reallocated to payments API and AI CoE pilot.</p>
+          <p class="hl-owner">Sandra Wu &middot; US VP Product</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="accordion-item" data-group="highlights">
+      <button type="button" class="accordion-trigger" aria-expanded="false">
+        <div><div class="label">&#10005; Cancelled <span style="color:#64748B;">— muted</span></div><div class="desc">Scope dropped</div></div>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="accordion-panel">
+        <div class="preview-wrap"><div class="hl-card hl-cancelled">
+          <div class="hl-head"><span class="hl-cat">Infrastructure</span><span class="hl-pill">&#10005; Cancelled</span></div>
+          <p class="hl-title">On-prem data center extension — removed from FY26 plan</p>
+          <p class="hl-body">Superseded by cloud Phase 2. Budget reallocated to AI GPU capacity.</p>
+          <p class="hl-owner">Priya Menon &middot; Infrastructure Lead</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div style="padding:16px 24px 24px;background:#F8FAFC;border-top:1px solid #E2E8F0;">
+      <div class="legend">
+        <strong>Pulse presets explained:</strong><br />
+        Monthly sprint = delivery only &nbsp;&middot;&nbsp; Balanced = balanced row &nbsp;&middot;&nbsp; Audit season = governance + delivery &nbsp;&middot;&nbsp; Campus/hiring = hiring only &nbsp;&middot;&nbsp; QBR = outcomes only &nbsp;&middot;&nbsp; Dual focus = delivery + governance<br /><br />
+        <strong>Highlight mix:</strong> 3–5 On Track &middot; 0–1 Done &middot; 0–1 At Risk &middot; max 1 red (Critical or Blocked)
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var PRESETS = {
+    sprint:    ['delivery'],
+    balanced:  ['balanced'],
+    audit:     ['governance', 'delivery'],
+    hiring:    ['hiring'],
+    qbr:       ['outcomes'],
+    dual:      ['delivery', 'governance'],
+    all:       ['hiring', 'delivery', 'outcomes', 'governance', 'balanced'],
+    clear:     []
+  };
+
+  var composedEl = document.getElementById('composed-pulse');
+  var countEl = document.getElementById('pulse-count');
+
+  function togglePanel(btn, open) {
+    var item = btn.closest('.pulse-item') || btn.closest('.accordion-item');
+    var panel = item.querySelector('.accordion-panel');
+    if (open === undefined) open = !btn.classList.contains('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    panel.classList.toggle('open', open);
+  }
+
+  function updateComposer() {
+    var selected = [];
+    document.querySelectorAll('.pulse-item').forEach(function (item) {
+      var cb = item.querySelector('.pulse-include');
+      item.classList.toggle('selected', cb.checked);
+      if (cb.checked) selected.push(item);
+    });
+
+    countEl.textContent = selected.length;
+    composedEl.innerHTML = '';
+
+    if (selected.length === 0) {
+      composedEl.innerHTML = '<div class="composed-empty">No rows selected — check boxes below or click a monthly preset.</div>';
+      return;
+    }
+
+    selected.forEach(function (item) {
+      var row = document.createElement('div');
+      row.className = 'composed-row';
+      var label = document.createElement('div');
+      label.className = 'composed-row-label';
+      label.textContent = item.getAttribute('data-pulse-label');
+      var src = item.querySelector('.pulse-kpi-source');
+      row.appendChild(label);
+      row.appendChild(src.cloneNode(true));
+      composedEl.appendChild(row);
+    });
+  }
+
+  function applyPreset(name) {
+    var ids = PRESETS[name] || [];
+    document.querySelectorAll('.pulse-item').forEach(function (item) {
+      var id = item.getAttribute('data-pulse-id');
+      item.querySelector('.pulse-include').checked = ids.indexOf(id) !== -1;
+    });
+    updateComposer();
+  }
+
+  /* Pulse: independent collapse */
+  document.querySelectorAll('.pulse-item .accordion-trigger').forEach(function (btn) {
+    btn.addEventListener('click', function () { togglePanel(btn); });
+  });
+
+  document.querySelectorAll('.pulse-include').forEach(function (cb) {
+    cb.addEventListener('change', updateComposer);
+    cb.addEventListener('click', function (e) { e.stopPropagation(); });
+  });
+
+  document.querySelectorAll('.presets button').forEach(function (btn) {
+    btn.addEventListener('click', function () { applyPreset(btn.getAttribute('data-preset')); });
+  });
+
+  document.getElementById('expand-all-pulse').addEventListener('click', function () {
+    document.querySelectorAll('.pulse-item .accordion-trigger').forEach(function (btn) { togglePanel(btn, true); });
+  });
+
+  document.getElementById('collapse-all-pulse').addEventListener('click', function () {
+    document.querySelectorAll('.pulse-item .accordion-trigger').forEach(function (btn) { togglePanel(btn, false); });
+  });
+
+  /* Highlights: one at a time */
+  document.querySelectorAll('.hl-only .accordion-trigger').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.accordion-item');
+      var isOpen = btn.classList.contains('open');
+      document.querySelectorAll('.hl-only .accordion-item').forEach(function (sibling) {
+        togglePanel(sibling.querySelector('.accordion-trigger'), false);
+      });
+      if (!isOpen) togglePanel(btn, true);
+    });
+  });
+
+  updateComposer();
+})();
+</script>
+
+</body>
+</html>

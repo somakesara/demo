@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCC Hyderabad — Monthly Newsletter</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0F0E1A;
+    --indigo:    #1A1744;
+    --teal:      #00C9B1;
+    --teal-dim:  #00C9B120;
+    --slate:     #4A4868;
+    --mist:      #F5F5F7;
+    --white:     #FFFFFF;
+    --red:       #E85D5D;
+    --amber:     #F5A623;
+    --green:     #2ECC71;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--mist);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 2rem auto;
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 32px rgba(15,14,26,0.08);
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    background: var(--indigo);
+    color: var(--white);
+    padding: 2.8rem 3rem 2.4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -40px;
+    width: 220px; height: 220px;
+    background: var(--teal);
+    opacity: 0.12;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .masthead-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+  .masthead h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    line-height: 1.1;
+    font-weight: 400;
+  }
+  .masthead-meta {
+    text-align: right;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.8;
+    flex-shrink: 0;
+  }
+  .masthead-meta strong {
+    display: block;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.88rem;
+  }
+  .masthead-divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal) 0%, transparent 100%);
+    margin: 1.6rem 0 1.4rem;
+    opacity: 0.6;
+  }
+  .brief-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.7rem;
+  }
+  .brief-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .brief-list li {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.82);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .brief-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-size: 0.8rem;
+  }
+
+  /* ── BODY ── */
+  .body-grid {
+    padding: 2.4rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 2.4rem;
+  }
+
+  .section { display: flex; flex-direction: column; gap: 0.8rem; }
+  .section.full { grid-column: 1 / -1; }
+
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E8E8EE;
+  }
+
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--indigo);
+  }
+
+  /* ── METRICS ── */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .metric-card {
+    background: var(--mist);
+    border-radius: 6px;
+    padding: 1rem 1rem 0.9rem;
+    border-top: 3px solid var(--teal);
+  }
+  .metric-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    color: var(--indigo);
+    line-height: 1;
+  }
+  .metric-label {
+    font-size: 0.72rem;
+    color: var(--slate);
+    margin-top: 0.25rem;
+    font-weight: 500;
+  }
+  .metric-trend {
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+  }
+  .up   { color: var(--green); }
+  .down { color: var(--red); }
+  .flat { color: var(--slate); }
+
+  /* ── WINS & IN PROGRESS ── */
+  .item-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .item-list li {
+    font-size: 0.87rem;
+    color: #2C2B3A;
+    padding: 0.65rem 0.9rem;
+    background: var(--mist);
+    border-radius: 5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    line-height: 1.45;
+  }
+  .item-list li .icon { flex-shrink: 0; font-size: 1rem; margin-top: 0.05rem; }
+
+  /* ── STATUS ITEMS ── */
+  .status-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 0.87rem;
+    padding: 0.65rem 0.9rem;
+    background: var(--mist);
+    border-radius: 5px;
+    margin-bottom: 0.6rem;
+    line-height: 1.45;
+  }
+  .rag {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.35rem;
+  }
+  .rag.r { background: var(--red); }
+  .rag.a { background: var(--amber); }
+  .rag.g { background: var(--green); }
+  .status-text strong { display: block; font-weight: 600; color: var(--indigo); font-size: 0.85rem; }
+  .status-text span { color: var(--slate); font-size: 0.8rem; }
+
+  /* ── SPOTLIGHT ── */
+  .spotlight-card {
+    background: var(--indigo);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+  .spotlight-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: var(--indigo);
+  }
+  .spotlight-name {
+    font-weight: 600;
+    color: var(--white);
+    font-size: 0.95rem;
+  }
+  .spotlight-role {
+    font-size: 0.75rem;
+    color: var(--teal);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  .spotlight-quote {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  /* ── COMING UP ── */
+  .upcoming-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .upcoming-list li {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    font-size: 0.87rem;
+    color: #2C2B3A;
+  }
+  .upcoming-date {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--teal);
+    background: var(--teal-dim);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--indigo);
+    padding: 1.2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .footer-brand {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+  .footer-brand strong { color: rgba(255,255,255,0.75); }
+  .footer-note {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.3);
+  }
+
+  @media (max-width: 640px) {
+    .masthead { padding: 2rem 1.4rem 1.8rem; }
+    .masthead h1 { font-size: 1.7rem; }
+    .masthead-top { flex-direction: column; }
+    .masthead-meta { text-align: left; }
+    .body-grid { padding: 1.6rem 1.4rem; grid-template-columns: 1fr; }
+    .section.full { grid-column: 1; }
+    .metrics-row { grid-template-columns: 1fr 1fr; }
+    .footer { padding: 1rem 1.4rem; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="masthead-top">
+      <div>
+        <p class="masthead-eyebrow">GCC Hyderabad · Monthly Dispatch</p>
+        <h1>The Pulse</h1>
+      </div>
+      <div class="masthead-meta">
+        <strong>June 2026</strong>
+        Issue 01
+        <br>Hyderabad, India
+      </div>
+    </div>
+    <div class="masthead-divider"></div>
+    <p class="brief-label">This month in brief</p>
+    <ul class="brief-list">
+      <li>Team grew to 42 — 6 new joiners onboarded across Engineering and Operations</li>
+      <li>Platform v2.1 shipped on schedule; zero P1 incidents post-launch</li>
+      <li>GCC leadership review: HYD ranked #2 globally on delivery velocity</li>
+    </ul>
+  </header>
+
+  <!-- BODY -->
+  <main class="body-grid">
+
+    <!-- METRICS -->
+    <div class="section full">
+      <p class="section-label">Metrics Snapshot</p>
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-value">42</div>
+          <div class="metric-label">Team Headcount</div>
+          <div class="metric-trend up">↑ 6 this month</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">94%</div>
+          <div class="metric-label">Sprint Velocity</div>
+          <div class="metric-trend up">↑ 3pts vs May</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">1.2d</div>
+          <div class="metric-label">Avg. Review TAT</div>
+          <div class="metric-trend down">↓ from 1.8d</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">0</div>
+          <div class="metric-label">P1 Incidents</div>
+          <div class="metric-trend flat">→ stable</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WINS -->
+    <div class="section">
+      <p class="section-label">Wins This Month</p>
+      <ul class="item-list">
+        <li><span class="icon">🚀</span>Platform v2.1 launched — 40% faster load times</li>
+        <li><span class="icon">✅</span>ISO audit prep completed; no major findings</li>
+        <li><span class="icon">🏆</span>Team recognized in global engineering awards</li>
+        <li><span class="icon">🤝</span>Onboarding playbook finalised and published</li>
+      </ul>
+    </div>
+
+    <!-- IN PROGRESS -->
+    <div class="section">
+      <p class="section-label">In Progress</p>
+
+      <div class="status-item">
+        <div class="rag g"></div>
+        <div class="status-text">
+          <strong>Data Platform Migration</strong>
+          <span>Phase 2 of 3 complete. On track for July cutover.</span>
+        </div>
+      </div>
+      <div class="status-item">
+        <div class="rag a"></div>
+        <div class="status-text">
+          <strong>Hiring: 8 open roles</strong>
+          <span>Offer stage for 3 candidates. Pipeline review this week.</span>
+        </div>
+      </div>
+      <div class="status-item">
+        <div class="rag r"></div>
+        <div class="status-text">
+          <strong>Legacy API Decommission</strong>
+          <span>Blocked on upstream dependency. Escalated to global team.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SPOTLIGHT -->
+    <div class="section full">
+      <p class="section-label">Spotlight</p>
+      <div class="spotlight-card">
+        <div class="spotlight-avatar">P</div>
+        <div>
+          <div class="spotlight-name">Priya Menon</div>
+          <div class="spotlight-role">Senior Engineer, Platform</div>
+          <div class="spotlight-quote">
+            Led the v2.1 performance overhaul from design to prod in under 6 weeks —
+            cutting page load by 40% and eliminating two legacy bottlenecks. Her system
+            design is now a reference pattern for other GCC teams.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMING UP -->
+    <div class="section full">
+      <p class="section-label">Coming Up — July</p>
+      <ul class="upcoming-list">
+        <li>
+          <span class="upcoming-date">Jul 3</span>
+          All-hands with global engineering leadership — HYD team presenting
+        </li>
+        <li>
+          <span class="upcoming-date">Jul 10</span>
+          Data platform Phase 3 cutover window opens
+        </li>
+        <li>
+          <span class="upcoming-date">Jul 18</span>
+          Q3 planning kick-off — heads-up for roadmap inputs by Jul 12
+        </li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-brand"><strong>GCC Hyderabad</strong> · The Pulse · June 2026</div>
+    <div class="footer-note">Internal — for team and leadership distribution</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
